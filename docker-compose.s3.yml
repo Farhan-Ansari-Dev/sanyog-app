@@ -1,0 +1,16 @@
+# S3 override for backend storage
+# Usage:
+#   docker compose -f docker-compose.prod.yml -f docker-compose.s3.yml up --build
+#
+# Keep AWS credentials in a local file that is NOT committed.
+# Recommended: create backend/.env.s3 from backend/.env.s3.example and fill AWS_* values.
+
+services:
+  backend:
+    environment:
+      STORAGE_PROVIDER: "s3"
+    # Load real secrets locally (file is gitignored)
+    env_file:
+      - ./backend/.env.s3
+    # No local uploads persistence needed when using S3
+    volumes: []
