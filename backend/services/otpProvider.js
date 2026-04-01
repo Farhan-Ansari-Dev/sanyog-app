@@ -36,27 +36,36 @@ function createOtpProvider() {
        */
       async sendOtp(mobile, code) {
         const number = stripToTenDigits(mobile);
-        const response = await axios.post(
-          'https://www.fast2sms.com/dev/bulkV2',
-          {
-            route: 'otp',
-            variables_values: String(code),
-            numbers: number,
-          },
-          {
-            headers: {
-              authorization: apiKey,
-              'Content-Type': 'application/json',
-            },
-            timeout: 10000,
+        console.log(`[Fast2SMS] Sending OTP to number: ${number}`);
+
+        try {
+          const response = await axios.get(
+            'https://www.fast2sms.com/dev/bulkV2',
+            {
+              params: {
+                authorization: apiKey,
+                route: 'otp',
+                variables_values: String(code),
+                numbers: number,
+                flash: '0',
+              },
+              timeout: 10000,
+            }
+          );
+
+          const data = response.data;
+          console.log('[Fast2SMS] Response:', JSON.stringify(data));
+
+          if (!data.return) {
+            throw new Error(`Fast2SMS rejected: ${JSON.stringify(data)}`);
           }
-        );
-
-        const data = response.data;
-        console.log('[Fast2SMS] send response:', JSON.stringify(data));
-
-        if (!data.return) {
-          throw new Error(`Fast2SMS send failed: ${JSON.stringify(data)}`);
+        } catch (err) {
+          // Log the actual Fast2SMS error body, not just the HTTP status
+          const errBody = err.response?.data
+            ? JSON.stringify(err.response.data)
+            : err.message;
+          console.error('[Fast2SMS] SEND ERROR:', errBody);
+          throw new Error(`Fast2SMS error: ${errBody}`);
         }
       },
 
