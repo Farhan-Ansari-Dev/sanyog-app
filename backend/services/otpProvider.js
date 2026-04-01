@@ -44,8 +44,8 @@ function createOtpProvider() {
             {
               params: {
                 authorization: apiKey,
-                route: 'otp',
-                variables_values: String(code),
+                route: 'q',
+                message: `Your Sanyog Certify OTP is ${String(code)}. Valid for 10 minutes. Do not share this code with anyone.`,
                 numbers: number,
                 flash: '0',
               },
