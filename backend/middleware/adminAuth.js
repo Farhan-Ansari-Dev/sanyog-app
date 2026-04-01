@@ -20,9 +20,11 @@ function adminAuth(req, res, next) {
 
 function requireRole(roles) {
   const allowed = Array.isArray(roles) ? roles : [roles];
+  // 'admin' and 'superadmin' are treated equivalently
+  const expanded = [...new Set(allowed.flatMap(r => r === 'admin' ? ['admin', 'superadmin'] : [r]))];
   return (req, res, next) => {
     const role = req.admin?.role;
-    if (!role || !allowed.includes(role)) {
+    if (!role || !expanded.includes(role)) {
       return res.status(403).json({ error: 'Forbidden' });
     }
     return next();

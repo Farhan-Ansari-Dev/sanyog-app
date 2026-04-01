@@ -1,211 +1,284 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import {
+  Search, Filter, RefreshCw, Loader2, Save, FileText,
+  AlertCircle, CheckCircle, XCircle, Clock, ChevronLeft, ChevronRight, X
+} from 'lucide-react';
+import AdminLayout from '../components/AdminLayout';
+import api from '../services/api';
 
-import api from '../services/api.js';
-
-const STATUSES = [
-  'Documents Received',
-  'Under Review',
-  'Submitted to Authority',
-  'Query Raised',
-  'Approved / Completed',
+const STATUS_OPTIONS = [
+  { value: '', label: 'All Statuses' },
+  { value: 'submitted', label: 'Submitted' },
+  { value: 'documents-received', label: 'Documents Received' },
+  { value: 'under-review', label: 'Under Review' },
+  { value: 'additional-docs-required', label: 'Additional Docs Required' },
+  { value: 'approved', label: 'Approved' },
+  { value: 'rejected', label: 'Rejected' },
+  { value: 'certificate-issued', label: 'Certificate Issued' },
 ];
 
-function formatDate(value) {
-  if (!value) return '';
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return '';
-  return d.toLocaleString();
+const STATUS_STYLE = {
+  submitted: 'bg-blue-100 text-blue-800',
+  'documents-received': 'bg-blue-100 text-blue-800',
+  'under-review': 'bg-yellow-100 text-yellow-800',
+  pending: 'bg-yellow-100 text-yellow-800',
+  'additional-docs-required': 'bg-orange-100 text-orange-800',
+  documents_required: 'bg-orange-100 text-orange-800',
+  approved: 'bg-green-100 text-green-800',
+  rejected: 'bg-red-100 text-red-800',
+  'certificate-issued': 'bg-emerald-100 text-emerald-800',
+};
+
+function StatusBadge({ status }) {
+  const s = (status || '').toLowerCase().replace(/ /g, '-');
+  return <span className={`badge ${STATUS_STYLE[s] || 'bg-gray-100 text-gray-700'} capitalize whitespace-nowrap`}>{(status || '').replace(/-/g, ' ') || '—'}</span>;
 }
+
+const PAGE_SIZE = 10;
 
 export default function Applications() {
   const [apps, setApps] = useState([]);
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
-  const [savingId, setSavingId] = useState('');
-
+  const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
-  const [serviceGroupFilter, setServiceGroupFilter] = useState('');
+  const [groupFilter, setGroupFilter] = useState('');
+  const [groups, setGroups] = useState([]);
+  const [page, setPage] = useState(1);
+  const [saving, setSaving] = useState({});
+  const [edits, setEdits] = useState({});
+  const [feedback, setFeedback] = useState({});
 
-  const [drafts, setDrafts] = useState({});
-
-  const openDocument = async (docId) => {
-    setError('');
-    try {
-      const res = await api.get(`/admin/documents/${docId}/signed-url`);
-      const url = res?.data?.url;
-      if (!url) {
-        setError('No URL returned for document');
-        return;
-      }
-      window.open(url, '_blank', 'noopener,noreferrer');
-    } catch (e) {
-      setError(e?.response?.data?.error || 'Failed to open document');
-    }
-  };
-
-  const load = async () => {
-    setError('');
+  const fetchApps = useCallback(async () => {
     setLoading(true);
     try {
-      const params = {};
-      if (statusFilter) params.status = statusFilter;
-      if (serviceGroupFilter) params.serviceGroup = serviceGroupFilter;
+      const params = new URLSearchParams();
+      if (statusFilter) params.set('status', statusFilter);
+      if (groupFilter) params.set('serviceGroup', groupFilter);
+      const { data } = await api.get(`/admin/applications?${params}`);
+      const list = Array.isArray(data) ? data : data?.applications || [];
+      setApps(list);
+      const uniqueGroups = [...new Set(list.map(a => a.serviceGroup).filter(Boolean))];
+      setGroups(uniqueGroups);
+    } catch (e) { console.error(e); }
+    finally { setLoading(false); }
+  }, [statusFilter, groupFilter]);
 
-      const res = await api.get('/admin/applications', { params });
-      setApps(res.data);
-      const nextDrafts = {};
-      res.data.forEach((a) => {
-        nextDrafts[a._id] = { status: a.status || '', remarks: a.remarks || '' };
-      });
-      setDrafts(nextDrafts);
-    } catch (e) {
-      setError(e?.response?.data?.error || 'Failed to load applications');
-    } finally {
-      setLoading(false);
-    }
-  };
+  useEffect(() => { fetchApps(); }, [fetchApps]);
 
-  useEffect(() => {
-    load();
-  }, []);
+  const filtered = apps.filter(app => {
+    const q = search.toLowerCase();
+    return !q ||
+      (app.companyName || '').toLowerCase().includes(q) ||
+      (app.applicantName || '').toLowerCase().includes(q) ||
+      (app.mobile || '').includes(q) ||
+      (app.serviceName || app.certName || '').toLowerCase().includes(q);
+  });
 
-  const count = useMemo(() => apps.length, [apps]);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  const save = async (id) => {
-    setSavingId(id);
-    setError('');
+  const getEdit = (id, field, fallback) => edits[id]?.[field] ?? fallback;
+  const setEdit = (id, field, val) => setEdits(prev => ({ ...prev, [id]: { ...prev[id], [field]: val } }));
+
+  const handleSave = async (app) => {
+    const id = app._id || app.id;
+    setSaving(s => ({ ...s, [id]: true }));
     try {
-      const payload = drafts[id];
+      const payload = {};
+      if (edits[id]?.status) payload.status = edits[id].status;
+      if (edits[id]?.remarks !== undefined) payload.remarks = edits[id].remarks;
       await api.patch(`/admin/applications/${id}`, payload);
-      await load();
-    } catch (e) {
-      setError(e?.response?.data?.error || 'Failed to update application');
+      setFeedback(f => ({ ...f, [id]: 'success' }));
+      setTimeout(() => setFeedback(f => { const n = {...f}; delete n[id]; return n; }), 3000);
+      setApps(prev => prev.map(a => (a._id || a.id) === id ? { ...a, ...payload } : a));
+      setEdits(e => { const n = {...e}; delete n[id]; return n; });
+    } catch {
+      setFeedback(f => ({ ...f, [id]: 'error' }));
+      setTimeout(() => setFeedback(f => { const n = {...f}; delete n[id]; return n; }), 3000);
     } finally {
-      setSavingId('');
+      setSaving(s => ({ ...s, [id]: false }));
     }
   };
 
-  if (loading) {
-    return <div className="card">Loading…</div>;
-  }
+  const clearFilters = () => { setSearch(''); setStatusFilter(''); setGroupFilter(''); setPage(1); };
+
+  const stats = [
+    { label: 'Total', value: apps.length, color: 'text-slate-900', bg: 'bg-slate-100' },
+    { label: 'Pending', value: apps.filter(a => ['submitted','pending','under-review'].includes(a.status)).length, color: 'text-amber-700', bg: 'bg-amber-50' },
+    { label: 'Approved', value: apps.filter(a => ['approved','certificate-issued'].includes(a.status)).length, color: 'text-green-700', bg: 'bg-green-50' },
+    { label: 'Rejected', value: apps.filter(a => a.status === 'rejected').length, color: 'text-red-700', bg: 'bg-red-50' },
+  ];
 
   return (
-    <div className="card">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
-        <h2 style={{ marginTop: 0, marginBottom: 0 }}>Applications</h2>
-        <button className="btn secondary" onClick={load}>Refresh</button>
+    <AdminLayout title="Applications Management" subtitle="Review and update certification applications">
+      {/* Stats */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-5">
+        {stats.map(({ label, value, color, bg }) => (
+          <div key={label} className={`card p-4 border-0 ${bg}`}>
+            <p className={`text-2xl font-bold ${color}`}>{loading ? '—' : value}</p>
+            <p className="text-xs text-slate-500 mt-0.5 font-medium">{label}</p>
+          </div>
+        ))}
       </div>
 
-      <div className="row" style={{ marginTop: 12, marginBottom: 12 }}>
-        <div>
-          <label className="muted">Status</label>
-          <select className="select" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
-            <option value="">All</option>
-            {STATUSES.map((s) => (<option key={s} value={s}>{s}</option>))}
-          </select>
+      {/* Filters */}
+      <div className="card p-4 mb-5">
+        <div className="flex flex-wrap gap-3 items-center">
+          <div className="relative flex-1 min-w-48">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <input type="text" placeholder="Search company, applicant, mobile..." value={search}
+              onChange={e => { setSearch(e.target.value); setPage(1); }}
+              className="input-field pl-9 h-9 text-xs" />
+          </div>
+          <div className="relative">
+            <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1); }}
+              className="select-field h-9 text-xs pr-8 min-w-40">
+              {STATUS_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+            </select>
+          </div>
+          {groups.length > 0 && (
+            <div className="relative">
+              <select value={groupFilter} onChange={e => { setGroupFilter(e.target.value); setPage(1); }}
+                className="select-field h-9 text-xs pr-8 min-w-40">
+                <option value="">All Groups</option>
+                {groups.map(g => <option key={g} value={g}>{g}</option>)}
+              </select>
+            </div>
+          )}
+          {(search || statusFilter || groupFilter) && (
+            <button onClick={clearFilters} className="btn-ghost h-9 text-xs gap-1.5">
+              <X className="w-3.5 h-3.5" /> Clear
+            </button>
+          )}
+          <button onClick={fetchApps} className="btn-ghost h-9 ml-auto">
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          </button>
         </div>
-        <div>
-          <label className="muted">Service Group</label>
-          <select className="select" value={serviceGroupFilter} onChange={(e) => setServiceGroupFilter(e.target.value)}>
-            <option value="">All</option>
-            <option value="Domestic Certification">Domestic Certification</option>
-            <option value="International Certification">International Certification</option>
-            <option value="Testing Services">Testing Services</option>
-            <option value="Inspection Services">Inspection Services</option>
-            <option value="Regulatory Approvals">Regulatory Approvals</option>
-          </select>
-        </div>
       </div>
 
-      <p className="muted">Total: {count}</p>
-      {error ? <p className="error">{error}</p> : null}
+      {/* Table */}
+      <div className="card overflow-hidden">
+        {loading ? (
+          <div className="flex items-center justify-center py-16">
+            <Loader2 className="w-6 h-6 animate-spin text-primary" />
+          </div>
+        ) : paginated.length === 0 ? (
+          <div className="text-center py-16 text-slate-400">
+            <FileText className="w-10 h-10 mx-auto mb-3 opacity-30" />
+            <p className="text-sm font-medium">{apps.length === 0 ? 'No applications found' : 'No results match your filters'}</p>
+          </div>
+        ) : (
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-slate-50 border-b border-slate-200">
+                  <tr>
+                    <th className="table-header">Client & Company</th>
+                    <th className="table-header hidden md:table-cell">Service</th>
+                    <th className="table-header hidden lg:table-cell">City</th>
+                    <th className="table-header">Status</th>
+                    <th className="table-header hidden lg:table-cell">Remarks</th>
+                    <th className="table-header hidden xl:table-cell">Date</th>
+                    <th className="table-header">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {paginated.map((app) => {
+                    const id = app._id || app.id;
+                    const isSaving = saving[id];
+                    const fb = feedback[id];
+                    const hasEdits = !!edits[id];
+                    return (
+                      <tr key={id} className="table-row">
+                        <td className="table-cell">
+                          <p className="font-semibold text-slate-900 text-xs">{app.companyName || '—'}</p>
+                          <p className="text-slate-500 text-xs">{app.applicantName || '—'}</p>
+                          <p className="text-slate-400 text-xs">{app.mobile || ''}</p>
+                        </td>
+                        <td className="table-cell hidden md:table-cell">
+                          <p className="text-xs font-medium max-w-[140px] truncate">{app.serviceName || app.certName || '—'}</p>
+                          <p className="text-slate-400 text-xs truncate max-w-[140px]">{app.serviceGroup || ''}</p>
+                        </td>
+                        <td className="table-cell hidden lg:table-cell text-xs text-slate-500">{app.city || '—'}</td>
+                        <td className="table-cell">
+                          <select
+                            value={getEdit(id, 'status', app.status || '')}
+                            onChange={e => setEdit(id, 'status', e.target.value)}
+                            className="select-field text-xs h-8 min-w-36"
+                          >
+                            {STATUS_OPTIONS.slice(1).map(s => (
+                              <option key={s.value} value={s.value}>{s.label}</option>
+                            ))}
+                          </select>
+                        </td>
+                        <td className="table-cell hidden lg:table-cell">
+                          <input
+                            type="text"
+                            placeholder="Add remarks..."
+                            value={getEdit(id, 'remarks', app.remarks || '')}
+                            onChange={e => setEdit(id, 'remarks', e.target.value)}
+                            className="input-field text-xs h-8 min-w-40"
+                          />
+                        </td>
+                        <td className="table-cell hidden xl:table-cell text-xs text-slate-400">
+                          {app.createdAt ? new Date(app.createdAt).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) : '—'}
+                        </td>
+                        <td className="table-cell">
+                          <div className="flex items-center gap-1.5">
+                            {fb === 'success' && <CheckCircle className="w-4 h-4 text-green-500 shrink-0" />}
+                            {fb === 'error' && <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />}
+                            {(hasEdits || !fb) && (
+                              <button
+                                onClick={() => handleSave(app)}
+                                disabled={isSaving || !hasEdits}
+                                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                                  hasEdits
+                                    ? 'bg-primary text-white hover:bg-primary-dark'
+                                    : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                                }`}
+                              >
+                                {isSaving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />}
+                                Save
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
 
-      <div style={{ overflowX: 'auto' }}>
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Client</th>
-              <th>Certification</th>
-              <th>Details</th>
-              <th>Status / Remarks</th>
-              <th>Docs</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {apps.map((a) => (
-              <tr key={a._id}>
-                <td>
-                  <div style={{ fontWeight: 800 }}>{a.userMobile}</div>
-                  <div className="muted">Updated: {formatDate(a.updatedAt)}</div>
-                </td>
-                <td>
-                  <div style={{ fontWeight: 800 }}>{a.serviceName || a.certification}</div>
-                  {a.serviceGroup ? <div className="muted">{a.serviceGroup}</div> : null}
-                  <span className="badge">{a.status}</span>
-                </td>
-                <td>
-                  <div><b>Company:</b> {a.companyName || '-'}</div>
-                  <div><b>Applicant:</b> {a.applicantName || '-'}</div>
-                  <div><b>Email:</b> {a.email || '-'}</div>
-                  <div><b>City:</b> {a.city || '-'}</div>
-                </td>
-                <td style={{ minWidth: 260 }}>
-                  <select
-                    className="select"
-                    value={drafts[a._id]?.status || ''}
-                    onChange={(e) => setDrafts((p) => ({ ...p, [a._id]: { ...p[a._id], status: e.target.value } }))}
-                  >
-                    {STATUSES.map((s) => (
-                      <option key={s} value={s}>{s}</option>
-                    ))}
-                  </select>
-                  <div style={{ height: 8 }} />
-                  <input
-                    className="input"
-                    value={drafts[a._id]?.remarks || ''}
-                    onChange={(e) => setDrafts((p) => ({ ...p, [a._id]: { ...p[a._id], remarks: e.target.value } }))}
-                    placeholder="Remarks visible to client"
-                  />
-                </td>
-                <td style={{ minWidth: 180 }}>
-                  {(a.documentsMeta || []).length ? (
-                    <ul style={{ margin: 0, paddingLeft: 18 }}>
-                      {a.documentsMeta.map((d) => (
-                        <li key={d._id}>
-                          <button className="btn secondary" type="button" onClick={() => openDocument(d._id)}>
-                            Open
-                          </button>
-                          <span className="muted" style={{ marginLeft: 8 }}>
-                            {d.originalName}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (a.documents || []).length ? (
-                    <ul style={{ margin: 0, paddingLeft: 18 }}>
-                      {a.documents.map((d) => (
-                        <li key={d}>
-                          <a href={String(d).startsWith('http') ? d : `${api.defaults.baseURL}${d}`} target="_blank" rel="noreferrer">
-                            Open
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <span className="muted">No docs</span>
-                  )}
-                </td>
-                <td>
-                  <button className="btn" onClick={() => save(a._id)} disabled={savingId === a._id}>
-                    {savingId === a._id ? 'Saving…' : 'Save'}
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+            {/* Pagination */}
+            <div className="flex items-center justify-between px-5 py-3 border-t border-slate-100 bg-slate-50">
+              <p className="text-xs text-slate-500">
+                Showing {Math.min((page-1)*PAGE_SIZE+1, filtered.length)}–{Math.min(page*PAGE_SIZE, filtered.length)} of {filtered.length}
+              </p>
+              <div className="flex items-center gap-1">
+                <button onClick={() => setPage(p => Math.max(1, p-1))} disabled={page === 1}
+                  className="p-1.5 rounded hover:bg-slate-200 disabled:opacity-40 transition-colors">
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  const pg = page <= 3 ? i+1 : page - 2 + i;
+                  if (pg < 1 || pg > totalPages) return null;
+                  return (
+                    <button key={pg} onClick={() => setPage(pg)}
+                      className={`w-7 h-7 rounded text-xs font-medium transition-colors ${pg === page ? 'bg-primary text-white' : 'hover:bg-slate-200 text-slate-600'}`}>
+                      {pg}
+                    </button>
+                  );
+                })}
+                <button onClick={() => setPage(p => Math.min(totalPages, p+1))} disabled={page === totalPages}
+                  className="p-1.5 rounded hover:bg-slate-200 disabled:opacity-40 transition-colors">
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </>
+        )}
       </div>
-    </div>
+    </AdminLayout>
   );
 }
