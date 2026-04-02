@@ -21,6 +21,41 @@ function stripToTenDigits(mobile) {
 function createOtpProvider() {
   const provider = (process.env.OTP_PROVIDER || 'mock').toLowerCase();
 
+  // ─── 2Factor.in ───────────────────────────────────────────────────────────
+  if (provider === '2factor') {
+    const apiKey = process.env.TWO_FACTOR_API_KEY;
+    if (!apiKey) throw new Error('Missing TWO_FACTOR_API_KEY in environment variables');
+
+    return {
+      async sendOtp(mobile, code) {
+        const number = stripToTenDigits(mobile);
+        console.log(`[2Factor] Sending OTP to number: ${number}`);
+        try {
+          const url = `https://2factor.in/API/V1/${apiKey}/SMS/${number}/${String(code)}/OTP1`;
+          const response = await axios.get(url, { timeout: 10000 });
+          const data = response.data;
+          console.log('[2Factor] Response:', JSON.stringify(data));
+          if (data.Status !== 'Success') {
+            throw new Error(`2Factor send failed: ${JSON.stringify(data)}`);
+          }
+        } catch (err) {
+          const errBody = err.response?.data ? JSON.stringify(err.response.data) : err.message;
+          console.error('[2Factor] SEND ERROR:', errBody);
+          throw new Error(`2Factor error: ${errBody}`);
+        }
+      },
+
+      async verifyOtp(mobile, code, storedHash) {
+        const bcrypt = require('bcryptjs');
+        if (!storedHash) return false;
+        return bcrypt.compare(String(code), storedHash);
+      },
+
+      mode: '2factor',
+    };
+  }
+
+
   // ─── Fast2SMS ──────────────────────────────────────────────────────────────
   if (provider === 'fast2sms') {
     const apiKey = process.env.FAST2SMS_API_KEY;
