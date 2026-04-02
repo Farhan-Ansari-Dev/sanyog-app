@@ -119,39 +119,55 @@ function createOtpProvider() {
   }
 
   // ─── MSG91 ────────────────────────────────────────────────────────────────
-  if (provider === 'msg91_otp') {
+  if (provider === 'msg91') {
     const authKey = process.env.MSG91_AUTH_KEY;
-    const templateId = process.env.MSG91_TEMPLATE_ID;
-    if (!authKey || !templateId) {
-      throw new Error('Missing MSG91_AUTH_KEY or MSG91_TEMPLATE_ID');
-    }
-
-    const base = process.env.MSG91_BASE_URL || 'https://api.msg91.com/api/v5/otp';
+    if (!authKey) throw new Error('Missing MSG91_AUTH_KEY in environment variables');
+    const templateId = process.env.MSG91_TEMPLATE_ID || '';
 
     return {
-      async sendOtp(mobile) {
-        const to = normalizeIndianMobile(mobile).replace('+', ''); // MSG91 expects countrycode+number without + in many setups
-        const url = `${base}?template_id=${encodeURIComponent(templateId)}&mobile=${encodeURIComponent(to)}&authkey=${encodeURIComponent(authKey)}`;
-        const resp = await fetch(url, { method: 'GET' });
-        if (!resp.ok) {
-          const text = await resp.text();
-          throw new Error(`MSG91 send OTP failed: ${resp.status} ${text}`);
+      async sendOtp(mobile, code) {
+        const number = `91${stripToTenDigits(mobile)}`;
+        console.log(`[MSG91] Sending OTP to: ${number}`);
+        try {
+          const payload = {
+            mobile: number,
+            otp: String(code),
+          };
+          if (templateId) payload.template_id = templateId;
+
+          const response = await axios.post(
+            'https://control.msg91.com/api/v5/otp',
+            payload,
+            {
+              headers: {
+                authkey: authKey,
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+              },
+              timeout: 10000,
+            }
+          );
+          console.log('[MSG91] Response:', JSON.stringify(response.data));
+          if (response.data?.type === 'error') {
+            throw new Error(`MSG91 error: ${JSON.stringify(response.data)}`);
+          }
+        } catch (err) {
+          const errBody = err.response?.data ? JSON.stringify(err.response.data) : err.message;
+          console.error('[MSG91] SEND ERROR:', errBody);
+          throw new Error(`MSG91 error: ${errBody}`);
         }
       },
-      async verifyOtp(mobile, code) {
-        const to = normalizeIndianMobile(mobile).replace('+', '');
-        const url = `${base}/verify?mobile=${encodeURIComponent(to)}&otp=${encodeURIComponent(code)}&authkey=${encodeURIComponent(authKey)}`;
-        const resp = await fetch(url, { method: 'GET' });
-        if (!resp.ok) {
-          return false;
-        }
-        const data = await resp.json().catch(() => null);
-        // MSG91 typically returns { type: 'success' } on success
-        return Boolean(data && (data.type === 'success' || data.message === 'OTP verified success'));
+
+      async verifyOtp(mobile, code, storedHash) {
+        const bcrypt = require('bcryptjs');
+        if (!storedHash) return false;
+        return bcrypt.compare(String(code), storedHash);
       },
-      mode: 'msg91_otp',
+
+      mode: 'msg91',
     };
   }
+
 
   // ─── Twilio Verify ────────────────────────────────────────────────────────
   if (provider === 'twilio_verify') {
