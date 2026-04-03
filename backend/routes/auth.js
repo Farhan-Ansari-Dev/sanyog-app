@@ -208,4 +208,79 @@ router.post('/resend-otp', sendOtpLimiter, async (req, res) => {
   return router.handle({ ...req, url: '/send-otp', path: '/send-otp' }, res, () => {});
 });
 
+// ─── POST /auth/register ──────────────────────────────────────────────────────
+router.post('/register', async (req, res) => {
+  const schema = z.object({
+    name:     z.string().min(2).max(100),
+    email:    z.string().email(),
+    password: z.string().min(8).max(128),
+    mobile:   z.string().regex(/^\d{10}$/, 'Mobile must be 10 digits'),
+    company:  z.string().min(1).max(200),
+    country:  z.string().min(1).max(100),
+  });
+
+  const parsed = schema.safeParse(req.body);
+  if (!parsed.success) {
+    const msg = parsed.error.errors[0]?.message || 'Invalid input.';
+    return res.status(400).json({ message: msg });
+  }
+
+  const { name, email, password, mobile, company, country } = parsed.data;
+  const normalizedMobile = normalizeIndianMobile(mobile);
+
+  try {
+    // Check duplicate mobile
+    const existingMobile = await User.findOne({ mobile: normalizedMobile });
+    if (existingMobile && existingMobile.passwordHash) {
+      return res.status(409).json({ message: 'Mobile number is already registered. Please sign in.' });
+    }
+
+    // Check duplicate email
+    const existingEmail = await User.findOne({ email: email.toLowerCase() });
+    if (existingEmail) {
+      return res.status(409).json({ message: 'Email is already registered. Please sign in.' });
+    }
+
+    // Hash password
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    // Create or update user (mobile might exist from OTP attempts)
+    const user = await User.findOneAndUpdate(
+      { mobile: normalizedMobile },
+      {
+        $set: {
+          name,
+          email: email.toLowerCase(),
+          passwordHash,
+          company,
+          country,
+          isVerified: true,
+        },
+      },
+      { upsert: true, new: true }
+    );
+
+    // Issue JWT
+    const token = jwt.sign(
+      { mobile: normalizedMobile, userId: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+    );
+
+    console.log(`[register] New user registered: ${email} / ${normalizedMobile}`);
+
+    return res.status(201).json({
+      ok: true,
+      token,
+      mobile: normalizedMobile,
+      name,
+      message: 'Account created successfully.',
+    });
+  } catch (err) {
+    console.error('[register] Error:', err.message);
+    return res.status(500).json({ message: 'Registration failed. Please try again.' });
+  }
+});
+
 module.exports = router;
+
