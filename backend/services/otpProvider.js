@@ -21,6 +21,52 @@ function stripToTenDigits(mobile) {
 function createOtpProvider() {
   const provider = (process.env.OTP_PROVIDER || 'mock').toLowerCase();
 
+  // ─── UltraMsg WhatsApp ────────────────────────────────────────────────────
+  if (provider === 'whatsapp') {
+    const instanceId = process.env.ULTRAMSG_INSTANCE_ID;
+    const token = process.env.ULTRAMSG_TOKEN;
+    if (!instanceId || !token) {
+      throw new Error('Missing ULTRAMSG_INSTANCE_ID or ULTRAMSG_TOKEN in environment variables');
+    }
+
+    return {
+      async sendOtp(mobile, code) {
+        const number = `91${stripToTenDigits(mobile)}`;
+        console.log(`[WhatsApp] Sending OTP to: ${number}`);
+        try {
+          const response = await axios.post(
+            `https://api.ultramsg.com/${instanceId}/messages/chat`,
+            new URLSearchParams({
+              token,
+              to: number,
+              body: `🔐 *Sanyog Certify OTP*\n\nYour verification code is: *${String(code)}*\n\nValid for 10 minutes. Do not share this code with anyone.\n\n_Sanyog Conformity Solutions Pvt. Ltd._`,
+            }).toString(),
+            {
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              timeout: 10000,
+            }
+          );
+          console.log('[WhatsApp] Response:', JSON.stringify(response.data));
+          if (response.data?.sent === false || response.data?.error) {
+            throw new Error(`WhatsApp send failed: ${JSON.stringify(response.data)}`);
+          }
+        } catch (err) {
+          const errBody = err.response?.data ? JSON.stringify(err.response.data) : err.message;
+          console.error('[WhatsApp] SEND ERROR:', errBody);
+          throw new Error(`WhatsApp OTP error: ${errBody}`);
+        }
+      },
+
+      async verifyOtp(mobile, code, storedHash) {
+        const bcrypt = require('bcryptjs');
+        if (!storedHash) return false;
+        return bcrypt.compare(String(code), storedHash);
+      },
+
+      mode: 'whatsapp',
+    };
+  }
+
   // ─── 2Factor.in ───────────────────────────────────────────────────────────
   if (provider === '2factor') {
     const apiKey = process.env.TWO_FACTOR_API_KEY;
