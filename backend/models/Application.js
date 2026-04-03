@@ -2,26 +2,29 @@ const mongoose = require('mongoose');
 
 const ApplicationSchema = new mongoose.Schema(
   {
-    userMobile: { type: String, required: true, index: true },
+    userMobile:    { type: String, required: true, index: true },
     certification: { type: String, required: true },
 
-    // Website-derived taxonomy (preferred)
-    serviceGroup: { type: String },
-    serviceName: { type: String },
+    serviceGroup:  { type: String },
+    serviceName:   { type: String },
 
-    companyName: { type: String },
-    applicantName: { type: String },
-    email: { type: String },
-    city: { type: String },
-    description: { type: String },
+    companyName:    { type: String },
+    applicantName:  { type: String },
+    email:          { type: String },
+    city:           { type: String },
+    description:    { type: String },
+    productDescription: { type: String },
+    additionalNotes:    { type: String },
 
-    status: { type: String, default: 'Documents Received' },
+    status:  { type: String, default: 'submitted' },
     remarks: { type: String },
-    // Legacy: public URLs for local uploads
-    documents: [{ type: String }],
 
-    // Preferred: document metadata references
-    documentIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Document' }]
+    documents:   [{ type: String }],
+    documentIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Document' }],
+
+    // Soft-delete support
+    deletedAt:  { type: Date, default: null, index: true },
+    deletedBy:  { type: String },   // admin email
   },
   { timestamps: true }
 );

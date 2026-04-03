@@ -26,3 +26,4 @@ Thumbs.db
 # Uploads (keep folder, ignore files)
 backend/uploads/*
 !backend/uploads/.gitkeep
+"mobile-app.zip"  

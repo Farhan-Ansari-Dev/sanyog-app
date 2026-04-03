@@ -47,13 +47,19 @@ export default function Login() {
         </div>
 
         <div className="relative z-10">
-          {/* Logo */}
+          {/* Logo — place your logo.png in admin-panel/public/ */}
           <div className="flex items-center gap-3 mb-16">
-            <div className="w-11 h-11 bg-white/20 rounded-xl flex items-center justify-center shadow-lg">
-              <Shield className="w-6 h-6 text-white" />
+            <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center shadow-lg overflow-hidden p-1">
+              <img
+                src="/logo.png"
+                alt="Sanyog Logo"
+                className="w-full h-full object-contain"
+                onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='block'; }}
+              />
+              <Shield style={{display:'none'}} className="w-6 h-6 text-white" />
             </div>
             <div>
-              <p className="text-white font-bold text-lg leading-tight">Sanyog Conformity</p>
+              <p className="text-white font-bold text-xl leading-tight">Sanyog Conformity</p>
               <p className="text-blue-300 text-sm">Admin Portal</p>
             </div>
           </div>
@@ -90,8 +96,10 @@ export default function Login() {
         <div className="w-full max-w-md">
           {/* Mobile logo */}
           <div className="flex items-center justify-center gap-3 mb-8 lg:hidden">
-            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
-              <Shield className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center overflow-hidden p-1">
+              <img src="/logo.png" alt="Logo" className="w-full h-full object-contain"
+                onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='block'; }} />
+              <Shield style={{display:'none'}} className="w-5 h-5 text-white" />
             </div>
             <span className="text-primary font-bold text-lg">Sanyog Admin</span>
           </div>

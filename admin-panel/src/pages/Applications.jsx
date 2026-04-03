@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
   Search, Filter, RefreshCw, Loader2, Save, FileText,
-  AlertCircle, CheckCircle, XCircle, Clock, ChevronLeft, ChevronRight, X
+  AlertCircle, CheckCircle, XCircle, Clock, ChevronLeft, ChevronRight, X, Trash2
 } from 'lucide-react';
 import AdminLayout from '../components/AdminLayout';
 import api from '../services/api';
@@ -45,8 +45,15 @@ export default function Applications() {
   const [groups, setGroups] = useState([]);
   const [page, setPage] = useState(1);
   const [saving, setSaving] = useState({});
+  const [deleting, setDeleting] = useState({});
   const [edits, setEdits] = useState({});
   const [feedback, setFeedback] = useState({});
+  const [toast, setToast] = useState(null);
+
+  const showToast = (msg, type = 'success') => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   const fetchApps = useCallback(async () => {
     setLoading(true);
@@ -100,6 +107,21 @@ export default function Applications() {
     }
   };
 
+  const handleDelete = async (app) => {
+    const id = app._id || app.id;
+    if (!window.confirm(`Move "${app.companyName || 'this application'}" to trash?`)) return;
+    setDeleting(d => ({ ...d, [id]: true }));
+    try {
+      await api.delete(`/admin/applications/${id}`);
+      setApps(prev => prev.filter(a => (a._id || a.id) !== id));
+      showToast('Application moved to trash. Restore from Trash page.');
+    } catch (err) {
+      showToast(err.response?.data?.error || 'Delete failed', 'error');
+    } finally {
+      setDeleting(d => ({ ...d, [id]: false }));
+    }
+  };
+
   const clearFilters = () => { setSearch(''); setStatusFilter(''); setGroupFilter(''); setPage(1); };
 
   const stats = [
@@ -111,6 +133,12 @@ export default function Applications() {
 
   return (
     <AdminLayout title="Applications Management" subtitle="Review and update certification applications">
+      {/* Toast */}
+      {toast && (
+        <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium animate-fade-in ${toast.type === 'error' ? 'bg-red-600 text-white' : 'bg-green-600 text-white'}`}>
+          {toast.msg}
+        </div>
+      )}
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-5">
         {stats.map(({ label, value, color, bg }) => (
@@ -241,6 +269,14 @@ export default function Applications() {
                                 Save
                               </button>
                             )}
+                            <button
+                              onClick={() => handleDelete(app)}
+                              disabled={deleting[id]}
+                              className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                              title="Move to trash"
+                            >
+                              {deleting[id] ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                            </button>
                           </div>
                         </td>
                       </tr>
