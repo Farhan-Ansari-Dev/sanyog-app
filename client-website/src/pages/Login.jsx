@@ -198,11 +198,21 @@ export default function Login() {
       <div className="w-full max-w-md relative z-10">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-white/15 backdrop-blur-sm border border-white/20 rounded-2xl mb-4 shadow-xl">
-            <Shield className="w-9 h-9 text-white" />
+          <div className="flex items-center justify-center mb-4">
+            <img
+              src="/logo.png"
+              alt="Sanyog"
+              className="h-14 w-auto object-contain drop-shadow-lg"
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.nextSibling.style.display = 'flex';
+              }}
+            />
+            <div style={{ display: 'none' }} className="items-center justify-center w-16 h-16 bg-white/15 backdrop-blur-sm border border-white/20 rounded-2xl shadow-xl">
+              <Shield className="w-9 h-9 text-white" />
+            </div>
           </div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">Sanyog Certify</h1>
-          <p className="text-blue-200 mt-1 text-sm">Client Portal — Secure Login</p>
+          <p className="text-blue-200 mt-1 text-sm font-medium">Client Portal — Secure Login</p>
         </div>
 
         {/* Card */}

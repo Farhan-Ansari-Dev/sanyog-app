@@ -6,11 +6,17 @@ module.exports = {
       fontFamily: { sans: ['Inter', 'sans-serif'] },
       colors: {
         primary: {
-          DEFAULT: '#1e3a8a',
-          light: '#3b82f6',
-          dark: '#1e2d6b',
-          50: '#eff6ff',
-          100: '#dbeafe',
+          DEFAULT: '#1B3FA0',   // Sanyog brand royal blue
+          light:   '#3b82f6',
+          dark:    '#142d73',
+          50:      '#eef2ff',
+          100:     '#e0e7ff',
+        },
+        brand: {
+          green:       '#22A547',  // Sanyog brand green
+          'green-dark':'#187a35',
+          'green-50':  '#f0fdf4',
+          blue:        '#1B3FA0',
         },
       },
       animation: {

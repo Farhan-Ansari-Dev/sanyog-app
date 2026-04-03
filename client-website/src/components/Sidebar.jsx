@@ -32,14 +32,17 @@ export default function Sidebar() {
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
       {/* Logo */}
-      <div className="px-6 py-6 border-b border-white/10">
+      <div className="px-6 py-5 border-b border-white/10">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center">
+          {/* Logo — auto-loaded from /logo.png */}
+          <img
+            src="/logo.png"
+            alt="Sanyog"
+            className="h-8 w-auto object-contain"
+            onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }}
+          />
+          <div style={{display:'none'}} className="w-9 h-9 bg-white/20 rounded-lg items-center justify-center">
             <Shield className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <h1 className="text-white font-bold text-base leading-tight">Sanyog Certify</h1>
-            <p className="text-blue-200 text-xs">Client Portal</p>
           </div>
         </div>
       </div>
@@ -80,7 +83,10 @@ export default function Sidebar() {
       {/* Mobile hamburger */}
       <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-primary flex items-center px-4 z-40 shadow-md">
         <div className="flex items-center gap-3 flex-1">
-          <Shield className="w-5 h-5 text-white" />
+          <img src="/logo.png" alt="Sanyog" className="h-7 w-auto object-contain"
+            onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='inline'; }}
+          />
+          <Shield style={{display:'none'}} className="w-5 h-5 text-white" />
           <span className="text-white font-bold text-sm">Sanyog Certify</span>
         </div>
         <button

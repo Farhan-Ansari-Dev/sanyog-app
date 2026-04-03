@@ -87,8 +87,19 @@ export default function Register() {
       <div className="w-full max-w-md relative">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 bg-white/20 backdrop-blur rounded-2xl mb-4 shadow-lg">
-            <Shield className="w-8 h-8 text-white" />
+          <div className="flex items-center justify-center mb-3">
+            <img
+              src="/logo.png"
+              alt="Sanyog"
+              className="h-12 w-auto object-contain drop-shadow-lg"
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.nextSibling.style.display = 'flex';
+              }}
+            />
+            <div style={{ display: 'none' }} className="inline-flex items-center justify-center w-14 h-14 bg-white/20 backdrop-blur rounded-2xl mb-4 shadow-lg">
+              <Shield className="w-8 h-8 text-white" />
+            </div>
           </div>
           <h1 className="text-3xl font-bold text-white">Sanyog Certify</h1>
           <p className="text-blue-200 mt-1">Create Your Client Account</p>
