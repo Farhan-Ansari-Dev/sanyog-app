@@ -200,7 +200,7 @@ export default function Login() {
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
             <img
-              src="/logo.png"
+              src="/logo.jpeg"
               alt="Sanyog"
               className="h-14 w-auto object-contain drop-shadow-lg"
               onError={(e) => {

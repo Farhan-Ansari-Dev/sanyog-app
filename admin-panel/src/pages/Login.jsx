@@ -51,7 +51,7 @@ export default function Login() {
           <div className="mb-12">
             <div className="bg-white/10 backdrop-blur rounded-2xl p-4 shadow-lg inline-flex items-center justify-center min-w-[200px]">
               <img
-                src="/logo.png"
+                src="/logo.jpeg"
                 alt="Sanyog Logo"
                 className="h-16 w-auto object-contain drop-shadow-md"
                 onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }}
@@ -99,7 +99,7 @@ export default function Login() {
           {/* Mobile logo */}
           <div className="flex items-center justify-center mb-8 lg:hidden">
             <img 
-              src="/logo.png" 
+              src="/logo.jpeg" 
               alt="Sanyog" 
               className="h-14 w-auto object-contain drop-shadow-sm"
               onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }} 

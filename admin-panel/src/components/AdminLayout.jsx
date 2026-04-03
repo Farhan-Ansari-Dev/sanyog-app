@@ -67,7 +67,7 @@ export default function AdminLayout({ children, title, subtitle }) {
         <div className="flex items-center gap-3">
           {/* LOGO SLOT */}
           <img
-            src="/logo.png"
+            src="/logo.jpeg"
             alt="Sanyog Logo"
             className="h-8 w-auto object-contain"
             onError={(e) => {
