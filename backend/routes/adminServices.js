@@ -1,10 +1,10 @@
 const router = require('express').Router();
 const { z } = require('zod');
-const { adminAuth } = require('../middleware/auth');
+const { adminAuth, requireRole } = require('../middleware/adminAuth');
 const Service = require('../models/Service');
 
 // Create a new service
-router.post('/', adminAuth, async (req, res) => {
+router.post('/', adminAuth, requireRole(['admin', 'ops']), async (req, res) => {
   try {
     const schema = z.object({
       category: z.string().min(1),
@@ -32,7 +32,7 @@ router.post('/', adminAuth, async (req, res) => {
 });
 
 // Update a service
-router.put('/:id', adminAuth, async (req, res) => {
+router.put('/:id', adminAuth, requireRole(['admin', 'ops']), async (req, res) => {
   try {
     const schema = z.object({
       category: z.string().min(1).optional(),
@@ -57,7 +57,7 @@ router.put('/:id', adminAuth, async (req, res) => {
 });
 
 // Delete a service
-router.delete('/:id', adminAuth, async (req, res) => {
+router.delete('/:id', adminAuth, requireRole(['admin']), async (req, res) => {
   try {
     const service = await Service.findByIdAndDelete(req.params.id);
     if (!service) return res.status(404).json({ error: 'Service not found' });

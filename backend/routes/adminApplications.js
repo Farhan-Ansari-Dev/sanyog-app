@@ -66,6 +66,7 @@ router.post('/', adminAuth, requireRole(['admin', 'ops']), async (req, res) => {
       email,
       companyName,
       serviceName,
+      certification: serviceName, // Required field fallback
       serviceGroup: serviceGroup || 'Admin Created',
       status: status || 'Documents Received',
       remarks: remarks || '',
