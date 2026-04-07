@@ -84,7 +84,7 @@ export default function Login() {
                   type="email"
                   value={email}
                   onChange={(e) => { setEmail(e.target.value); setError(""); }}
-                  placeholder="admin@sanyogconformity.com"
+                  placeholder="Email"
                   className="w-full pl-[46px] pr-4 h-14 bg-white border border-[#E5E7EB] outline-none rounded-xl text-[15px] font-medium text-[#0F172A] transition-all duration-200 focus:border-[#22C55E] placeholder:text-[#9CA3AF] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.2)]"
                   required
                   autoFocus
@@ -102,7 +102,7 @@ export default function Login() {
                   type="password"
                   value={password}
                   onChange={(e) => { setPassword(e.target.value); setError(""); }}
-                  placeholder="Enter your password"
+                  placeholder="Password"
                   className="w-full pl-[46px] pr-4 h-14 bg-white border border-[#E5E7EB] outline-none rounded-xl text-[15px] font-medium text-[#0F172A] transition-all duration-200 focus:border-[#22C55E] placeholder:text-[#9CA3AF] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.2)]"
                   required
                 />
