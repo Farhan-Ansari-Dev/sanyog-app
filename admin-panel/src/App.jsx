@@ -4,6 +4,7 @@ import Dashboard from "./pages/Dashboard";
 import Applications from "./pages/Applications";
 import ContactRequests from "./pages/ContactRequests";
 import ServicesManagement from "./pages/ServicesManagement";
+import UserManagement from "./pages/UserManagement";
 import Layout from "./components/Layout";
 import { getAdminToken } from "./services/auth";
 
@@ -30,6 +31,7 @@ function App() {
           <Route path="applications" element={<Applications />} />
           <Route path="services" element={<ServicesManagement />} />
           <Route path="contacts" element={<ContactRequests />} />
+          <Route path="users" element={<UserManagement />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

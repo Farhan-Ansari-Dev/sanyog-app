@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Download, ChevronDown, ChevronRight, Inbox, Search, RefreshCw, Loader2, Save, FileText } from "lucide-react";
 import api from "../services/api";
 
 const STATUS_OPTIONS = [
@@ -10,11 +11,11 @@ const STATUS_OPTIONS = [
 ];
 
 const STATUS_BADGE = {
-  "Documents Received": "badge-blue",
-  "Under Review": "badge-orange",
-  "Submitted to Authority": "badge-purple",
-  "Query Raised": "badge-red",
-  "Approved / Completed": "badge-green",
+  "Documents Received": "bg-blue-50 text-blue-700 border-blue-200",
+  "Under Review": "bg-orange-50 text-orange-700 border-orange-200",
+  "Submitted to Authority": "bg-purple-50 text-purple-700 border-purple-200",
+  "Query Raised": "bg-red-50 text-red-700 border-red-200",
+  "Approved / Completed": "bg-green-50 text-green-700 border-green-200",
 };
 
 const SERVICE_GROUPS = [
@@ -27,7 +28,7 @@ const SERVICE_GROUPS = [
 function formatDate(v) {
   if (!v) return "";
   const d = new Date(v);
-  return isNaN(d.getTime()) ? "" : d.toLocaleString();
+  return isNaN(d.getTime()) ? "" : d.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
 function formatBytes(bytes) {
@@ -38,9 +39,9 @@ function formatBytes(bytes) {
 }
 
 function getDocIcon(mime) {
-  if (mime === "application/pdf") return "📄";
-  if (mime?.startsWith("image/")) return "🖼️";
-  return "📎";
+  if (mime === "application/pdf") return <FileText className="w-5 h-5 text-red-500" />;
+  if (mime?.startsWith("image/")) return <FileText className="w-5 h-5 text-blue-500" />;
+  return <FileText className="w-5 h-5 text-slate-500" />;
 }
 
 export default function Applications() {
@@ -48,21 +49,17 @@ export default function Applications() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Filters
   const [filterStatus, setFilterStatus] = useState("");
   const [filterGroup, setFilterGroup] = useState("");
   const [search, setSearch] = useState("");
 
-  // Expanded row
   const [expandedId, setExpandedId] = useState(null);
 
-  // Editing
   const [editStatus, setEditStatus] = useState("");
   const [editRemarks, setEditRemarks] = useState("");
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState("");
 
-  // Document download
   const [downloadingDoc, setDownloadingDoc] = useState("");
 
   const load = async () => {
@@ -128,7 +125,6 @@ export default function Applications() {
     }
   };
 
-  // Client-side search filter
   const filtered = apps.filter((a) => {
     if (!search) return true;
     const q = search.toLowerCase();
@@ -142,300 +138,252 @@ export default function Applications() {
   });
 
   return (
-    <>
-      <div className="page-header">
-        <h2>Applications</h2>
-        <p>Manage all client certification applications</p>
+    <div className="animate-fade-in pb-12">
+      <div className="mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-[#0F172A] tracking-tight">Applications</h1>
+        <p className="text-[15px] text-[#64748B] mt-1">Manage all client certification applications sequentially.</p>
       </div>
 
-      <div className="page-body">
-        {error && <p className="text-error mb-16">{error}</p>}
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-xl border border-red-200">
+          {error}
+        </div>
+      )}
 
-        {/* Filters */}
-        <div className="filters-bar">
+      {/* Filters */}
+      <div className="bg-white p-4 rounded-2xl border border-[#E2E8F0] shadow-sm mb-6 flex flex-col md:flex-row gap-4 items-center">
+        <div className="relative flex-1 w-full">
+          <Search className="w-4 h-4 text-[#94A3B8] absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
-            className="input input-inline"
+            className="w-full pl-10 pr-4 h-10 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] rounded-xl outline-none focus:border-[#22C55E] focus:bg-white transition-all"
             placeholder="Search company, name, mobile..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            style={{ minWidth: 240 }}
           />
-
-          <select
-            className="select input-inline"
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-          >
-            <option value="">All Statuses</option>
-            {STATUS_OPTIONS.map((s) => (
-              <option key={s} value={s}>{s}</option>
-            ))}
-          </select>
-
-          <select
-            className="select input-inline"
-            value={filterGroup}
-            onChange={(e) => setFilterGroup(e.target.value)}
-          >
-            <option value="">All Service Groups</option>
-            {SERVICE_GROUPS.map((g) => (
-              <option key={g} value={g}>{g}</option>
-            ))}
-          </select>
-
-          <button className="btn btn-secondary btn-sm" onClick={load}>
-            ↻ Refresh
-          </button>
-
-          <span className="text-muted text-sm" style={{ marginLeft: "auto" }}>
-            {filtered.length} application{filtered.length !== 1 ? "s" : ""}
-          </span>
         </div>
 
-        {/* Loading */}
+        <select
+          className="h-10 px-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] text-[#334155] font-medium rounded-xl outline-none focus:border-[#22C55E] focus:bg-white transition-all w-full md:w-auto min-w-[180px]"
+          value={filterStatus}
+          onChange={(e) => setFilterStatus(e.target.value)}
+        >
+          <option value="">All Statuses</option>
+          {STATUS_OPTIONS.map((s) => (
+            <option key={s} value={s}>{s}</option>
+          ))}
+        </select>
+
+        <select
+          className="h-10 px-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] text-[#334155] font-medium rounded-xl outline-none focus:border-[#22C55E] focus:bg-white transition-all w-full md:w-auto min-w-[200px]"
+          value={filterGroup}
+          onChange={(e) => setFilterGroup(e.target.value)}
+        >
+          <option value="">All Service Groups</option>
+          {SERVICE_GROUPS.map((g) => (
+            <option key={g} value={g}>{g}</option>
+          ))}
+        </select>
+
+        <button 
+          className="h-10 px-5 bg-white border border-[#E2E8F0] text-[14px] text-[#0F172A] font-medium rounded-xl hover:bg-slate-50 flex items-center gap-2 transition-colors w-full md:w-auto justify-center shadow-sm"
+          onClick={load}
+        >
+          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          Refresh
+        </button>
+
+        <div className="text-[13px] font-semibold text-[#64748B] bg-slate-100 px-3 py-1.5 rounded-lg whitespace-nowrap">
+          {filtered.length} Results
+        </div>
+      </div>
+
+      {/* Main Content Area */}
+      <div className="bg-white border border-[#E2E8F0] rounded-2xl shadow-sm overflow-hidden">
         {loading ? (
-          <div className="flex-center" style={{ padding: 48 }}>
-            <div className="spinner"></div>
+          <div className="w-full h-64 flex flex-col items-center justify-center">
+            <Loader2 className="w-8 h-8 animate-spin text-[#22C55E] mb-4" />
+            <p className="text-[#64748B] font-medium text-[15px]">Loading applications...</p>
           </div>
         ) : !filtered.length ? (
-          <div className="card">
-            <div className="empty-state">
-              <div className="empty-icon">📋</div>
-              <h3>No applications found</h3>
-              <p>Try adjusting your filters or wait for new submissions.</p>
+          <div className="flex flex-col items-center justify-center p-16 text-center h-full">
+            <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-5 border border-slate-100">
+              <Inbox className="w-10 h-10 text-slate-300" />
             </div>
+            <h3 className="text-[18px] font-bold text-[#0F172A] mb-2">No applications found</h3>
+            <p className="text-[15px] text-[#64748B] max-w-[300px]">Adjust your filters or wait for new client submissions to arrive.</p>
           </div>
         ) : (
-          <div className="table-wrap">
-            <table className="table">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse min-w-[900px]">
               <thead>
-                <tr>
-                  <th style={{ width: 36 }}></th>
-                  <th>Company</th>
-                  <th>Applicant</th>
-                  <th>Service</th>
-                  <th>Status</th>
-                  <th>Docs</th>
-                  <th>Created</th>
+                <tr className="bg-[#F8FAFC] border-b border-[#E2E8F0]">
+                  <th className="w-12 px-4 py-3.5 text-center"></th>
+                  <th className="px-6 py-3.5 text-[12px] font-bold text-[#64748B] uppercase tracking-wider">Company</th>
+                  <th className="px-6 py-3.5 text-[12px] font-bold text-[#64748B] uppercase tracking-wider">Applicant</th>
+                  <th className="px-6 py-3.5 text-[12px] font-bold text-[#64748B] uppercase tracking-wider">Service</th>
+                  <th className="px-6 py-3.5 text-[12px] font-bold text-[#64748B] uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3.5 text-[12px] font-bold text-[#64748B] uppercase tracking-wider">Docs</th>
+                  <th className="px-6 py-3.5 text-[12px] font-bold text-[#64748B] uppercase tracking-wider text-right">Created</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-[#F1F5F9] bg-white">
                 {filtered.map((app) => {
                   const isExpanded = expandedId === app._id;
-                  const badgeCls = STATUS_BADGE[app.status] || "badge-default";
+                  const badgeCls = STATUS_BADGE[app.status || "Documents Received"] || "bg-slate-100 text-slate-700 border-slate-200";
                   const docCount = (app.documentsMeta || []).length;
 
                   return (
                     <React.Fragment key={app._id}>
+                      {/* Main Row */}
                       <tr
-                        key={app._id}
                         onClick={() => toggleExpand(app)}
-                        style={{ cursor: "pointer" }}
+                        className={`cursor-pointer transition-colors ${isExpanded ? 'bg-blue-50/30' : 'hover:bg-slate-50/50'}`}
                       >
-                        <td style={{ fontSize: 14, color: "var(--text-muted)" }}>
-                          {isExpanded ? "▼" : "▶"}
+                        <td className="px-4 py-4 text-center">
+                          {isExpanded ? (
+                            <ChevronDown className="w-5 h-5 text-[#22C55E] mx-auto" />
+                          ) : (
+                            <ChevronRight className="w-5 h-5 text-[#94A3B8] mx-auto group-hover:text-[#64748B]" />
+                          )}
                         </td>
-                        <td className="text-bold">
-                          {app.companyName || "—"}
+                        <td className="px-6 py-4">
+                          <span className="text-[14px] font-bold text-[#0F172A]">{app.companyName || "—"}</span>
                         </td>
-                        <td>
-                          <div>{app.applicantName || "—"}</div>
-                          <div className="text-xs text-muted">
-                            {app.userMobile}
-                          </div>
+                        <td className="px-6 py-4">
+                          <div className="text-[14px] font-semibold text-[#334155]">{app.applicantName || "—"}</div>
+                          <div className="text-[12px] font-medium text-[#64748B]">{app.userMobile}</div>
                         </td>
-                        <td>
-                          <div className="text-sm">
-                            {app.serviceName || app.certification || "—"}
-                          </div>
+                        <td className="px-6 py-4">
+                          <div className="text-[14px] text-[#0F172A] font-medium">{app.serviceName || app.certification || "—"}</div>
                           {app.serviceGroup && (
-                            <div className="text-xs text-muted">
+                            <div className="text-[12px] text-[#64748B] bg-slate-100 inline-block px-2 py-0.5 rounded mt-1">
                               {app.serviceGroup}
                             </div>
                           )}
                         </td>
-                        <td>
-                          <span className={`badge ${badgeCls}`}>
+                        <td className="px-6 py-4">
+                          <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[12px] font-bold border ${badgeCls}`}>
                             {app.status || "Documents Received"}
                           </span>
                         </td>
-                        <td className="text-sm">
+                        <td className="px-6 py-4">
                           {docCount > 0 ? (
-                            <span className="badge badge-default">
-                              📎 {docCount}
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 text-slate-600 rounded-full text-[12px] font-bold border border-slate-200">
+                              <FileText className="w-3.5 h-3.5" />
+                              {docCount}
                             </span>
                           ) : (
-                            <span className="text-muted">—</span>
+                            <span className="text-[#94A3B8]">—</span>
                           )}
                         </td>
-                        <td className="text-muted text-sm">
-                          {formatDate(app.createdAt)}
+                        <td className="px-6 py-4 text-right">
+                          <span className="text-[13px] text-[#64748B] font-medium">{formatDate(app.createdAt)}</span>
                         </td>
                       </tr>
 
+                      {/* Expanding Configuration Row */}
                       {isExpanded && (
-                        <tr key={`${app._id}-row`} className="expand-row">
-                          <td colSpan={7}>
-                            <div className="expand-content">
-                              {/* Application Details */}
-                              <div className="expand-grid">
-                                <div className="expand-field">
-                                  <span className="label">Company</span>
-                                  <span className="value">
-                                    {app.companyName || "—"}
-                                  </span>
-                                </div>
-                                <div className="expand-field">
-                                  <span className="label">Applicant</span>
-                                  <span className="value">
-                                    {app.applicantName || "—"}
-                                  </span>
-                                </div>
-                                <div className="expand-field">
-                                  <span className="label">Email</span>
-                                  <span className="value">
-                                    {app.email || "—"}
-                                  </span>
-                                </div>
-                                <div className="expand-field">
-                                  <span className="label">City</span>
-                                  <span className="value">
-                                    {app.city || "—"}
-                                  </span>
-                                </div>
-                                <div className="expand-field">
-                                  <span className="label">Mobile</span>
-                                  <span className="value">
-                                    {app.userMobile}
-                                  </span>
-                                </div>
-                                <div className="expand-field">
-                                  <span className="label">Service Group</span>
-                                  <span className="value">
-                                    {app.serviceGroup || "—"}
-                                  </span>
-                                </div>
-                                {app.description && (
-                                  <div
-                                    className="expand-field"
-                                    style={{ gridColumn: "1 / -1" }}
-                                  >
-                                    <span className="label">Description</span>
-                                    <span className="value">
+                        <tr className="bg-slate-50/50">
+                          <td colSpan={7} className="border-b-2 border-[#22C55E]/20 p-0">
+                            <div className="p-6 lg:p-8 animate-fade-in grid grid-cols-1 lg:grid-cols-2 gap-8">
+                              
+                              {/* Left Column: Details & Documents */}
+                              <div className="space-y-6">
+                                <div>
+                                  <h4 className="text-[12px] font-bold text-[#64748B] uppercase tracking-wider mb-4 border-b border-slate-200 pb-2">Application Details</h4>
+                                  <div className="grid grid-cols-2 gap-y-4 gap-x-6">
+                                    <div><p className="text-[12px] text-[#64748B] mb-0.5">Company</p><p className="text-[14px] font-semibold text-[#0F172A]">{app.companyName || "—"}</p></div>
+                                    <div><p className="text-[12px] text-[#64748B] mb-0.5">Applicant</p><p className="text-[14px] font-semibold text-[#0F172A]">{app.applicantName || "—"}</p></div>
+                                    <div><p className="text-[12px] text-[#64748B] mb-0.5">Email</p><p className="text-[14px] font-semibold text-[#0F172A] break-all">{app.email || "—"}</p></div>
+                                    <div><p className="text-[12px] text-[#64748B] mb-0.5">City</p><p className="text-[14px] font-semibold text-[#0F172A]">{app.city || "—"}</p></div>
+                                  </div>
+                                  {app.description && (
+                                    <div className="mt-4 bg-white p-3 rounded-lg border border-slate-200 text-[14px] text-[#475569]">
+                                      <span className="font-semibold text-slate-700 block mb-1">Description:</span>
                                       {app.description}
-                                    </span>
-                                  </div>
-                                )}
-                              </div>
+                                    </div>
+                                  )}
+                                </div>
 
-                              {/* Documents */}
-                              {(app.documentsMeta || []).length > 0 && (
-                                <div style={{ marginTop: 20 }}>
-                                  <div className="text-xs text-bold text-muted" style={{ textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>
-                                    Documents ({app.documentsMeta.length})
-                                  </div>
-                                  <div className="docs-list">
-                                    {app.documentsMeta.map((doc) => (
-                                      <div className="doc-item" key={doc._id}>
-                                        <span className="doc-icon">
-                                          {getDocIcon(doc.mimeType)}
-                                        </span>
-                                        <div className="doc-info">
-                                          <div className="doc-name">
-                                            {doc.originalName}
+                                {docCount > 0 && (
+                                  <div>
+                                    <h4 className="text-[12px] font-bold text-[#64748B] uppercase tracking-wider mb-4 border-b border-slate-200 pb-2">Uploaded Documents</h4>
+                                    <div className="space-y-3 lg:max-h-[300px] lg:overflow-y-auto pr-2">
+                                      {app.documentsMeta.map((doc) => (
+                                        <div key={doc._id} className="bg-white border border-[#E2E8F0] p-3 rounded-xl flex items-center gap-3 shadow-sm hover:border-[#22C55E]/50 transition-colors">
+                                          <div className="p-2 bg-slate-50 rounded-lg">
+                                            {getDocIcon(doc.mimeType)}
                                           </div>
-                                          <div className="doc-meta">
-                                            {doc.mimeType} · {formatBytes(doc.sizeBytes)} · {formatDate(doc.createdAt)}
+                                          <div className="flex-1 min-w-0">
+                                            <p className="text-[14px] font-semibold text-[#0F172A] truncate" title={doc.originalName}>{doc.originalName}</p>
+                                            <p className="text-[12px] text-[#64748B] mt-0.5">{formatBytes(doc.sizeBytes)} • {formatDate(doc.createdAt)}</p>
                                           </div>
+                                          <button
+                                            onClick={(e) => { e.stopPropagation(); downloadDocument(doc._id, doc.originalName); }}
+                                            disabled={downloadingDoc === doc._id}
+                                            className="p-2 bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg text-[#0F172A] hover:bg-[#22C55E] hover:text-white hover:border-[#22C55E] transition-all disabled:opacity-50 flex-shrink-0"
+                                            title="Download Document"
+                                          >
+                                            {downloadingDoc === doc._id ? <Loader2 className="w-5 h-5 animate-spin text-[#22C55E]" /> : <Download className="w-5 h-5" />}
+                                          </button>
                                         </div>
-                                        <button
-                                          className="btn btn-secondary btn-sm"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            downloadDocument(doc._id, doc.originalName);
-                                          }}
-                                          disabled={downloadingDoc === doc._id}
-                                        >
-                                          {downloadingDoc === doc._id ? (
-                                            <span className="spinner" style={{ width: 14, height: 14 }}></span>
-                                          ) : (
-                                            "Download"
-                                          )}
-                                        </button>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
-                              )}
-
-                              {/* Edit Status & Remarks */}
-                              <div className="edit-section">
-                                <div className="text-xs text-bold text-muted" style={{ textTransform: "uppercase", letterSpacing: 1, marginBottom: 12 }}>
-                                  Update Application
-                                </div>
-
-                                <div className="edit-row">
-                                  <div className="input-group" style={{ minWidth: 220 }}>
-                                    <label>Status</label>
-                                    <select
-                                      className="select"
-                                      value={editStatus}
-                                      onChange={(e) =>
-                                        setEditStatus(e.target.value)
-                                      }
-                                    >
-                                      {STATUS_OPTIONS.map((s) => (
-                                        <option key={s} value={s}>
-                                          {s}
-                                        </option>
                                       ))}
-                                    </select>
+                                    </div>
                                   </div>
-
-                                  <div
-                                    className="input-group"
-                                    style={{ flex: 1, minWidth: 280 }}
-                                  >
-                                    <label>Remarks (visible to client)</label>
-                                    <input
-                                      className="input"
-                                      value={editRemarks}
-                                      onChange={(e) =>
-                                        setEditRemarks(e.target.value)
-                                      }
-                                      placeholder="Add remarks for the client..."
-                                    />
-                                  </div>
-
-                                  <button
-                                    className="btn btn-primary"
-                                    onClick={() => saveChanges(app._id)}
-                                    disabled={saving}
-                                    style={{ alignSelf: "flex-end" }}
-                                  >
-                                    {saving ? (
-                                      <>
-                                        <span className="spinner" style={{ width: 14, height: 14 }}></span>
-                                        Saving...
-                                      </>
-                                    ) : (
-                                      "Save Changes"
-                                    )}
-                                  </button>
-                                </div>
-
-                                {saveMsg && (
-                                  <p
-                                    className={
-                                      saveMsg.includes("success")
-                                        ? "text-success mt-8 text-sm"
-                                        : "text-error mt-8 text-sm"
-                                    }
-                                  >
-                                    {saveMsg}
-                                  </p>
                                 )}
                               </div>
+
+                              {/* Right Column: Edit Status/Remarks */}
+                              <div>
+                                <div className="bg-white p-5 rounded-2xl border border-[#E2E8F0] shadow-sm sticky top-4">
+                                  <h4 className="text-[12px] font-bold text-[#64748B] uppercase tracking-wider mb-4">Update Pipeline Stage</h4>
+                                  
+                                  <div className="space-y-4">
+                                    <div>
+                                      <label className="block text-[13px] font-semibold text-[#334155] mb-1.5">Official Status</label>
+                                      <select
+                                        className="w-full h-11 px-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] font-medium text-[#0F172A] rounded-xl outline-none focus:border-[#22C55E] focus:bg-white transition-all shadow-sm"
+                                        value={editStatus}
+                                        onChange={(e) => setEditStatus(e.target.value)}
+                                      >
+                                        {STATUS_OPTIONS.map((s) => (
+                                          <option key={s} value={s}>{s}</option>
+                                        ))}
+                                      </select>
+                                    </div>
+
+                                    <div>
+                                      <label className="block text-[13px] font-semibold text-[#334155] mb-1.5 flex justify-between">
+                                        Remarks
+                                        <span className="text-[#94A3B8] font-normal text-xs">Visible to Client</span>
+                                      </label>
+                                      <textarea
+                                        className="w-full p-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] rounded-xl outline-none focus:border-[#22C55E] focus:bg-white transition-all shadow-sm resize-none min-h-[100px]"
+                                        value={editRemarks}
+                                        onChange={(e) => setEditRemarks(e.target.value)}
+                                        placeholder="Add notes, next steps, or specific queries..."
+                                      />
+                                    </div>
+
+                                    <div className="pt-2">
+                                      <button
+                                        onClick={() => saveChanges(app._id)}
+                                        disabled={saving}
+                                        className="w-full h-11 bg-[#22C55E] hover:bg-[#16A34A] text-white font-semibold text-[14px] rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 disabled:opacity-70"
+                                      >
+                                        {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+                                        {saving ? "Updating..." : "Save Changes"}
+                                      </button>
+                                      {saveMsg && (
+                                        <p className={`mt-3 text-[13px] font-bold text-center ${saveMsg.includes("success") ? "text-[#16A34A]" : "text-red-500"}`}>
+                                          {saveMsg}
+                                        </p>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+
                             </div>
                           </td>
                         </tr>
@@ -448,6 +396,6 @@ export default function Applications() {
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 }

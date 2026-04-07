@@ -5,7 +5,8 @@ import {
   ClipboardList, 
   FolderTree, 
   PhoneCall, 
-  LogOut 
+  LogOut,
+  Users
 } from "lucide-react";
 
 export default function Layout() {
@@ -91,6 +92,20 @@ export default function Layout() {
             >
               <PhoneCall className="w-5 h-5" />
               Contact Requests
+            </NavLink>
+
+            <NavLink
+              to="/users"
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2.5 rounded-lg text-[15px] font-medium transition-all duration-200 ${
+                  isActive 
+                    ? "bg-[#22C55E]/10 text-[#16A34A] shadow-sm" 
+                    : "text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A]"
+                }`
+              }
+            >
+              <Users className="w-5 h-5" />
+              User Management
             </NavLink>
           </nav>
         </div>

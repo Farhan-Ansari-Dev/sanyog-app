@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import api from "../api";
+import { Plus, Edit2, Trash2, Loader2, FolderTree, X } from "lucide-react";
+import api from "../services/api";
 
 export default function ServicesManagement() {
   const [services, setServices] = useState([]);
@@ -77,126 +78,186 @@ export default function ServicesManagement() {
   };
 
   return (
-    <div className="page-container">
-      <header className="page-header">
+    <div className="animate-fade-in pb-12">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
         <div>
-          <h1 className="page-title">Services</h1>
-          <p className="page-subtitle">Manage catalog offerings</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#0F172A] tracking-tight">Services Catalog</h1>
+          <p className="text-[15px] text-[#64748B] mt-1">Manage global system services and offerings.</p>
         </div>
-        <button className="btn btn-primary" onClick={() => handleOpenModal()}>
-          + Add Service
+        <button 
+          onClick={() => handleOpenModal()}
+          className="h-11 px-5 bg-[#22C55E] hover:bg-[#16A34A] text-white text-[14px] font-semibold rounded-xl transition-all shadow-sm flex items-center gap-2"
+        >
+          <Plus className="w-5 h-5" />
+          Add Service
         </button>
-      </header>
+      </div>
 
-      {error ? (
-        <div className="error-box">{error}</div>
-      ) : loading ? (
-        <div className="loading-state">Loading services...</div>
-      ) : (
-        <div className="table-responsive">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Category</th>
-                <th>Slug</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {services.length === 0 ? (
-                <tr>
-                  <td colSpan="5" style={{ textAlign: "center", padding: "2rem" }}>
-                    No services found.
-                  </td>
-                </tr>
-              ) : (
-                services.map((svc) => (
-                  <tr key={svc._id}>
-                    <td>
-                      <strong>{svc.name}</strong>
-                    </td>
-                    <td>{svc.category}</td>
-                    <td><span className="badge badge-pending">{svc.slug}</span></td>
-                    <td>
-                      {svc.isActive ? (
-                        <span className="badge badge-success">Active</span>
-                      ) : (
-                        <span className="badge badge-pending">Inactive</span>
-                      )}
-                    </td>
-                    <td>
-                      <button className="btn btn-secondary" style={{ marginRight: "8px" }} onClick={() => handleOpenModal(svc)}>Edit</button>
-                      <button className="btn btn-danger" onClick={() => handleDelete(svc._id)}>Delete</button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-xl border border-red-200 font-medium">
+          {error}
         </div>
       )}
 
+      <div className="bg-white border border-[#E2E8F0] rounded-2xl shadow-sm overflow-hidden">
+        {loading ? (
+          <div className="w-full h-64 flex flex-col items-center justify-center">
+            <Loader2 className="w-8 h-8 animate-spin text-[#22C55E] mb-4" />
+            <p className="text-[#64748B] font-medium text-[15px]">Loading services...</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse min-w-[800px]">
+              <thead>
+                <tr className="bg-[#F8FAFC] border-b border-[#E2E8F0]">
+                  <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] uppercase tracking-wider">Service Name</th>
+                  <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] uppercase tracking-wider">Group / Category</th>
+                  <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] uppercase tracking-wider">Slug Path</th>
+                  <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] uppercase tracking-wider text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#F1F5F9] bg-white">
+                {services.length === 0 ? (
+                  <tr>
+                    <td colSpan="5">
+                      <div className="flex flex-col items-center justify-center p-16 text-center h-full">
+                        <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-5 border border-slate-100">
+                          <FolderTree className="w-10 h-10 text-slate-300" />
+                        </div>
+                        <h3 className="text-[18px] font-bold text-[#0F172A] mb-2">No services configured</h3>
+                        <p className="text-[15px] text-[#64748B]">Click "Add Service" to create your first catalog entry.</p>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  services.map((svc) => (
+                    <tr key={svc._id} className="hover:bg-slate-50/50 transition-colors">
+                      <td className="px-6 py-5 whitespace-nowrap">
+                        <span className="text-[14px] font-bold text-[#0F172A]">{svc.name}</span>
+                      </td>
+                      <td className="px-6 py-5 whitespace-nowrap">
+                        <span className="text-[14px] text-[#475569] font-medium">{svc.category}</span>
+                      </td>
+                      <td className="px-6 py-5 whitespace-nowrap">
+                        <span className="inline-block bg-slate-100 text-slate-600 px-2.5 py-1 text-[12px] font-mono rounded-md border border-slate-200">
+                          /{svc.slug}
+                        </span>
+                      </td>
+                      <td className="px-6 py-5 whitespace-nowrap">
+                        {svc.isActive ? (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-full text-[12px] font-bold border border-emerald-200">
+                            <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse blur-[0.5px]"></span>
+                            Active
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-2.5 py-1 bg-slate-100 text-slate-600 rounded-full text-[12px] font-bold border border-slate-200">
+                            Inactive
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-6 py-5 whitespace-nowrap text-right">
+                        <div className="flex justify-end gap-2">
+                          <button 
+                            onClick={() => handleOpenModal(svc)}
+                            className="p-2 text-[#64748B] hover:text-[#22C55E] hover:bg-green-50 rounded-lg transition-colors border border-transparent hover:border-green-100"
+                            title="Edit Service"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                          <button 
+                            onClick={() => handleDelete(svc._id)}
+                            className="p-2 text-[#64748B] hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-100"
+                            title="Delete Service"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
       {showModal && (
-        <div className="modal-overlay" style={{
-            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, 
-            backgroundColor: 'rgba(0,0,0,0.7)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000
-        }}>
-          <div className="modal-content" style={{
-              backgroundColor: '#1E1E2F', padding: '32px', borderRadius: '12px', width: '90%', maxWidth: '500px', border: '1px solid #3A3A55'
-          }}>
-            <h2 style={{ marginBottom: '24px', color: '#FFF' }}>{isEditing ? "Edit Service" : "Add Service"}</h2>
-            <form onSubmit={handleSubmit}>
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', marginBottom: '8px', color: '#A0A0B0' }}>Category</label>
-                <input 
-                  type="text" 
-                  style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #3A3A55', backgroundColor: '#2A2A3F', color: '#FFF' }}
-                  value={form.category} 
-                  onChange={e => setForm({...form, category: e.target.value})} 
-                  required 
-                  placeholder="e.g. Domestic Certification"
-                />
-              </div>
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', marginBottom: '8px', color: '#A0A0B0' }}>Name</label>
-                <input 
-                  type="text" 
-                  style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #3A3A55', backgroundColor: '#2A2A3F', color: '#FFF' }}
-                  value={form.name} 
-                  onChange={e => setForm({
-                      ...form, 
-                      name: e.target.value, 
-                      slug: !isEditing ? e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-') : form.slug 
-                  })} 
-                  required 
-                />
-              </div>
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', marginBottom: '8px', color: '#A0A0B0' }}>Slug</label>
-                <input 
-                  type="text" 
-                  style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #3A3A55', backgroundColor: '#2A2A3F', color: '#FFF' }}
-                  value={form.slug} 
-                  onChange={e => setForm({...form, slug: e.target.value})} 
-                  required 
-                />
-              </div>
-              <div style={{ marginBottom: '24px' }}>
-                <label style={{ display: 'block', marginBottom: '8px', color: '#A0A0B0' }}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={handleCloseModal}></div>
+          <div className="relative bg-white w-full max-w-lg rounded-2xl shadow-[0_20px_40px_rgba(0,0,0,0.1)] border border-[#E2E8F0] overflow-hidden animate-fade-in">
+            <div className="flex justify-between items-center p-6 border-b border-[#F1F5F9]">
+              <h2 className="text-[18px] font-bold text-[#0F172A]">{isEditing ? "Edit Service" : "Add New Service"}</h2>
+              <button onClick={handleCloseModal} className="text-[#64748B] hover:text-[#0F172A] transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleSubmit} className="p-6">
+              <div className="space-y-5">
+                <div>
+                  <label className="block text-[13px] font-semibold text-[#334155] mb-1.5">Service Group / Category</label>
                   <input 
-                    type="checkbox" 
-                    checked={form.isActive} 
-                    onChange={e => setForm({...form, isActive: e.target.checked})} 
-                    style={{ marginRight: '8px' }}
+                    type="text" 
+                    className="w-full h-11 px-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] text-[#0F172A] rounded-xl outline-none focus:border-[#22C55E] focus:bg-white transition-all shadow-sm"
+                    value={form.category} 
+                    onChange={e => setForm({...form, category: e.target.value})} 
+                    required 
+                    placeholder="e.g. Domestic Certification"
                   />
-                  Active
-                </label>
+                </div>
+                
+                <div>
+                  <label className="block text-[13px] font-semibold text-[#334155] mb-1.5">Service Name</label>
+                  <input 
+                    type="text" 
+                    className="w-full h-11 px-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] text-[#0F172A] rounded-xl outline-none focus:border-[#22C55E] focus:bg-white transition-all shadow-sm"
+                    value={form.name} 
+                    onChange={e => setForm({
+                        ...form, 
+                        name: e.target.value, 
+                        slug: !isEditing ? e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-') : form.slug 
+                    })} 
+                    required 
+                    placeholder="e.g. BIS Certification"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[13px] font-semibold text-[#334155] mb-1.5">URL Slug Path</label>
+                  <input 
+                    type="text" 
+                    className="w-full h-11 px-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] text-[#0F172A] rounded-xl outline-none focus:border-[#22C55E] focus:bg-white transition-all shadow-sm font-mono"
+                    value={form.slug} 
+                    onChange={e => setForm({...form, slug: e.target.value})} 
+                    required 
+                  />
+                </div>
+
+                <div className="pt-2">
+                  <label className="flex items-center gap-3 cursor-pointer group">
+                    <div className="relative flex items-center">
+                      <input 
+                        type="checkbox" 
+                        className="peer sr-only"
+                        checked={form.isActive} 
+                        onChange={e => setForm({...form, isActive: e.target.checked})} 
+                      />
+                      <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#22C55E]"></div>
+                    </div>
+                    <span className="text-[14px] font-bold text-[#0F172A] group-hover:text-[#22C55E] transition-colors">Visible to public</span>
+                  </label>
+                </div>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
-                <button type="button" className="btn btn-secondary" onClick={handleCloseModal}>Cancel</button>
-                <button type="submit" className="btn btn-primary">{isEditing ? "Update" : "Create"}</button>
+
+              <div className="mt-8 pt-5 border-t border-[#F1F5F9] flex gap-3 justify-end">
+                <button type="button" onClick={handleCloseModal} className="h-11 px-5 text-[14px] font-semibold text-[#64748B] hover:bg-slate-100 rounded-xl transition-colors">
+                  Cancel
+                </button>
+                <button type="submit" className="h-11 px-6 bg-[#22C55E] hover:bg-[#16A34A] text-white text-[14px] font-semibold rounded-xl transition-all shadow-sm">
+                  {isEditing ? "Save Changes" : "Create Service"}
+                </button>
               </div>
             </form>
           </div>
