@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Shield, AlertCircle, Loader2, LockKeyhole, Mail } from "lucide-react";
+import { Shield, AlertCircle, Loader2, LockKeyhole, Mail, Sun, Moon } from "lucide-react";
 import api from "../services/api";
 import { setAdminToken } from "../services/auth";
+import { useEffect } from "react";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -10,6 +11,29 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+      setIsDark(true);
+    } else {
+      document.documentElement.classList.remove('dark');
+      setIsDark(false);
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    if (isDark) {
+      document.documentElement.classList.remove('dark');
+      localStorage.theme = 'light';
+      setIsDark(false);
+    } else {
+      document.documentElement.classList.add('dark');
+      localStorage.theme = 'dark';
+      setIsDark(true);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,7 +54,16 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] font-['Inter'] flex flex-col items-center justify-center p-4 antialiased selection:bg-[#22C55E]/10 selection:text-[#16A34A] relative">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#020617] font-['Inter'] flex flex-col items-center justify-center p-4 antialiased selection:bg-[#22C55E]/10 selection:text-[#16A34A] relative transition-colors duration-300">
+      
+      {/* Top right theme toggle */}
+      <button 
+        onClick={toggleTheme}
+        className="absolute top-6 right-6 w-11 h-11 bg-white dark:bg-[#0F172A] border border-[#E2E8F0] dark:border-[#1E293B] rounded-full shadow-sm flex items-center justify-center transition-all hover:scale-105"
+      >
+        {isDark ? <Sun className="w-5 h-5 text-yellow-500" /> : <Moon className="w-5 h-5 text-[#64748B]" />}
+      </button>
+
       {/* Super subtle radial glow in background */}
       <div 
         className="absolute inset-0 pointer-events-none" 
@@ -57,27 +90,27 @@ export default function Login() {
 
         {/* The Premium Light Card */}
         <div 
-          className="w-full bg-[#FFFFFF] animate-fade-in overflow-hidden relative z-20"
-          style={{ borderRadius: '16px', boxShadow: '0 20px 40px rgba(0, 0, 0, 0.08)', border: '1px solid rgba(226, 232, 240, 0.8)' }}
+          className="w-full bg-[#FFFFFF] dark:bg-[#0F172A] animate-fade-in overflow-hidden relative z-20 border border-[rgba(226,232,240,0.8)] dark:border-[#1E293B] transition-colors duration-300"
+          style={{ borderRadius: '16px', boxShadow: '0 20px 40px rgba(0, 0, 0, 0.08)' }}
         >
           <form onSubmit={handleSubmit} className="px-8 py-10 sm:px-10">
             <div className="text-center mb-8">
-              <h2 className="text-[26px] font-bold text-[#0F172A] tracking-tight m-0">Welcome Admin</h2>
-              <p className="text-[14px] text-[#6B7280] mt-2 font-medium">Please sign in to manage the portal.</p>
+              <h2 className="text-[26px] font-bold text-[#0F172A] dark:text-white tracking-tight m-0">Welcome Admin</h2>
+              <p className="text-[14px] text-[#6B7280] dark:text-[#94A3B8] mt-2 font-medium">Please sign in to manage the portal.</p>
             </div>
 
             {/* Minimal Alerts */}
             {error && (
-              <div className="flex items-start gap-2 bg-red-50 text-red-600 px-4 py-3 rounded-xl mb-6 text-[14px] border border-red-100 font-medium">
+              <div className="flex items-start gap-2 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 px-4 py-3 rounded-xl mb-6 text-[14px] border border-red-100 dark:border-red-500/20 font-medium">
                 <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                 {error}
               </div>
             )}
 
             <div className="mb-6">
-              <label className="block text-[14px] font-semibold text-[#0F172A] mb-2">Email</label>
+              <label className="block text-[14px] font-semibold text-[#0F172A] dark:text-slate-300 mb-2">Email</label>
               <div className="relative flex items-center group">
-                <span className="absolute left-4 text-[#6B7280]">
+                <span className="absolute left-4 text-[#6B7280] dark:text-[#94A3B8]">
                   <Mail className="w-5 h-5" />
                 </span>
                 <input
@@ -85,7 +118,7 @@ export default function Login() {
                   value={email}
                   onChange={(e) => { setEmail(e.target.value); setError(""); }}
                   placeholder="Email"
-                  className="w-full pl-[46px] pr-4 h-14 bg-white dark:bg-[#0F172A] border border-[#E5E7EB] outline-none rounded-xl text-[15px] font-medium text-[#0F172A] transition-all duration-200 focus:border-[#22C55E] placeholder:text-[#9CA3AF] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.2)]"
+                  className="w-full pl-[46px] pr-4 h-14 bg-white dark:bg-[#1E293B] border border-[#E5E7EB] dark:border-[#334155] outline-none rounded-xl text-[15px] font-medium text-[#0F172A] dark:text-white transition-all duration-200 focus:border-[#22C55E] dark:focus:border-[#22C55E] placeholder:text-[#9CA3AF] dark:placeholder:text-[#64748B] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.2)]"
                   required
                   autoFocus
                 />
@@ -93,9 +126,9 @@ export default function Login() {
             </div>
 
             <div className="mb-8">
-              <label className="block text-[14px] font-semibold text-[#0F172A] mb-2">Password</label>
+              <label className="block text-[14px] font-semibold text-[#0F172A] dark:text-slate-300 mb-2">Password</label>
               <div className="relative flex items-center group">
-                <span className="absolute left-4 text-[#6B7280]">
+                <span className="absolute left-4 text-[#6B7280] dark:text-[#94A3B8]">
                   <LockKeyhole className="w-5 h-5" />
                 </span>
                 <input
@@ -103,7 +136,7 @@ export default function Login() {
                   value={password}
                   onChange={(e) => { setPassword(e.target.value); setError(""); }}
                   placeholder="Password"
-                  className="w-full pl-[46px] pr-4 h-14 bg-white dark:bg-[#0F172A] border border-[#E5E7EB] outline-none rounded-xl text-[15px] font-medium text-[#0F172A] transition-all duration-200 focus:border-[#22C55E] placeholder:text-[#9CA3AF] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.2)]"
+                  className="w-full pl-[46px] pr-4 h-14 bg-white dark:bg-[#1E293B] border border-[#E5E7EB] dark:border-[#334155] outline-none rounded-xl text-[15px] font-medium text-[#0F172A] dark:text-white transition-all duration-200 focus:border-[#22C55E] dark:focus:border-[#22C55E] placeholder:text-[#9CA3AF] dark:placeholder:text-[#64748B] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.2)]"
                   required
                 />
               </div>
