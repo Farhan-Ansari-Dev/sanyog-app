@@ -81,8 +81,8 @@ export default function ServicesManagement() {
     <div className="animate-fade-in pb-12">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-[#0F172A] tracking-tight">Services Catalog</h1>
-          <p className="text-[15px] text-[#64748B] mt-1">Manage global system services and offerings.</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#0F172A] dark:text-white tracking-tight">Services Catalog</h1>
+          <p className="text-[15px] text-[#64748B] dark:text-[#94A3B8] mt-1">Manage global system services and offerings.</p>
         </div>
         <button 
           onClick={() => handleOpenModal()}
@@ -99,7 +99,7 @@ export default function ServicesManagement() {
         </div>
       )}
 
-      <div className="bg-white dark:bg-[#0F172A] border border-[#E2E8F0] rounded-2xl shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-[#0F172A] border border-[#E2E8F0] dark:border-[#334155] rounded-2xl shadow-sm overflow-hidden">
         {loading ? (
           <div className="w-full h-64 flex flex-col items-center justify-center">
             <Loader2 className="w-8 h-8 animate-spin text-[#22C55E] mb-4" />
@@ -109,15 +109,15 @@ export default function ServicesManagement() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-[800px]">
               <thead>
-                <tr className="bg-[#F8FAFC] border-b border-[#E2E8F0]">
-                  <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] uppercase tracking-wider">Service Name</th>
-                  <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] uppercase tracking-wider">Group / Category</th>
-                  <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] uppercase tracking-wider">Slug Path</th>
-                  <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] uppercase tracking-wider text-right">Actions</th>
+                <tr className="bg-[#F8FAFC] dark:bg-[#1E293B] border-b border-[#E2E8F0] dark:border-[#334155]">
+                  <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider">Service Name</th>
+                  <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider">Group / Category</th>
+                  <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider">Slug Path</th>
+                  <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#F1F5F9] bg-white dark:bg-[#0F172A]">
+              <tbody className="divide-y divide-[#F1F5F9] dark:divide-[#1E293B] bg-white dark:bg-[#0F172A]">
                 {services.length === 0 ? (
                   <tr>
                     <td colSpan="5">
@@ -132,12 +132,12 @@ export default function ServicesManagement() {
                   </tr>
                 ) : (
                   services.map((svc) => (
-                    <tr key={svc._id} className="hover:bg-slate-50 dark:bg-[#1E293B]/50 transition-colors">
+                    <tr key={svc._id} className="hover:bg-slate-50 dark:hover:bg-[#1E293B] transition-colors">
                       <td className="px-6 py-5 whitespace-nowrap">
-                        <span className="text-[14px] font-bold text-[#0F172A]">{svc.name}</span>
+                        <span className="text-[14px] font-bold text-[#0F172A] dark:text-white">{svc.name}</span>
                       </td>
                       <td className="px-6 py-5 whitespace-nowrap">
-                        <span className="text-[14px] text-[#475569] font-medium">{svc.category}</span>
+                        <span className="text-[14px] text-[#475569] dark:text-[#94A3B8] font-medium">{svc.category}</span>
                       </td>
                       <td className="px-6 py-5 whitespace-nowrap">
                         <span className="inline-block bg-slate-100 text-slate-600 px-2.5 py-1 text-[12px] font-mono rounded-md border border-slate-200">

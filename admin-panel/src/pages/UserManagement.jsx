@@ -121,8 +121,8 @@ export default function UserManagement() {
         <div className="animate-fade-in pb-12">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
                 <div>
-                    <h1 className="text-2xl sm:text-3xl font-bold text-[#0F172A] tracking-tight">System Access & Users</h1>
-                    <p className="text-[15px] text-[#64748B] mt-1">Manage portal application clients and internal admin staff.</p>
+                    <h1 className="text-2xl sm:text-3xl font-bold text-[#0F172A] dark:text-white tracking-tight">System Access & Users</h1>
+                    <p className="text-[15px] text-[#64748B] dark:text-[#94A3B8] mt-1">Manage portal application clients and internal admin staff.</p>
                 </div>
                 
                 <div className="flex gap-3 w-full sm:w-auto">
@@ -145,7 +145,7 @@ export default function UserManagement() {
                     )}
                     <button 
                         onClick={loadData}
-                        className="flex-1 sm:flex-none h-11 px-5 bg-white dark:bg-[#0F172A] border border-[#E2E8F0] text-[14px] text-[#0F172A] font-semibold rounded-xl hover:bg-slate-50 dark:bg-[#1E293B] transition-colors shadow-sm flex items-center justify-center gap-2"
+                        className="flex-1 sm:flex-none h-11 px-5 bg-white dark:bg-[#0F172A] border border-[#E2E8F0] dark:border-[#334155] text-[14px] text-[#0F172A] dark:text-white font-semibold rounded-xl hover:bg-slate-50 dark:hover:bg-[#1E293B] transition-colors shadow-sm flex items-center justify-center gap-2"
                     >
                         <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
                         Refresh
@@ -154,11 +154,11 @@ export default function UserManagement() {
             </div>
 
             {/* Custom Tabs */}
-            <div className="flex gap-2 mb-6 p-1 bg-[#F1F5F9] rounded-xl max-w-sm">
+            <div className="flex gap-2 mb-6 p-1 bg-[#F1F5F9] dark:bg-[#1E293B] rounded-xl max-w-sm">
                 <button 
                     onClick={() => setActiveTab("clients")}
                     className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-[14px] font-bold rounded-lg transition-all ${
-                        activeTab === "clients" ? 'bg-white dark:bg-[#0F172A] text-[#0F172A] shadow-sm' : 'text-[#64748B] hover:text-[#0F172A]'
+                        activeTab === "clients" ? 'bg-white dark:bg-[#0F172A] text-[#0F172A] dark:text-white shadow-sm' : 'text-[#64748B] dark:text-[#94A3B8] hover:text-[#0F172A] dark:hover:text-white'
                     }`}
                 >
                     <UserCircle2 className="w-4 h-4" />
@@ -167,7 +167,7 @@ export default function UserManagement() {
                 <button 
                     onClick={() => setActiveTab("staff")}
                     className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-[14px] font-bold rounded-lg transition-all ${
-                        activeTab === "staff" ? 'bg-white dark:bg-[#0F172A] text-[#0F172A] shadow-sm' : 'text-[#64748B] hover:text-[#0F172A]'
+                        activeTab === "staff" ? 'bg-white dark:bg-[#0F172A] text-[#0F172A] dark:text-white shadow-sm' : 'text-[#64748B] dark:text-[#94A3B8] hover:text-[#0F172A] dark:hover:text-white'
                     }`}
                 >
                     <Shield className="w-4 h-4" />
@@ -181,13 +181,13 @@ export default function UserManagement() {
                 </div>
             )}
 
-            <div className="bg-white dark:bg-[#0F172A] border border-[#E2E8F0] rounded-2xl shadow-sm overflow-hidden min-h-[400px]">
+            <div className="bg-white dark:bg-[#0F172A] border border-[#E2E8F0] dark:border-[#334155] rounded-2xl shadow-sm overflow-hidden min-h-[400px]">
                 {/* Search Bar matching inside container for clean look */}
-                <div className="p-4 border-b border-[#F1F5F9] bg-[#F8FAFC]">
+                <div className="p-4 border-b border-[#F1F5F9] dark:border-[#334155] bg-[#F8FAFC] dark:bg-[#1E293B]">
                     <div className="relative max-w-md">
                         <Search className="w-4 h-4 text-[#94A3B8] absolute left-3.5 top-1/2 -translate-y-1/2" />
                         <input
-                            className="w-full pl-10 pr-4 h-10 bg-white dark:bg-[#0F172A] border border-[#E2E8F0] text-[14px] rounded-xl outline-none focus:border-[#22C55E] transition-all"
+                            className="w-full pl-10 pr-4 h-10 bg-white dark:bg-[#0F172A] border border-[#E2E8F0] dark:border-[#334155] text-[14px] text-[#0F172A] dark:text-white rounded-xl outline-none focus:border-[#22C55E] transition-all"
                             placeholder={activeTab === "clients" ? "Search clients by phone or email..." : "Search staff by name or email..."}
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}

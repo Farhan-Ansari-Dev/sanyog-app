@@ -198,7 +198,7 @@ export default function Applications() {
         <div className="relative flex-1 w-full">
           <Search className="w-4 h-4 text-[#94A3B8] absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
-            className="w-full pl-10 pr-4 h-10 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] rounded-xl outline-none focus:border-[#22C55E] focus:bg-white dark:bg-[#0F172A] transition-all"
+            className="w-full pl-10 pr-4 h-10 bg-[#F8FAFC] dark:bg-[#1E293B] border border-[#E2E8F0] dark:border-[#334155] text-[14px] text-[#0F172A] dark:text-white rounded-xl outline-none focus:border-[#22C55E] transition-all"
             placeholder="Search company, name, mobile..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -234,14 +234,14 @@ export default function Applications() {
         </div>
 
         <button 
-          className="h-10 px-5 bg-white dark:bg-[#0F172A] border border-[#E2E8F0] text-[14px] text-[#0F172A] font-medium rounded-xl hover:bg-slate-50 dark:bg-[#1E293B] flex items-center gap-2 transition-colors w-full md:w-auto justify-center shadow-sm"
+          className="h-10 px-5 bg-white dark:bg-[#0F172A] border border-[#E2E8F0] dark:border-[#334155] text-[14px] text-[#0F172A] dark:text-white font-medium rounded-xl hover:bg-slate-50 dark:hover:bg-[#1E293B] flex items-center gap-2 transition-colors w-full md:w-auto justify-center shadow-sm"
           onClick={load}
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           Refresh
         </button>
 
-        <div className="text-[13px] font-semibold text-[#64748B] bg-slate-100 px-3 py-1.5 rounded-lg whitespace-nowrap">
+        <div className="text-[13px] font-semibold text-[#64748B] dark:text-[#94A3B8] bg-slate-100 dark:bg-[#1A1A1A] px-3 py-1.5 rounded-lg whitespace-nowrap">
           {filtered.length} Results
         </div>
       </div>
