@@ -13,11 +13,13 @@ import {
   Platform,
   ScrollView,
   Pressable,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../hooks/useTheme';
 import { useAppStore } from '../../store/useAppStore';
 import PrimaryButton from '../../components/common/PrimaryButton';
+import api from '../../services/api';
 import { spacing, typography, borderRadius } from '../../theme';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { AuthStackParamList } from '../../types';
@@ -28,8 +30,8 @@ const OTP_LENGTH = 6;
 
 export default function OTPScreen({ navigation, route }: Props) {
   const t = useTheme();
-  const setAuth = useAppStore((s) => s.setAuth);
-  const phone = route.params?.phone || '9876543210';
+  const setAuth = useAppStore((s: any) => s.setAuth);
+  const phone = route.params?.mobile || '9876543210';
   const maskedPhone = phone.slice(0, 2) + '****' + phone.slice(-4);
 
   const [otp, setOtp] = useState<string[]>(new Array(OTP_LENGTH).fill(''));
@@ -84,9 +86,14 @@ export default function OTPScreen({ navigation, route }: Props) {
     const code = otp.join('');
     if (code.length !== OTP_LENGTH) return;
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1000));
-    setAuth('demo-token-' + Date.now());
-    setLoading(false);
+    try {
+      const res = await api.post('/auth/verify-otp', { mobile: phone, code });
+      setAuth(res.data.token, res.data.user);
+    } catch (e: any) {
+      Alert.alert('Error', e?.response?.data?.error || 'Invalid OTP');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleResend = () => {

@@ -2,6 +2,7 @@
  * LoginScreen – Phone-based auth with premium native UI
  */
 import React, { useState } from 'react';
+import { Alert } from 'react-native';
 import {
   View,
   Text,
@@ -16,6 +17,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../hooks/useTheme';
 import PrimaryButton from '../../components/common/PrimaryButton';
+import api from '../../services/api';
 import { spacing, typography, borderRadius } from '../../theme';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { AuthStackParamList } from '../../types';
@@ -31,9 +33,14 @@ export default function LoginScreen({ navigation }: Props) {
   const handleSend = async () => {
     if (!isValid) return;
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 800));
-    setLoading(false);
-    navigation.navigate('OTP', { phone });
+    try {
+      await api.post('/auth/send-otp', { mobile: phone });
+      navigation.navigate('OTP', { mobile: phone });
+    } catch (e: any) {
+      Alert.alert('Error', e?.response?.data?.error || 'Failed to send OTP');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
