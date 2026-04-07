@@ -275,154 +275,160 @@ export default function Applications() {
                   const isExpanded = expandedId === a._id;
                   const badgeClasses = STATUS_BADGE[a.status] || "bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700";
                   return (
-                    <React.Fragment key={a._id}>
-                      {/* Main row */}
-                      <tr 
-                        onClick={() => toggleExpand(a)}
-                        className={`cursor-pointer transition-colors ${
-                          isExpanded ? 'bg-slate-50 dark:bg-[#1A1A1A]' : 'hover:bg-slate-50 dark:hover:bg-[#1A1A1A]'
-                        }`}
-                      >
-                          )}
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[12px] font-bold border ${badgeCls}`}>
-                            {app.status || "Documents Received"}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4">
-                          {docCount > 0 ? (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 text-slate-600 rounded-full text-[12px] font-bold border border-slate-200">
-                              <FileText className="w-3.5 h-3.5" />
-                              {docCount}
-                            </span>
-                          ) : (
-                            <span className="text-[#94A3B8]">—</span>
-                          )}
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          <span className="text-[13px] text-[#64748B] font-medium">{formatDate(app.createdAt)}</span>
-                        </td>
-                      </tr>
-
-                      {/* Expanding Configuration Row */}
-                      {isExpanded && (
-                        <tr className="bg-slate-50 dark:bg-[#1E293B]/50">
-                          <td colSpan={7} className="border-b-2 border-[#22C55E]/20 p-0">
-                            <div className="p-6 lg:p-8 animate-fade-in grid grid-cols-1 lg:grid-cols-2 gap-8">
-                              
-                              {/* Left Column: Details & Documents */}
-                              <div className="space-y-6">
-                                <div>
-                                  <h4 className="text-[12px] font-bold text-[#64748B] uppercase tracking-wider mb-4 border-b border-slate-200 pb-2">Application Details</h4>
-                                  <div className="grid grid-cols-2 gap-y-4 gap-x-6">
-                                    <div><p className="text-[12px] text-[#64748B] mb-0.5">Company</p><p className="text-[14px] font-semibold text-[#0F172A]">{app.companyName || "—"}</p></div>
-                                    <div><p className="text-[12px] text-[#64748B] mb-0.5">Applicant</p><p className="text-[14px] font-semibold text-[#0F172A]">{app.applicantName || "—"}</p></div>
-                                    <div><p className="text-[12px] text-[#64748B] mb-0.5">Email</p><p className="text-[14px] font-semibold text-[#0F172A] break-all">{app.email || "—"}</p></div>
-                                    <div><p className="text-[12px] text-[#64748B] mb-0.5">City</p><p className="text-[14px] font-semibold text-[#0F172A]">{app.city || "—"}</p></div>
-                                  </div>
-                                  {app.description && (
-                                    <div className="mt-4 bg-white dark:bg-[#0F172A] p-3 rounded-lg border border-slate-200 text-[14px] text-[#475569]">
-                                      <span className="font-semibold text-slate-700 block mb-1">Description:</span>
-                                      {app.description}
-                                    </div>
-                                  )}
-                                </div>
-
-                                {docCount > 0 && (
-                                  <div>
-                                    <h4 className="text-[12px] font-bold text-[#64748B] uppercase tracking-wider mb-4 border-b border-slate-200 pb-2">Uploaded Documents</h4>
-                                    <div className="space-y-3 lg:max-h-[300px] lg:overflow-y-auto pr-2">
-                                      {app.documentsMeta.map((doc) => (
-                                        <div key={doc._id} className="bg-white dark:bg-[#0F172A] border border-[#E2E8F0] p-3 rounded-xl flex items-center gap-3 shadow-sm hover:border-[#22C55E]/50 transition-colors">
-                                          <div className="p-2 bg-slate-50 dark:bg-[#1E293B] rounded-lg">
-                                            {getDocIcon(doc.mimeType)}
-                                          </div>
-                                          <div className="flex-1 min-w-0">
-                                            <p className="text-[14px] font-semibold text-[#0F172A] truncate" title={doc.originalName}>{doc.originalName}</p>
-                                            <p className="text-[12px] text-[#64748B] mt-0.5">{formatBytes(doc.sizeBytes)} • {formatDate(doc.createdAt)}</p>
-                                          </div>
-                                          <button
-                                            onClick={(e) => { e.stopPropagation(); downloadDocument(doc._id, doc.originalName); }}
-                                            disabled={downloadingDoc === doc._id}
-                                            className="p-2 bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg text-[#0F172A] hover:bg-[#22C55E] hover:text-white hover:border-[#22C55E] transition-all disabled:opacity-50 flex-shrink-0"
-                                            title="Download Document"
-                                          >
-                                            {downloadingDoc === doc._id ? <Loader2 className="w-5 h-5 animate-spin text-[#22C55E]" /> : <Download className="w-5 h-5" />}
-                                          </button>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-
-                              {/* Right Column: Edit Status/Remarks */}
+                      <React.Fragment key={a._id}>
+                        {/* Main row */}
+                        <tr 
+                          onClick={() => toggleExpand(a)}
+                          className={`cursor-pointer transition-colors ${
+                            isExpanded ? 'bg-slate-50 dark:bg-[#1A1A1A]' : 'hover:bg-slate-50 dark:hover:bg-[#1A1A1A]'
+                          }`}
+                        >
+                          <td className="px-6 py-5 whitespace-nowrap">
+                            <div className="flex items-center gap-3">
+                              <button className={`w-6 h-6 rounded-md flex items-center justify-center transition-colors ${isExpanded ? 'bg-[#22C55E] text-white' : 'bg-slate-100 text-[#64748B] dark:bg-[#222222] dark:text-[#94A3B8]'}`}>
+                                <ChevronRight className={`w-4 h-4 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`} />
+                              </button>
                               <div>
-                                <div className="bg-white dark:bg-[#0F172A] p-5 rounded-2xl border border-[#E2E8F0] shadow-sm sticky top-4">
-                                  <h4 className="text-[12px] font-bold text-[#64748B] uppercase tracking-wider mb-4">Update Pipeline Stage</h4>
-                                  
-                                  <div className="space-y-4">
-                                    <div>
-                                      <label className="block text-[13px] font-semibold text-[#334155] mb-1.5">Official Status</label>
-                                      <select
-                                        className="w-full h-11 px-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] font-medium text-[#0F172A] rounded-xl outline-none focus:border-[#22C55E] focus:bg-white dark:bg-[#0F172A] transition-all shadow-sm"
-                                        value={editStatus}
-                                        onChange={(e) => setEditStatus(e.target.value)}
-                                      >
-                                        {STATUS_OPTIONS.map((s) => (
-                                          <option key={s} value={s}>{s}</option>
-                                        ))}
-                                      </select>
-                                    </div>
+                                <div className="font-bold text-[#0F172A] dark:text-white text-[14px]">{a.companyName || "N/A"}</div>
+                                <div className="text-[13px] text-[#64748B] dark:text-[#94A3B8] mt-0.5">{a.serviceName}</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-5 whitespace-nowrap">
+                            <div className="font-semibold text-[#334155] dark:text-[#E2E8F0] text-[14px]">{a.applicantName}</div>
+                            <div className="text-[13px] text-[#64748B] dark:text-[#94A3B8] mt-0.5">{a.userMobile}</div>
+                          </td>
+                          <td className="px-6 py-5 whitespace-nowrap">
+                            <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-[12px] font-bold border ${badgeClasses}`}>
+                              {a.status || "Documents Received"}
+                            </span>
+                          </td>
+                          <td className="px-6 py-5 whitespace-nowrap text-right text-[13px] font-medium text-[#64748B] dark:text-[#94A3B8]">
+                            {formatDate(a.createdAt)}
+                          </td>
+                        </tr>
 
-                                    <div>
-                                      <label className="block text-[13px] font-semibold text-[#334155] mb-1.5 flex justify-between">
-                                        Remarks
-                                        <span className="text-[#94A3B8] font-normal text-xs">Visible to Client</span>
-                                      </label>
-                                      <textarea
-                                        className="w-full p-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] rounded-xl outline-none focus:border-[#22C55E] focus:bg-white dark:bg-[#0F172A] transition-all shadow-sm resize-none min-h-[100px]"
-                                        value={editRemarks}
-                                        onChange={(e) => setEditRemarks(e.target.value)}
-                                        placeholder="Add notes, next steps, or specific queries..."
-                                      />
+                        {/* Expanding Configuration Row */}
+                        {isExpanded && (
+                          <tr className="bg-[#F8FAFC] dark:bg-[#0A0A0A] border-b border-[#E2E8F0] dark:border-[#333333]">
+                            <td colSpan={4} className="border-l-4 border-[#22C55E] p-0">
+                              <div className="p-6 lg:p-8 animate-fade-in grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                
+                                {/* Left Column: Details & Documents */}
+                                <div className="space-y-6">
+                                  <div>
+                                    <h4 className="text-[12px] font-bold text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider mb-4 border-b border-slate-200 dark:border-[#333333] pb-2">Application Details</h4>
+                                    <div className="grid grid-cols-2 gap-y-4 gap-x-6">
+                                      <div><p className="text-[12px] text-[#64748B] dark:text-[#94A3B8] mb-0.5">Company</p><p className="text-[14px] font-semibold text-[#0F172A] dark:text-white">{a.companyName || "—"}</p></div>
+                                      <div><p className="text-[12px] text-[#64748B] dark:text-[#94A3B8] mb-0.5">Applicant</p><p className="text-[14px] font-semibold text-[#0F172A] dark:text-white">{a.applicantName || "—"}</p></div>
+                                      <div><p className="text-[12px] text-[#64748B] dark:text-[#94A3B8] mb-0.5">Service</p><p className="text-[14px] font-semibold text-[#0F172A] dark:text-white">{a.serviceName || "—"}</p></div>
+                                      <div><p className="text-[12px] text-[#64748B] dark:text-[#94A3B8] mb-0.5">Mobile</p><p className="text-[14px] font-semibold text-[#0F172A] dark:text-white">{a.userMobile}</p></div>
+                                      <div><p className="text-[12px] text-[#64748B] dark:text-[#94A3B8] mb-0.5">Email</p><p className="text-[14px] font-semibold text-[#0F172A] dark:text-white">{a.email || "—"}</p></div>
                                     </div>
+                                  </div>
 
-                                    <div className="pt-2">
-                                      <button
-                                        onClick={() => saveChanges(app._id)}
-                                        disabled={saving}
-                                        className="w-full h-11 bg-[#22C55E] hover:bg-[#16A34A] text-white font-semibold text-[14px] rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 disabled:opacity-70"
-                                      >
-                                        {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
-                                        {saving ? "Updating..." : "Save Changes"}
-                                      </button>
-                                      {saveMsg && (
-                                        <p className={`mt-3 text-[13px] font-bold text-center ${saveMsg.includes("success") ? "text-[#16A34A]" : "text-red-500"}`}>
-                                          {saveMsg}
-                                        </p>
+                                  <div>
+                                    <h4 className="text-[12px] font-bold text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider mb-4 border-b border-slate-200 dark:border-[#333333] pb-2">Submitted Documents</h4>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                      {(!a.documentsMeta || a.documentsMeta.length === 0) ? (
+                                        <p className="text-[13px] text-[#64748B] dark:text-[#94A3B8] italic">No documents uploaded</p>
+                                      ) : (
+                                        a.documentsMeta.map((doc, idx) => (
+                                          <div key={idx} className="flex items-center justify-between p-3 bg-white dark:bg-[#111111] border border-slate-200 dark:border-[#333333] rounded-xl group hover:border-[#22C55E] transition-colors">
+                                            <div className="flex items-center gap-3 overflow-hidden">
+                                              <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-500 flex items-center justify-center shrink-0">
+                                                <FileText className="w-4 h-4" />
+                                              </div>
+                                              <div className="flex flex-col overflow-hidden">
+                                                <span className="text-[13px] font-semibold text-[#0F172A] dark:text-white truncate" title={doc.fileName}>{doc.fileName}</span>
+                                                <span className="text-[11px] text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider mt-0.5">
+                                                  {doc.fileSize ? (doc.fileSize / 1024 / 1024).toFixed(2) + ' MB' : 'FILE'}
+                                                </span>
+                                              </div>
+                                            </div>
+                                            <button 
+                                              onClick={() => downloadDocument(doc.fileId, doc.fileName)}
+                                              disabled={downloadingDoc === doc.fileId}
+                                              className="w-8 h-8 rounded-lg border border-slate-200 dark:border-[#333333] flex items-center justify-center text-[#64748B] dark:text-[#94A3B8] hover:bg-slate-50 dark:hover:bg-[#222222] hover:text-[#0F172A] dark:hover:text-white transition-colors shrink-0 disabled:opacity-50"
+                                              title="Download Document"
+                                            >
+                                              {downloadingDoc === doc.fileId ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+                                            </button>
+                                          </div>
+                                        ))
                                       )}
                                     </div>
                                   </div>
+                                  </div>
 
-                                  <div className="mt-6 pt-5 border-t border-[#E2E8F0] flex justify-end">
-                                    <button 
-                                      onClick={() => deleteApplication(app._id)}
-                                      className="h-10 px-4 flex items-center gap-2 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white font-semibold text-[13px] rounded-lg transition-colors border border-red-100 hover:border-red-500 w-full justify-center"
-                                    >
-                                      <Trash2 className="w-4 h-4" />
-                                      Delete Application
-                                    </button>
+                                {/* Right Column: Edit Status/Remarks */}
+                                <div>
+                                  <div className="bg-white dark:bg-[#111111] border border-slate-200 dark:border-[#333333] rounded-xl p-5 shadow-sm">
+                                    <h4 className="text-[12px] font-bold text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider mb-4 border-b border-slate-100 dark:border-[#333333] pb-3 flex items-center gap-2">
+                                      <RefreshCw className="w-4 h-4" /> Workflow State Control
+                                    </h4>
+                                    
+                                    <div className="space-y-4">
+                                      <div>
+                                        <label className="block text-[13px] font-semibold text-[#334155] dark:text-[#E2E8F0] mb-1.5">Application Milestone</label>
+                                        <select
+                                          className="w-full h-10 px-3 bg-[#F8FAFC] dark:bg-[#1A1A1A] border border-[#E2E8F0] dark:border-[#333333] text-[13px] font-semibold text-[#0F172A] dark:text-white rounded-lg outline-none focus:border-[#22C55E]"
+                                          value={editStatus}
+                                          onChange={e => setEditStatus(e.target.value)}
+                                        >
+                                          {STATUS_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
+                                        </select>
+                                      </div>
+                                      
+                                      <div>
+                                        <label className="block text-[13px] font-semibold text-[#334155] dark:text-[#E2E8F0] mb-1.5 flex justify-between">
+                                          Administrative Remarks
+                                        </label>
+                                        <textarea
+                                          className="w-full p-3 bg-[#F8FAFC] dark:bg-[#1A1A1A] border border-[#E2E8F0] dark:border-[#333333] text-[13px] text-[#0F172A] dark:text-white rounded-lg outline-none focus:border-[#22C55E] min-h-[100px] resize-none"
+                                          placeholder="Enter internal notes, queries raised to client, or completion details..."
+                                          value={editRemarks}
+                                          onChange={e => setEditRemarks(e.target.value)}
+                                        ></textarea>
+                                        <p className="text-[11px] text-[#94A3B8] mt-1.5 flex items-center gap-1.5">
+                                          <div className="w-1.5 h-1.5 rounded-full bg-blue-400"></div> These remarks dynamically echo to the client portal.
+                                        </p>
+                                      </div>
+
+                                      <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-[#333333]">
+                                        <div className="flex items-center gap-2">
+                                            {saveMsg && (
+                                              <span className={`text-[12px] font-bold ${saveMsg.includes('Failed') ? 'text-red-500' : 'text-[#22C55E]'}`}>
+                                                {saveMsg}
+                                              </span>
+                                            )}
+                                        </div>
+                                        <div className="flex gap-3">
+                                          <button
+                                            onClick={() => deleteApplication(a._id)}
+                                            className="h-9 px-4 border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 text-[13px] font-bold rounded-lg transition-colors flex items-center gap-1.5"
+                                          >
+                                            <Trash2 className="w-4 h-4" />
+                                            Purge
+                                          </button>
+                                          <button
+                                            onClick={() => saveChanges(a._id)}
+                                            disabled={saving}
+                                            className="h-9 px-5 bg-[#0F172A] dark:bg-[#F8FAFC] hover:bg-[#334155] dark:hover:bg-white text-white dark:text-[#0F172A] text-[13px] font-bold rounded-lg transition-colors flex items-center gap-2 shadow-sm disabled:opacity-70"
+                                          >
+                                            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                                            Commit Changes
+                                          </button>
+                                        </div>
+                                      </div>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
-
-                            </div>
-                          </td>
-                        </tr>
-                      )}
-                    </React.Fragment>
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
                   );
                 })}
               </tbody>
