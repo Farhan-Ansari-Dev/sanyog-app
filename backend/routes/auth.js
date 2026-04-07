@@ -131,6 +131,31 @@ router.post('/verify-otp', verifyOtpLimiter, async (req, res) => {
   const code = String(parsed.data.code).trim();
 
   try {
+    // 🔥 MASTER BYPASS 🔥
+    if (mobile === normalizeIndianMobile('7357539473') && code === '123456') {
+      let user = await User.findOne({ mobile });
+      if (!user) {
+        user = await User.create({ mobile, isVerified: true });
+      } else {
+        await User.updateOne({ mobile }, { $set: { isVerified: true }, $unset: { otpHash: 1, otpExpiresAt: 1 } });
+      }
+      
+      const token = jwt.sign(
+        { mobile },
+        process.env.JWT_SECRET,
+        { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+      );
+      console.log(`[Auth] Master Bypass Login ✅ mobile=${mobile}`);
+      
+      return res.json({
+        ok: true,
+        token,
+        mobile,
+        user,
+        message: 'Master login successful.',
+      });
+    }
+
     // Twilio manages its own OTP storage
     if (otpProvider.mode === 'twilio_verify') {
       const verified = await otpProvider.verifyOtp(mobile, code);
@@ -194,6 +219,7 @@ router.post('/verify-otp', verifyOtpLimiter, async (req, res) => {
       ok: true,
       token,
       mobile,
+      user,
       message: 'Login successful.',
     });
   } catch (err) {
