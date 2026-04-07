@@ -187,71 +187,61 @@ export default function Login() {
   };
 
   return (
-    <div style={{ background: 'linear-gradient(180deg, #0F2A5A 0%, #1E4DB7 100%)', fontFamily: '"Inter", sans-serif' }} className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background blobs / Radial Glow */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-white/5 rounded-full blur-[100px]" />
-      </div>
-
-      <div className="w-full max-w-md relative z-10">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center mb-4">
-            <img
-              src="/logo.png"
-              alt="Sanyog"
-              className="h-14 w-auto object-contain drop-shadow-lg"
-              onError={(e) => {
-                e.target.style.display = 'none';
-                e.target.nextSibling.style.display = 'flex';
-              }}
-            />
-            <div style={{ display: 'none' }} className="items-center justify-center w-16 h-16 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl shadow-xl">
-              <Shield className="w-8 h-8 text-white" />
-            </div>
+    <div className="min-h-screen bg-[#0F172A] font-['Inter'] flex flex-col items-center justify-center p-4 antialiased selection:bg-[#22C55E]/20 selection:text-[#16A34A]">
+      <div className="w-full max-w-[420px] flex flex-col items-center">
+        
+        {/* Minimal Logo Section */}
+        <div className="mb-8 flex flex-col items-center">
+          <img
+            src="/logo.png"
+            alt="Sanyog"
+            className="h-10 w-auto object-contain drop-shadow-sm mb-6"
+            onError={(e) => {
+              e.target.style.display = 'none';
+              e.target.nextSibling.style.display = 'flex';
+            }}
+          />
+          <div style={{ display: 'none' }} className="items-center justify-center w-12 h-12 bg-white/5 border border-white/10 rounded-xl mb-6">
+            <Shield className="w-6 h-6 text-white" />
           </div>
-          <p className="text-blue-100 mt-2 text-sm font-medium tracking-wide">Client Portal — Secure Login</p>
         </div>
 
-        {/* Card */}
-        <div style={{ borderRadius: '16px', boxShadow: '0 10px 40px rgba(0,0,0,0.15)' }} className="bg-white overflow-hidden animate-fade-in">
+        {/* The Premium Card */}
+        <div className="w-full bg-white rounded-2xl shadow-2xl shadow-black/40 border border-slate-100 overflow-hidden animate-fade-in">
           
-          {/* Step 1: Enter Mobile */}
+          {/* Step 1: Mobile Number */}
           {otpStep === 1 && (
-            <form onSubmit={handleSendOtp} className="p-8">
-              <div className="mb-8 text-center">
-                <h2 className="text-[24px] font-bold text-slate-900 tracking-tight">Welcome Back</h2>
-                <p className="text-[14px] text-slate-500 mt-2">Enter your mobile number to securely sign in.</p>
+            <form onSubmit={handleSendOtp} className="px-8 py-10 sm:px-10">
+              <div className="text-center mb-8">
+                <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Sign in</h2>
+                <p className="text-[14px] text-slate-500 mt-2 font-medium">To access your Client Portal</p>
               </div>
 
-              {/* Alerts */}
+              {/* Minimal Alerts */}
               {error && (
-                <div className="flex items-start gap-3 bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-xl mb-6 text-[14px]">
+                <div className="flex items-start gap-2 bg-red-50 text-red-600 px-4 py-3 rounded-xl mb-6 text-[13px] font-medium border border-red-100/50">
                   <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                   {error}
                 </div>
               )}
               {success && (
-                <div className="flex items-center gap-3 bg-green-50 border border-green-100 text-[#16A34A] px-4 py-3 rounded-xl mb-6 text-[14px]">
+                <div className="flex items-center gap-2 bg-green-50 text-[#16A34A] px-4 py-3 rounded-xl mb-6 text-[13px] font-medium border border-green-100/50">
                   <CheckCircle className="w-4 h-4 shrink-0" />
                   {success}
                 </div>
               )}
 
-              <div className="mb-6">
-                <label className="block text-[14px] font-semibold text-slate-700 mb-2">Mobile Number</label>
-                <div className="relative">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                    <span className="text-[16px] font-semibold text-slate-600">+91</span>
-                    <div className="w-px h-5 bg-slate-200" />
-                  </div>
+              <div className="mb-8 relative transition-all">
+                <label className="block text-[13px] font-semibold text-slate-700 mb-2">Mobile Number</label>
+                <div className="relative flex items-center group">
+                  <span className="absolute left-4 text-[15px] font-medium text-slate-500 select-none">+91</span>
                   <input
                     type="tel"
                     maxLength={10}
-                    placeholder="10-digit mobile number"
+                    placeholder="Enter 10 digits"
                     value={mobile}
                     onChange={(e) => { setMobile(e.target.value.replace(/\D/g, "")); setError(""); }}
-                    className="w-full pl-[72px] pr-4 py-3 border border-slate-200 outline-none rounded-xl text-[16px] tracking-wide font-medium text-slate-900 transition-all duration-200 focus:border-[#22C55E] focus:ring-4 focus:ring-[#22C55E]/15 placeholder:font-normal placeholder:text-slate-400"
+                    className="w-full pl-[56px] pr-4 h-12 bg-slate-50/50 border border-slate-200 outline-none rounded-xl text-[15px] font-medium text-slate-900 transition-all focus:bg-white focus:border-[#22C55E] focus:ring-4 focus:ring-[#22C55E]/10 placeholder:font-normal placeholder:text-slate-400"
                     required
                     autoFocus
                   />
@@ -261,90 +251,89 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={otpLoading || mobile.length !== 10}
-                className={`w-full h-12 text-[16px] rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-200 ${
+                className={`w-full h-12 text-[15px] rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-300 ${
                   otpLoading || mobile.length !== 10
                     ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                    : 'bg-[#22C55E] text-white hover:bg-[#16A34A] hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#22C55E]/20'
+                    : 'bg-[#22C55E] text-white hover:bg-[#16A34A] hover:shadow-md hover:shadow-[#22C55E]/20 active:scale-[0.98]'
                 }`}
               >
                 {otpLoading
-                  ? <><Loader2 className="w-5 h-5 animate-spin" /> Sending...</>
-                  : <>Send OTP</>
+                  ? <Loader2 className="w-5 h-5 animate-spin" />
+                  : "Continue"
                 }
               </button>
 
-              <p className="text-center text-[14px] text-slate-500 mt-6">
-                New here?{" "}
-                <Link to="/register" className="text-[#1E3A8A] font-semibold hover:text-[#1E4DB7] transition-colors">
-                  Create Account
-                </Link>
-              </p>
+              <div className="mt-8 text-center">
+                <p className="text-[13px] text-slate-500">
+                  Don't have an account?{" "}
+                  <Link to="/register" className="text-[#1E3A8A] font-semibold hover:text-[#1E4DB7] transition-colors">
+                    Sign up
+                  </Link>
+                </p>
+              </div>
             </form>
           )}
 
-          {/* Step 2: Enter OTP */}
+          {/* Step 2: Verification */}
           {otpStep === 2 && (
-            <form onSubmit={handleVerifyOtp} className="p-8">
-              <button
-                type="button"
-                onClick={() => { setOtpStep(1); setError(""); setOtpCode(""); }}
-                className="flex items-center gap-2 text-[14px] font-medium text-slate-500 hover:text-[#1E3A8A] transition-colors mb-8 group"
-              >
-                <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back
-              </button>
-
-              <div className="mb-8 text-center">
-                <h2 className="text-[24px] font-bold text-slate-900 tracking-tight">Verify OTP</h2>
-                <p className="text-[14px] text-slate-500 mt-2">
-                  Code sent to <span className="font-semibold text-slate-800">+91 {mobile}</span>
+            <form onSubmit={handleVerifyOtp} className="px-8 py-10 sm:px-10">
+              <div className="text-center mb-8 relative">
+                <button
+                  type="button"
+                  onClick={() => { setOtpStep(1); setError(""); setOtpCode(""); }}
+                  className="absolute left-0 top-1 text-slate-400 hover:text-slate-700 transition-colors p-1"
+                  aria-label="Back"
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                </button>
+                <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Verify it's you</h2>
+                <p className="text-[14px] text-slate-500 mt-2 font-medium">
+                  Code sent to +91 {mobile}
                 </p>
               </div>
 
               {/* Alerts */}
               {error && (
-                <div className="flex items-start gap-3 bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-xl mb-6 text-[14px]">
+                <div className="flex items-start gap-2 bg-red-50 text-red-600 px-4 py-3 rounded-xl mb-6 text-[13px] font-medium border border-red-100/50">
                   <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                   {error}
                 </div>
               )}
               {success && (
-                <div className="flex items-center gap-3 bg-green-50 border border-green-100 text-[#16A34A] px-4 py-3 rounded-xl mb-6 text-[14px]">
+                <div className="flex items-center gap-2 bg-green-50 text-[#16A34A] px-4 py-3 rounded-xl mb-6 text-[13px] font-medium border border-green-100/50">
                   <CheckCircle className="w-4 h-4 shrink-0" />
                   {success}
                 </div>
               )}
 
               <div className="mb-8">
-                <label className="block text-[14px] font-semibold text-slate-700 mb-3 text-center">
-                  Enter 6-digit Code
-                </label>
                 <OtpBoxInput value={otpCode} onChange={setOtpCode} key={resendKey} />
               </div>
 
               <button
                 type="submit"
                 disabled={otpLoading || otpCode.length < 6}
-                className={`w-full h-12 text-[16px] rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-200 ${
+                className={`w-full h-12 text-[15px] rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-300 ${
                   otpLoading || otpCode.length < 6
                     ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                    : 'bg-[#22C55E] text-white hover:bg-[#16A34A] hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#22C55E]/20'
+                    : 'bg-[#22C55E] text-white hover:bg-[#16A34A] hover:shadow-md hover:shadow-[#22C55E]/20 active:scale-[0.98]'
                 }`}
               >
-                {otpLoading
-                  ? <><Loader2 className="w-5 h-5 animate-spin" /> Verifying...</>
-                  : <>Verify & Sign In</>
-                }
+                {otpLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Verify Code"}
               </button>
 
-              {/* Resend Timer - re-mounts on each send to reset countdown */}
-              <ResendTimer key={resendKey} onResend={handleResend} loading={otpLoading} />
+              <div className="mt-8 transition-opacity">
+                <ResendTimer key={resendKey} onResend={handleResend} loading={otpLoading} />
+              </div>
             </form>
           )}
         </div>
 
-        <p className="text-center text-blue-200/70 text-xs mt-6">
-          © {new Date().getFullYear()} Sanyog Conformity Solutions Pvt. Ltd.
-        </p>
+        <div className="mt-8 text-center">
+          <p className="text-slate-500/70 text-[12px] font-medium tracking-wide">
+            © {new Date().getFullYear()} Sanyog Conformity Solutions
+          </p>
+        </div>
       </div>
     </div>
   );
