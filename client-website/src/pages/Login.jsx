@@ -37,7 +37,7 @@ function ResendTimer({ onResend, loading }) {
         </button>
       ) : (
         <p className="text-sm text-gray-400">
-          Resend OTP in <span className="font-semibold text-gray-600">{seconds}s</span>
+          Resend OTP in <span className="font-semibold text-gray-600 dark:text-slate-400">{seconds}s</span>
         </p>
       )}
     </div>
@@ -91,7 +91,7 @@ function OtpBoxInput({ value, onChange }) {
           className={`w-11 h-14 text-center text-xl font-bold rounded-xl border-2 outline-none transition-all duration-200
             ${digits[idx]
               ? "border-primary bg-primary-50 text-primary"
-              : "border-gray-200 bg-white text-gray-700"}
+              : "border-gray-200 dark:border-[#334155] bg-white dark:bg-[#0F172A] text-gray-700 dark:text-slate-300"}
             focus:border-primary focus:ring-2 focus:ring-primary/20
           `}
         />
@@ -207,7 +207,7 @@ export default function Login() {
               e.target.nextSibling.style.display = 'flex';
             }}
           />
-          <div style={{ display: 'none' }} className="items-center justify-center w-14 h-14 bg-white border border-slate-200 rounded-2xl shadow-sm">
+          <div style={{ display: 'none' }} className="items-center justify-center w-14 h-14 bg-white dark:bg-[#0F172A] border border-slate-200 rounded-2xl shadow-sm">
             <Shield className="w-7 h-7 text-slate-800" />
           </div>
         </div>
@@ -250,7 +250,7 @@ export default function Login() {
                     placeholder="10-digit mobile number"
                     value={mobile}
                     onChange={(e) => { setMobile(e.target.value.replace(/\D/g, "")); setError(""); }}
-                    className="w-full pl-[56px] pr-4 h-14 bg-white border border-[#E5E7EB] outline-none rounded-xl text-[16px] font-medium text-[#0F172A] transition-all duration-200 focus:border-[#22C55E] placeholder:text-[#9CA3AF] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.2)]"
+                    className="w-full pl-[56px] pr-4 h-14 bg-white dark:bg-[#0F172A] border border-[#E5E7EB] outline-none rounded-xl text-[16px] font-medium text-[#0F172A] transition-all duration-200 focus:border-[#22C55E] placeholder:text-[#9CA3AF] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.2)]"
                     required
                     autoFocus
                   />

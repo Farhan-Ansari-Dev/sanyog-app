@@ -41,7 +41,8 @@ export default function Apply() {
     const fetchServices = async () => {
       try {
         const { data } = await API.get("/catalog/services");
-        setServices(data);
+        // Extract flat array from Backend catalog response
+        setServices(data.flatServices || data || []);
       } catch (e) {
         console.error(e);
       } finally {
@@ -125,15 +126,15 @@ export default function Apply() {
 
   if (success) {
     return (
-      <div className="flex min-h-screen bg-gray-50">
+      <div className="flex min-h-screen bg-gray-50 dark:bg-[#020617]">
         <Sidebar />
         <main className="flex-1 p-6 pt-20 md:pt-6 flex items-center justify-center">
           <div className="text-center max-w-md">
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle2 className="w-10 h-10 text-green-500" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Application Submitted!</h2>
-            <p className="text-gray-500 mb-2">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Application Submitted!</h2>
+            <p className="text-gray-500 dark:text-slate-400 mb-2">
               Your certification application for <strong>{selectedService?.name || selectedService?.title}</strong> has been submitted successfully.
             </p>
             {submittedId && (
@@ -154,7 +155,7 @@ export default function Apply() {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-gray-50 dark:bg-[#020617]">
       <Sidebar />
       <main className="flex-1 p-6 pt-20 md:pt-6 overflow-x-hidden">
         {/* Header */}
@@ -164,7 +165,7 @@ export default function Apply() {
         </div>
 
         {/* Progress Steps */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-6">
+        <div className="bg-white dark:bg-[#0F172A] rounded-xl border border-gray-100 dark:border-[#1E293B] shadow-sm p-6 mb-6">
           <div className="flex items-center justify-between">
             {STEPS.map(({ label, icon: Icon }, i) => {
               const idx = i + 1;
@@ -176,7 +177,7 @@ export default function Apply() {
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
                       done ? "bg-green-500 text-white shadow" :
                       active ? "bg-primary text-white shadow-md shadow-blue-200" :
-                      "bg-gray-100 text-gray-400"
+                      "bg-gray-100 dark:bg-[#1E293B] text-gray-400"
                     }`}>
                       {done ? <Check className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
                     </div>
@@ -194,7 +195,7 @@ export default function Apply() {
         </div>
 
         {/* Content */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+        <div className="bg-white dark:bg-[#0F172A] rounded-xl border border-gray-100 dark:border-[#1E293B] shadow-sm p-6">
           {error && (
             <div className="flex items-center gap-3 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-5 text-sm">
               <AlertCircle className="w-4 h-4 shrink-0" />
@@ -205,7 +206,7 @@ export default function Apply() {
           {/* Step 1: Service Group */}
           {step === 1 && (
             <div className="animate-fade-in">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">Select Service Group</h2>
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Select Service Group</h2>
               {catalogLoading ? (
                 <div className="flex items-center justify-center py-12">
                   <Loader2 className="w-6 h-6 animate-spin text-primary" />
@@ -224,15 +225,15 @@ export default function Apply() {
                       className={`text-left p-4 rounded-xl border-2 transition-all duration-200 ${
                         selectedGroup === group
                           ? "border-primary bg-primary-50 shadow-sm"
-                          : "border-gray-200 hover:border-primary-light hover:bg-blue-50/50"
+                          : "border-gray-200 dark:border-[#334155] hover:border-primary-light hover:bg-blue-50/50"
                       }`}
                     >
                       <div className={`w-8 h-8 rounded-lg flex items-center justify-center mb-2.5 ${
-                        selectedGroup === group ? "bg-primary text-white" : "bg-gray-100 text-gray-500"
+                        selectedGroup === group ? "bg-primary text-white" : "bg-gray-100 dark:bg-[#1E293B] text-gray-500 dark:text-slate-400"
                       }`}>
                         <Package className="w-4 h-4" />
                       </div>
-                      <p className={`font-semibold text-sm ${selectedGroup === group ? "text-primary" : "text-gray-800"}`}>{group}</p>
+                      <p className={`font-semibold text-sm ${selectedGroup === group ? "text-primary" : "text-gray-800 dark:text-slate-200"}`}>{group}</p>
                       <p className="text-xs text-gray-400 mt-0.5">
                         {services.filter((s) => (s.group || s.category || s.serviceGroup) === group).length} services
                       </p>
@@ -246,8 +247,8 @@ export default function Apply() {
           {/* Step 2: Service */}
           {step === 2 && (
             <div className="animate-fade-in">
-              <h2 className="text-lg font-bold text-gray-900 mb-1">Select Service</h2>
-              <p className="text-sm text-gray-500 mb-4">Group: <span className="font-medium text-primary">{selectedGroup}</span></p>
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-1">Select Service</h2>
+              <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">Group: <span className="font-medium text-primary">{selectedGroup}</span></p>
               {filteredServices.length === 0 ? (
                 <div className="text-center py-12">
                   <Settings className="w-10 h-10 text-gray-200 mx-auto mb-3" />
@@ -262,12 +263,12 @@ export default function Apply() {
                       className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 flex items-center justify-between ${
                         selectedService?._id === svc._id || selectedService?.id === svc.id
                           ? "border-primary bg-primary-50"
-                          : "border-gray-200 hover:border-primary-light hover:bg-blue-50/50"
+                          : "border-gray-200 dark:border-[#334155] hover:border-primary-light hover:bg-blue-50/50"
                       }`}
                     >
                       <div>
                         <p className={`font-semibold text-sm ${
-                          selectedService?._id === svc._id || selectedService?.id === svc.id ? "text-primary" : "text-gray-800"
+                          selectedService?._id === svc._id || selectedService?.id === svc.id ? "text-primary" : "text-gray-800 dark:text-slate-200"
                         }`}>
                           {svc.name || svc.title}
                         </p>
@@ -288,7 +289,7 @@ export default function Apply() {
           {/* Step 3: Company Details */}
           {step === 3 && (
             <div className="animate-fade-in">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">Company Details</h2>
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Company Details</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {[
                   { label: "Company Name *", field: "companyName", placeholder: "Your company name" },
@@ -297,7 +298,7 @@ export default function Apply() {
                   { label: "City *", field: "city", placeholder: "City of operation" },
                 ].map(({ label, field, placeholder, type }) => (
                   <div key={field}>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">{label}</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{label}</label>
                     <input
                       type={type || "text"}
                       placeholder={placeholder}
@@ -308,7 +309,7 @@ export default function Apply() {
                   </div>
                 ))}
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Product Description</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Product Description</label>
                   <textarea
                     placeholder="Brief description of the product to be certified..."
                     value={companyForm.productDescription}
@@ -318,7 +319,7 @@ export default function Apply() {
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Additional Notes</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Additional Notes</label>
                   <textarea
                     placeholder="Any additional information or special requirements..."
                     value={companyForm.additionalNotes}
@@ -334,13 +335,13 @@ export default function Apply() {
           {/* Step 4: Documents Upload */}
           {step === 4 && (
             <div className="animate-fade-in">
-              <h2 className="text-lg font-bold text-gray-900 mb-2">Upload Documents</h2>
-              <p className="text-sm text-gray-500 mb-5">Upload supporting documents (optional — you can also upload later).</p>
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Upload Documents</h2>
+              <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">Upload supporting documents (optional — you can also upload later).</p>
 
               {/* Upload Zone */}
               <label className="block border-2 border-dashed border-gray-300 hover:border-primary rounded-xl p-8 text-center cursor-pointer transition-colors group mb-4">
                 <Upload className="w-8 h-8 text-gray-400 group-hover:text-primary mx-auto mb-3 transition-colors" />
-                <p className="text-sm font-medium text-gray-600 group-hover:text-primary transition-colors">
+                <p className="text-sm font-medium text-gray-600 dark:text-slate-400 group-hover:text-primary transition-colors">
                   Click to upload or drag & drop
                 </p>
                 <p className="text-xs text-gray-400 mt-1">PDF, JPG, PNG, DOC — max 10MB each</p>
@@ -355,7 +356,7 @@ export default function Apply() {
                       <div className="flex items-center gap-3">
                         <FileUp className="w-4 h-4 text-primary shrink-0" />
                         <div>
-                          <p className="text-sm font-medium text-gray-700 line-clamp-1">{file.name}</p>
+                          <p className="text-sm font-medium text-gray-700 dark:text-slate-300 line-clamp-1">{file.name}</p>
                           <p className="text-xs text-gray-400">{(file.size / 1024).toFixed(1)} KB</p>
                         </div>
                       </div>
@@ -368,24 +369,24 @@ export default function Apply() {
               )}
 
               {/* Application Summary */}
-              <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Application Summary</p>
+              <div className="bg-gray-50 dark:bg-[#020617] rounded-xl p-4 border border-gray-100 dark:border-[#1E293B]">
+                <p className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-3">Application Summary</p>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Service Group</span>
-                    <span className="font-medium text-gray-800">{selectedGroup}</span>
+                    <span className="text-gray-500 dark:text-slate-400">Service Group</span>
+                    <span className="font-medium text-gray-800 dark:text-slate-200">{selectedGroup}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Service</span>
-                    <span className="font-medium text-gray-800">{selectedService?.name || selectedService?.title}</span>
+                    <span className="text-gray-500 dark:text-slate-400">Service</span>
+                    <span className="font-medium text-gray-800 dark:text-slate-200">{selectedService?.name || selectedService?.title}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Company</span>
-                    <span className="font-medium text-gray-800">{companyForm.companyName}</span>
+                    <span className="text-gray-500 dark:text-slate-400">Company</span>
+                    <span className="font-medium text-gray-800 dark:text-slate-200">{companyForm.companyName}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Documents</span>
-                    <span className="font-medium text-gray-800">{files.length} file(s)</span>
+                    <span className="text-gray-500 dark:text-slate-400">Documents</span>
+                    <span className="font-medium text-gray-800 dark:text-slate-200">{files.length} file(s)</span>
                   </div>
                 </div>
               </div>
@@ -397,7 +398,7 @@ export default function Apply() {
           )}
 
           {/* Navigation */}
-          <div className="flex justify-between mt-8 pt-6 border-t border-gray-100">
+          <div className="flex justify-between mt-8 pt-6 border-t border-gray-100 dark:border-[#1E293B]">
             <button
               onClick={() => { step === 1 ? navigate("/dashboard") : setStep((s) => s - 1); setError(""); }}
               className="btn-secondary"

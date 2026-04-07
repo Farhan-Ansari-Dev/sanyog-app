@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -10,7 +10,9 @@ import {
   Menu,
   X,
   ChevronRight,
-  MessageSquare
+  MessageSquare,
+  Sun,
+  Moon
 } from "lucide-react";
 
 const navItems = [
@@ -25,6 +27,29 @@ export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+      setIsDark(true);
+    } else {
+      document.documentElement.classList.remove('dark');
+      setIsDark(false);
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    if (isDark) {
+      document.documentElement.classList.remove('dark');
+      localStorage.theme = 'light';
+      setIsDark(false);
+    } else {
+      document.documentElement.classList.add('dark');
+      localStorage.theme = 'dark';
+      setIsDark(true);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -43,7 +68,7 @@ export default function Sidebar() {
             className="h-8 w-auto object-contain"
             onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }}
           />
-          <div style={{display:'none'}} className="w-9 h-9 bg-white/20 rounded-lg items-center justify-center">
+          <div style={{display:'none'}} className="w-9 h-9 bg-white dark:bg-[#0F172A]/20 rounded-lg items-center justify-center">
             <Shield className="w-5 h-5 text-white" />
           </div>
         </div>
@@ -70,8 +95,16 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* Logout */}
-      <div className="px-3 py-4 border-t border-white/10">
+      {/* Logout & Theme */}
+      <div className="px-3 py-4 border-t border-white/10 flex flex-col gap-2">
+        <button 
+          onClick={toggleTheme}
+          className="sidebar-link hover:bg-white/10 w-full mb-2"
+        >
+          {isDark ? <Sun className="w-5 h-5 shrink-0 text-yellow-400" /> : <Moon className="w-5 h-5 shrink-0 text-blue-200" />}
+          <span className="text-sm">{isDark ? "Light Mode" : "Dark Mode"}</span>
+        </button>
+
         <button onClick={handleLogout} className="sidebar-link text-red-300 hover:bg-red-500/20 hover:text-red-200 w-full">
           <LogOut className="w-5 h-5 shrink-0" />
           <span className="text-sm">Sign Out</span>
@@ -93,7 +126,7 @@ export default function Sidebar() {
         </div>
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="text-white p-2 rounded-lg hover:bg-white/10"
+          className="text-white p-2 rounded-lg hover:bg-white dark:bg-[#0F172A]/10"
         >
           {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>

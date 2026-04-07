@@ -23,7 +23,7 @@ function StatusBadge({ status }) {
     approved: { label: "Approved", color: "bg-green-100 text-green-700" },
     rejected: { label: "Rejected", color: "bg-red-100 text-red-700" },
   };
-  const s = map[status] || { label: status, color: "bg-gray-100 text-gray-600" };
+  const s = map[status] || { label: status, color: "bg-gray-100 dark:bg-[#1E293B] text-gray-600 dark:text-slate-400" };
   return <span className={`badge ${s.color}`}>{s.label}</span>;
 }
 
@@ -105,20 +105,20 @@ export default function Dashboard() {
   const recentApps = applications.slice(0, 5);
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-gray-50 dark:bg-[#020617]">
       <Sidebar />
       <main className="flex-1 p-6 pt-20 md:pt-6 overflow-x-hidden">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
               Welcome back, {user.name || "Client"} 👋
             </h1>
-            <p className="text-gray-500 text-sm mt-1">
+            <p className="text-gray-500 dark:text-slate-400 text-sm mt-1">
               Here's an overview of your certification applications.
             </p>
           </div>
-          <button onClick={fetchApps} className="hidden md:flex items-center gap-2 text-sm text-gray-500 hover:text-primary transition-colors">
+          <button onClick={fetchApps} className="hidden md:flex items-center gap-2 text-sm text-gray-500 dark:text-slate-400 hover:text-primary transition-colors">
             <RefreshCw className="w-4 h-4" /> Refresh
           </button>
         </div>
@@ -130,8 +130,8 @@ export default function Dashboard() {
               <div className={`w-10 h-10 ${bg} rounded-lg flex items-center justify-center mb-3`}>
                 <Icon className={`w-5 h-5 ${color}`} />
               </div>
-              <div className="text-2xl font-bold text-gray-900">{loading ? "—" : value}</div>
-              <div className="text-xs text-gray-500 mt-1 font-medium">{label}</div>
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">{loading ? "—" : value}</div>
+              <div className="text-xs text-gray-500 dark:text-slate-400 mt-1 font-medium">{label}</div>
             </div>
           ))}
         </div>
@@ -146,16 +146,16 @@ export default function Dashboard() {
             </p>
             <button
               onClick={() => navigate("/apply")}
-              className="flex items-center gap-2 bg-white text-primary font-semibold px-5 py-2.5 rounded-lg text-sm hover:bg-blue-50 transition-colors"
+              className="flex items-center gap-2 bg-white dark:bg-[#0F172A] text-primary font-semibold px-5 py-2.5 rounded-lg text-sm hover:bg-blue-50 transition-colors"
             >
               <PlusCircle className="w-4 h-4" /> Apply Now
             </button>
           </div>
 
-          <div className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm">
+          <div className="bg-white dark:bg-[#0F172A] border border-gray-100 dark:border-[#1E293B] rounded-xl p-6 shadow-sm">
             <Phone className="w-8 h-8 mb-3 text-gray-400" />
-            <h3 className="font-bold text-lg text-gray-900 mb-1">Need Help?</h3>
-            <p className="text-gray-500 text-sm mb-4">
+            <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-1">Need Help?</h3>
+            <p className="text-gray-500 dark:text-slate-400 text-sm mb-4">
               Request a callback from our certification experts — available 24/7.
             </p>
             {callbackMsg && (
@@ -173,9 +173,9 @@ export default function Dashboard() {
         </div>
 
         {/* Recent Applications */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm">
+        <div className="bg-white dark:bg-[#0F172A] rounded-xl border border-gray-100 dark:border-[#1E293B] shadow-sm">
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-50">
-            <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2">
+            <h2 className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
               <FileText className="w-4 h-4 text-primary" /> Recent Applications
             </h2>
             <button
@@ -204,19 +204,19 @@ export default function Dashboard() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-50">
-                    <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-3">Service</th>
-                    <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-3 hidden md:table-cell">Company</th>
-                    <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-3">Status</th>
-                    <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-3 hidden lg:table-cell">Date</th>
+                    <th className="text-left text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider px-6 py-3">Service</th>
+                    <th className="text-left text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider px-6 py-3 hidden md:table-cell">Company</th>
+                    <th className="text-left text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider px-6 py-3">Status</th>
+                    <th className="text-left text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider px-6 py-3 hidden lg:table-cell">Date</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
                   {recentApps.map((app) => (
-                    <tr key={app._id || app.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                    <tr key={app._id || app.id} className="hover:bg-gray-50 dark:bg-[#020617] transition-colors">
+                      <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
                         {app.serviceName || app.certName || "—"}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-500 hidden md:table-cell">
+                      <td className="px-6 py-4 text-sm text-gray-500 dark:text-slate-400 hidden md:table-cell">
                         {app.companyName || "—"}
                       </td>
                       <td className="px-6 py-4">

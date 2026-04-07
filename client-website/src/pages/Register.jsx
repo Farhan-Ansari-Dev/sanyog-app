@@ -80,8 +80,8 @@ export default function Register() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-900 via-primary to-primary-light flex items-center justify-center p-4">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
+        <div className="absolute -top-40 -right-40 w-96 h-96 bg-white dark:bg-[#0F172A]/5 rounded-full blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-white dark:bg-[#0F172A]/5 rounded-full blur-3xl" />
       </div>
 
       <div className="w-full max-w-md relative">
@@ -97,7 +97,7 @@ export default function Register() {
                 e.target.nextSibling.style.display = 'flex';
               }}
             />
-            <div style={{ display: 'none' }} className="inline-flex items-center justify-center w-14 h-14 bg-white/20 backdrop-blur rounded-2xl mb-4 shadow-lg">
+            <div style={{ display: 'none' }} className="inline-flex items-center justify-center w-14 h-14 bg-white dark:bg-[#0F172A]/20 backdrop-blur rounded-2xl mb-4 shadow-lg">
               <Shield className="w-8 h-8 text-white" />
             </div>
           </div>
@@ -105,7 +105,7 @@ export default function Register() {
           <p className="text-blue-200 mt-1">Create Your Client Account</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden animate-fade-in">
+        <div className="bg-white dark:bg-[#0F172A] rounded-2xl shadow-2xl overflow-hidden animate-fade-in">
           {/* Progress */}
           <div className="p-6 pb-0">
             <div className="flex items-center mb-6">
@@ -118,7 +118,7 @@ export default function Register() {
                           ? "bg-green-500 text-white"
                           : step === i + 1
                           ? "bg-primary text-white shadow-md"
-                          : "bg-gray-100 text-gray-400"
+                          : "bg-gray-100 dark:bg-[#1E293B] text-gray-400"
                       }`}
                     >
                       {step > i + 1 ? <Check className="w-4 h-4" /> : i + 1}
@@ -150,9 +150,9 @@ export default function Register() {
             {/* Step 1 */}
             {step === 1 && (
               <div className="space-y-4 animate-fade-in">
-                <h2 className="text-lg font-bold text-gray-900 mb-4">Account Details</h2>
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Account Details</h2>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Full Name *</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Full Name *</label>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input
@@ -165,7 +165,7 @@ export default function Register() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Email Address *</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Email Address *</label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input
@@ -178,7 +178,7 @@ export default function Register() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Password *</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Password *</label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input
@@ -189,7 +189,7 @@ export default function Register() {
                       className="input-field pl-10 pr-12"
                     />
                     <button type="button" onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-slate-400">
                       {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
                   </div>
@@ -206,7 +206,7 @@ export default function Register() {
                   )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Confirm Password *</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Confirm Password *</label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input
@@ -217,7 +217,7 @@ export default function Register() {
                       className="input-field pl-10 pr-12"
                     />
                     <button type="button" onClick={() => setShowConfirm(!showConfirm)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-slate-400">
                       {showConfirm ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
                   </div>
@@ -231,9 +231,9 @@ export default function Register() {
             {/* Step 2 */}
             {step === 2 && (
               <form onSubmit={handleSubmit} className="space-y-4 animate-fade-in">
-                <h2 className="text-lg font-bold text-gray-900 mb-4">Company Details</h2>
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Company Details</h2>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Mobile Number *</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Mobile Number *</label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-medium">+91</span>
                     <input
@@ -247,7 +247,7 @@ export default function Register() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Company Name *</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Company Name *</label>
                   <div className="relative">
                     <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input
@@ -260,7 +260,7 @@ export default function Register() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Country *</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Country *</label>
                   <div className="relative">
                     <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <select
@@ -285,7 +285,7 @@ export default function Register() {
               </form>
             )}
 
-            <p className="text-center text-sm text-gray-500 mt-5">
+            <p className="text-center text-sm text-gray-500 dark:text-slate-400 mt-5">
               Already have an account?{" "}
               <Link to="/login" className="text-primary font-semibold hover:underline">Sign In</Link>
             </p>

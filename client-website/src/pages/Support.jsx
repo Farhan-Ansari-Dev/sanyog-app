@@ -26,7 +26,7 @@ export default function Support() {
 
   return (
     <div className="max-w-2xl mx-auto py-8 px-4 sm:px-6">
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+      <div className="bg-white dark:bg-[#0F172A] rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="bg-primary/5 p-6 sm:p-8 border-b border-primary/10">
           <div className="flex items-center gap-4 mb-4">
             <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
@@ -73,7 +73,7 @@ export default function Support() {
                   <textarea
                     rows={5}
                     placeholder="Briefly describe what you need assistance with..."
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:bg-white focus:border-primary focus:ring-4 ring-primary/10 transition-all resize-none"
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:bg-white dark:bg-[#0F172A] focus:border-primary focus:ring-4 ring-primary/10 transition-all resize-none"
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     maxLength={2000}

@@ -36,7 +36,7 @@ const STATUS_LABELS = {
 };
 
 function StatusBadge({ status }) {
-  const style = STATUS_STYLES[status] || "bg-gray-100 text-gray-600 border border-gray-200";
+  const style = STATUS_STYLES[status] || "bg-gray-100 dark:bg-[#1E293B] text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-[#334155]";
   const label = STATUS_LABELS[status] || status;
   return (
     <span className={`badge ${style} capitalize`}>{label}</span>
@@ -80,7 +80,7 @@ export default function MyApplications() {
   }, {});
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-gray-50 dark:bg-[#020617]">
       <Sidebar />
       <main className="flex-1 p-6 pt-20 md:pt-6 overflow-x-hidden">
         {/* Header */}
@@ -90,7 +90,7 @@ export default function MyApplications() {
             <p className="page-subtitle">{applications.length} total application{applications.length !== 1 ? "s" : ""}</p>
           </div>
           <div className="flex gap-3">
-            <button onClick={fetchApps} className="hidden md:flex items-center gap-2 text-sm text-gray-500 hover:text-primary transition-colors border border-gray-200 px-3 py-2 rounded-lg bg-white">
+            <button onClick={fetchApps} className="hidden md:flex items-center gap-2 text-sm text-gray-500 dark:text-slate-400 hover:text-primary transition-colors border border-gray-200 dark:border-[#334155] px-3 py-2 rounded-lg bg-white dark:bg-[#0F172A]">
               <RefreshCw className="w-4 h-4" /> Refresh
             </button>
             <button onClick={() => navigate("/apply")} className="btn-primary text-sm px-4 py-2.5">
@@ -112,7 +112,7 @@ export default function MyApplications() {
               className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
                 filterStatus === status
                   ? STATUS_STYLES[status]
-                  : "bg-white border-gray-200 text-gray-600 hover:border-gray-300"
+                  : "bg-white dark:bg-[#0F172A] border-gray-200 dark:border-[#334155] text-gray-600 dark:text-slate-400 hover:border-gray-300"
               }`}
             >
               {label} ({counts[status] || 0})
@@ -148,7 +148,7 @@ export default function MyApplications() {
         </div>
 
         {/* Table */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-[#0F172A] rounded-xl border border-gray-100 dark:border-[#1E293B] shadow-sm overflow-hidden">
           {loading ? (
             <div className="flex items-center justify-center py-16">
               <Loader2 className="w-6 h-6 animate-spin text-primary" />
@@ -176,19 +176,19 @@ export default function MyApplications() {
               <div className="hidden md:block overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="bg-gray-50 border-b border-gray-100">
-                      <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-3">Service</th>
-                      <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-3">Company</th>
-                      <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-3">Status</th>
-                      <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-3">Date Applied</th>
-                      <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-3">Last Updated</th>
+                    <tr className="bg-gray-50 dark:bg-[#020617] border-b border-gray-100 dark:border-[#1E293B]">
+                      <th className="text-left text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider px-6 py-3">Service</th>
+                      <th className="text-left text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider px-6 py-3">Company</th>
+                      <th className="text-left text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider px-6 py-3">Status</th>
+                      <th className="text-left text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider px-6 py-3">Date Applied</th>
+                      <th className="text-left text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider px-6 py-3">Last Updated</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50">
                     {filtered.map((app) => (
-                      <tr key={app._id || app.id} className="hover:bg-gray-50 transition-colors group">
+                      <tr key={app._id || app.id} className="hover:bg-gray-50 dark:bg-[#020617] transition-colors group">
                         <td className="px-6 py-4">
-                          <p className="text-sm font-semibold text-gray-900 group-hover:text-primary transition-colors">
+                          <p className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-primary transition-colors">
                             {app.serviceName || app.certName || "—"}
                           </p>
                           {app.serviceGroup && (
@@ -198,7 +198,7 @@ export default function MyApplications() {
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-2">
                             <Building2 className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                            <span className="text-sm text-gray-600">{app.companyName || "—"}</span>
+                            <span className="text-sm text-gray-600 dark:text-slate-400">{app.companyName || "—"}</span>
                           </div>
                         </td>
                         <td className="px-6 py-4">
@@ -224,14 +224,14 @@ export default function MyApplications() {
               {/* Mobile cards */}
               <div className="md:hidden divide-y divide-gray-100">
                 {filtered.map((app) => (
-                  <div key={app._id || app.id} className="p-4 hover:bg-gray-50 transition-colors">
+                  <div key={app._id || app.id} className="p-4 hover:bg-gray-50 dark:bg-[#020617] transition-colors">
                     <div className="flex items-start justify-between mb-2">
-                      <p className="font-semibold text-gray-900 text-sm flex-1 pr-2">
+                      <p className="font-semibold text-gray-900 dark:text-white text-sm flex-1 pr-2">
                         {app.serviceName || app.certName || "—"}
                       </p>
                       <StatusBadge status={app.status} />
                     </div>
-                    <p className="text-xs text-gray-500 flex items-center gap-1.5 mb-1">
+                    <p className="text-xs text-gray-500 dark:text-slate-400 flex items-center gap-1.5 mb-1">
                       <Building2 className="w-3 h-3" /> {app.companyName || "—"}
                     </p>
                     <p className="text-xs text-gray-400 flex items-center gap-1.5">
@@ -243,7 +243,7 @@ export default function MyApplications() {
               </div>
 
               {/* Footer count */}
-              <div className="px-6 py-3 border-t border-gray-50 bg-gray-50/50">
+              <div className="px-6 py-3 border-t border-gray-50 bg-gray-50 dark:bg-[#020617]/50">
                 <p className="text-xs text-gray-400">
                   Showing {filtered.length} of {applications.length} applications
                 </p>
