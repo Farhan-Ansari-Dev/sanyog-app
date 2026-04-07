@@ -187,38 +187,35 @@ export default function Login() {
   };
 
   return (
-    <div 
-      style={{ background: 'linear-gradient(135deg, #0F2A5A 0%, #1E40AF 100%)', fontFamily: '"Inter", sans-serif' }} 
-      className="min-h-screen flex items-center justify-center p-4 relative antialiased"
-    >
-      {/* Radial Glow Container */}
+    <div className="min-h-screen bg-[#F8FAFC] font-['Inter'] flex flex-col items-center justify-center p-4 antialiased selection:bg-[#22C55E]/10 selection:text-[#16A34A] relative">
+      {/* Super subtle radial glow in background */}
       <div 
         className="absolute inset-0 pointer-events-none" 
-        style={{ background: 'radial-gradient(circle at center, rgba(255, 255, 255, 0.08), transparent 60%)' }}
+        style={{ background: 'radial-gradient(circle at center, rgba(238,242,255,0.7) 0%, transparent 70%)' }}
       />
 
       <div className="w-full max-w-[440px] flex flex-col items-center relative z-10">
         
         {/* Minimal Logo Section */}
-        <div className="mb-10 w-full flex flex-col items-center">
+        <div className="mb-10 w-full flex flex-col items-center relative z-20">
           <img
             src="/logo.png"
             alt="Sanyog"
-            className="h-12 w-auto object-contain drop-shadow-lg"
+            className="h-14 w-auto object-contain drop-shadow-sm transition-all duration-300"
             onError={(e) => {
               e.target.style.display = 'none';
               e.target.nextSibling.style.display = 'flex';
             }}
           />
-          <div style={{ display: 'none' }} className="items-center justify-center w-14 h-14 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl shadow-xl">
-            <Shield className="w-7 h-7 text-white" />
+          <div style={{ display: 'none' }} className="items-center justify-center w-14 h-14 bg-white border border-slate-200 rounded-2xl shadow-sm">
+            <Shield className="w-7 h-7 text-slate-800" />
           </div>
         </div>
 
-        {/* The Premium Card */}
+        {/* The Premium Light Card */}
         <div 
-          className="w-full bg-[#FFFFFF] animate-fade-in overflow-hidden"
-          style={{ borderRadius: '16px', boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)' }}
+          className="w-full bg-[#FFFFFF] animate-fade-in overflow-hidden relative z-20"
+          style={{ borderRadius: '16px', boxShadow: '0 20px 40px rgba(0, 0, 0, 0.08)', border: '1px solid rgba(226, 232, 240, 0.8)' }}
         >
           
           {/* Step 1: Mobile Number */}
@@ -226,34 +223,34 @@ export default function Login() {
             <form onSubmit={handleSendOtp} className="px-8 py-10 sm:px-10">
               <div className="text-center mb-8">
                 <h2 className="text-[26px] font-bold text-[#0F172A] tracking-tight m-0">Welcome Back</h2>
-                <p className="text-[14px] text-[#6B7280] mt-2">Enter your mobile number to securely sign in.</p>
+                <p className="text-[14px] text-[#6B7280] mt-2 font-medium">Enter your mobile number to securely sign in.</p>
               </div>
 
               {/* Minimal Alerts */}
               {error && (
-                <div className="flex items-start gap-2 bg-red-50 text-red-600 px-4 py-3 rounded-xl mb-6 text-[14px] border border-red-100">
+                <div className="flex items-start gap-2 bg-red-50 text-red-600 px-4 py-3 rounded-xl mb-6 text-[14px] border border-red-100 font-medium">
                   <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                   {error}
                 </div>
               )}
               {success && (
-                <div className="flex items-center gap-2 bg-green-50 text-[#16A34A] px-4 py-3 rounded-xl mb-6 text-[14px] border border-green-100">
+                <div className="flex items-center gap-2 bg-green-50 text-[#16A34A] px-4 py-3 rounded-xl mb-6 text-[14px] border border-green-100 font-medium">
                   <CheckCircle className="w-4 h-4 shrink-0" />
                   {success}
                 </div>
               )}
 
               <div className="mb-8">
-                <label className="block text-[14px] font-semibold text-[#374151] mb-2">Mobile Number</label>
+                <label className="block text-[14px] font-semibold text-[#0F172A] mb-2">Mobile Number</label>
                 <div className="relative flex items-center group">
-                  <span className="absolute left-4 text-[16px] font-medium text-[#6B7280] select-none">+91</span>
+                  <span className="absolute left-4 text-[16px] font-semibold text-[#6B7280] select-none">+91</span>
                   <input
                     type="tel"
                     maxLength={10}
                     placeholder="10-digit mobile number"
                     value={mobile}
                     onChange={(e) => { setMobile(e.target.value.replace(/\D/g, "")); setError(""); }}
-                    className="w-full pl-[56px] pr-4 h-14 bg-white border border-[#E5E7EB] outline-none rounded-xl text-[16px] font-medium text-[#111827] transition-all duration-200 focus:border-[#22C55E] placeholder:text-[#9CA3AF] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.2)]"
+                    className="w-full pl-[56px] pr-4 h-14 bg-white border border-[#E5E7EB] outline-none rounded-xl text-[16px] font-medium text-[#0F172A] transition-all duration-200 focus:border-[#22C55E] placeholder:text-[#9CA3AF] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.2)]"
                     required
                     autoFocus
                   />
@@ -269,9 +266,9 @@ export default function Login() {
               </button>
 
               <div className="mt-8 text-center pt-6 border-t border-slate-100">
-                <p className="text-[14px] text-[#6B7280]">
+                <p className="text-[14px] text-[#6B7280] font-medium">
                   New to Sanyog?{" "}
-                  <Link to="/register" className="text-[#1E40AF] font-semibold hover:text-[#1E3A8A] hover:underline transition-colors">
+                  <Link to="/register" className="text-[#0F172A] font-bold hover:text-[#22C55E] hover:underline transition-colors">
                     Create Account
                   </Link>
                 </p>
@@ -286,26 +283,26 @@ export default function Login() {
                 <button
                   type="button"
                   onClick={() => { setOtpStep(1); setError(""); setOtpCode(""); }}
-                  className="absolute left-0 top-1.5 text-[#9CA3AF] hover:text-[#4B5563] transition-colors p-1 rounded-lg hover:bg-slate-50"
+                  className="absolute left-0 top-1.5 text-[#6B7280] hover:text-[#0F172A] transition-colors p-1 rounded-lg hover:bg-slate-100"
                   aria-label="Back"
                 >
                   <ArrowLeft className="w-5 h-5" />
                 </button>
                 <h2 className="text-[26px] font-bold text-[#0F172A] tracking-tight m-0">Verify OTP</h2>
-                <p className="text-[14px] text-[#6B7280] mt-2">
-                  Code sent to <span className="font-semibold text-[#111827]">+91 {mobile}</span>
+                <p className="text-[14px] text-[#6B7280] mt-2 font-medium">
+                  Code sent to <span className="font-semibold text-[#0F172A]">+91 {mobile}</span>
                 </p>
               </div>
 
               {/* Alerts */}
               {error && (
-                <div className="flex items-start gap-2 bg-red-50 text-red-600 px-4 py-3 rounded-xl mb-6 text-[14px] border border-red-100">
+                <div className="flex items-start gap-2 bg-red-50 text-red-600 px-4 py-3 rounded-xl mb-6 text-[14px] border border-red-100 font-medium">
                   <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                   {error}
                 </div>
               )}
               {success && (
-                <div className="flex items-center gap-2 bg-green-50 text-[#16A34A] px-4 py-3 rounded-xl mb-6 text-[14px] border border-green-100">
+                <div className="flex items-center gap-2 bg-green-50 text-[#16A34A] px-4 py-3 rounded-xl mb-6 text-[14px] border border-green-100 font-medium">
                   <CheckCircle className="w-4 h-4 shrink-0" />
                   {success}
                 </div>
@@ -330,8 +327,8 @@ export default function Login() {
           )}
         </div>
 
-        <div className="mt-10 mb-4 text-center z-10 w-full">
-          <p className="text-blue-200/60 text-[13px] font-medium tracking-wide">
+        <div className="mt-10 mb-4 text-center z-10 w-full relative">
+          <p className="text-[#6B7280] text-[13px] font-medium tracking-wide">
             © {new Date().getFullYear()} Sanyog Conformity Solutions
           </p>
         </div>
