@@ -36,7 +36,7 @@ export default function Sidebar() {
         <div className="flex items-center gap-3">
           {/* Logo — auto-loaded from /logo.png */}
           <img
-            src="/logo.jpeg" 
+            src="/icon.png" 
             alt="Sanyog"
             className="h-8 w-auto object-contain"
             onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }}
@@ -83,7 +83,7 @@ export default function Sidebar() {
       {/* Mobile hamburger */}
       <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-primary flex items-center px-4 z-40 shadow-md">
         <div className="flex items-center gap-3 flex-1">
-          <img src="/logo.jpeg"  alt="Sanyog" className="h-7 w-auto object-contain"
+          <img src="/icon.png"  alt="Sanyog" className="h-7 w-auto object-contain"
             onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='inline'; }}
           />
           <Shield style={{display:'none'}} className="w-5 h-5 text-white" />
