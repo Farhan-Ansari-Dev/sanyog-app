@@ -51,6 +51,33 @@ router.get('/', adminAuth, requireRole(['admin', 'ops', 'viewer']), async (req, 
   return res.json(out);
 });
 
+// ── POST (manually create application) ───────────────────────────────────────
+router.post('/', adminAuth, requireRole(['admin', 'ops']), async (req, res) => {
+  try {
+    const { userMobile, applicantName, email, companyName, serviceName, serviceGroup, status, remarks } = req.body;
+    
+    if (!userMobile || !serviceName) {
+      return res.status(400).json({ error: 'Mobile and Service Name are required' });
+    }
+
+    const app = await Application.create({
+      userMobile,
+      applicantName,
+      email,
+      companyName,
+      serviceName,
+      serviceGroup: serviceGroup || 'Admin Created',
+      status: status || 'Documents Received',
+      remarks: remarks || '',
+    });
+
+    return res.status(201).json(app);
+  } catch (error) {
+    console.error('[Admin] Manual application create error', error);
+    return res.status(500).json({ error: 'Failed to create application' });
+  }
+});
+
 // ── PATCH status/remarks ─────────────────────────────────────────────────────
 router.patch('/:id', adminAuth, requireRole(['admin', 'ops']), async (req, res) => {
   const schema = z.object({

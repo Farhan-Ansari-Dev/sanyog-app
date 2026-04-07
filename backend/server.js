@@ -13,6 +13,7 @@ const adminApplicationRoutes = require('./routes/adminApplications');
 const adminContactRoutes = require('./routes/adminContact');
 const adminDocumentsRoutes = require('./routes/adminDocuments');
 const adminServicesRoutes = require('./routes/adminServices');
+const adminUsersRoutes = require('./routes/adminUsers');
 const catalogRoutes = require('./routes/catalog');
 const { seedAdminFromEnv } = require('./services/adminSeed');
 
@@ -94,6 +95,7 @@ app.use('/admin/applications', adminApplicationRoutes);
 app.use('/admin/contact', adminContactRoutes);
 app.use('/admin/documents', adminDocumentsRoutes);
 app.use('/admin/services', adminServicesRoutes);
+app.use('/admin/users', adminUsersRoutes);
 
 app.use('/catalog', catalogRoutes);
 

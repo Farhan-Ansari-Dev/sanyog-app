@@ -23,4 +23,10 @@ router.patch('/:id', adminAuth, requireRole(['admin', 'ops']), async (req, res) 
   return res.json(updated);
 });
 
+router.delete('/:id', adminAuth, requireRole(['admin']), async (req, res) => {
+  const deleted = await ContactRequest.findByIdAndDelete(req.params.id);
+  if (!deleted) return res.status(404).json({ error: 'Not found' });
+  return res.json({ ok: true, message: 'Deleted successfully' });
+});
+
 module.exports = router;

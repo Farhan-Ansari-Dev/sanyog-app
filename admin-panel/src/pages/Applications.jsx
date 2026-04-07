@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { Download, ChevronDown, ChevronRight, Inbox, Search, RefreshCw, Loader2, Save, FileText } from "lucide-react";
+import { Download, ChevronDown, ChevronRight, Inbox, Search, RefreshCw, Loader2, Save, FileText, Plus, Trash2, X } from "lucide-react";
 import api from "../services/api";
 
 const STATUS_OPTIONS = [
@@ -62,6 +61,12 @@ export default function Applications() {
 
   const [downloadingDoc, setDownloadingDoc] = useState("");
 
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [createForm, setCreateForm] = useState({
+    userMobile: "", applicantName: "", email: "", companyName: "", serviceName: "", serviceGroup: "", status: "Documents Received", remarks: ""
+  });
+  const [creating, setCreating] = useState(false);
+
   const load = async () => {
     setError("");
     setLoading(true);
@@ -110,6 +115,34 @@ export default function Applications() {
     }
   };
 
+  const deleteApplication = async (appId) => {
+    if (!window.confirm("Are you sure you want to delete this application? It will be moved to the trash.")) return;
+    try {
+      await api.delete(`/admin/applications/${appId}`);
+      await load();
+      if (expandedId === appId) setExpandedId(null);
+    } catch (e) {
+      alert(e?.response?.data?.error || "Failed to delete");
+    }
+  };
+
+  const handleCreate = async (e) => {
+    e.preventDefault();
+    setCreating(true);
+    try {
+      await api.post("/admin/applications", createForm);
+      setShowCreateModal(false);
+      setCreateForm({
+        userMobile: "", applicantName: "", email: "", companyName: "", serviceName: "", serviceGroup: "", status: "Documents Received", remarks: ""
+      });
+      load();
+    } catch (e) {
+      alert(e?.response?.data?.error || "Failed to create application");
+    } finally {
+      setCreating(false);
+    }
+  };
+
   const downloadDocument = async (docId, fileName) => {
     setDownloadingDoc(docId);
     try {
@@ -139,9 +172,18 @@ export default function Applications() {
 
   return (
     <div className="animate-fade-in pb-12">
-      <div className="mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-[#0F172A] tracking-tight">Applications</h1>
-        <p className="text-[15px] text-[#64748B] mt-1">Manage all client certification applications sequentially.</p>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#0F172A] tracking-tight">Applications</h1>
+          <p className="text-[15px] text-[#64748B] mt-1">Manage all client certification applications sequentially.</p>
+        </div>
+        <button 
+          onClick={() => setShowCreateModal(true)}
+          className="h-11 px-5 bg-[#22C55E] hover:bg-[#16A34A] text-white text-[14px] font-semibold rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 w-full sm:w-auto"
+        >
+          <Plus className="w-5 h-5" />
+          Add Application
+        </button>
       </div>
 
       {error && (
@@ -381,6 +423,16 @@ export default function Applications() {
                                       )}
                                     </div>
                                   </div>
+
+                                  <div className="mt-6 pt-5 border-t border-[#E2E8F0] flex justify-end">
+                                    <button 
+                                      onClick={() => deleteApplication(app._id)}
+                                      className="h-10 px-4 flex items-center gap-2 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white font-semibold text-[13px] rounded-lg transition-colors border border-red-100 hover:border-red-500 w-full justify-center"
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                      Delete Application
+                                    </button>
+                                  </div>
                                 </div>
                               </div>
 
@@ -396,6 +448,62 @@ export default function Applications() {
           </div>
         )}
       </div>
+
+      {/* CREATE MODAL */}
+      {showCreateModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setShowCreateModal(false)}></div>
+          <div className="relative bg-white w-full max-w-2xl rounded-2xl shadow-xl border border-[#E2E8F0] overflow-hidden animate-fade-in">
+            <div className="flex justify-between items-center p-6 border-b border-[#F1F5F9]">
+              <h2 className="text-[18px] font-bold text-[#0F172A]">Create New Application</h2>
+              <button onClick={() => setShowCreateModal(false)} className="text-[#64748B] hover:text-[#0F172A]">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <form onSubmit={handleCreate} className="p-6 overflow-y-auto max-h-[70vh]">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[13px] font-semibold text-[#334155] mb-1.5">Mobile Number *</label>
+                  <input required type="text" className="w-full h-11 px-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] rounded-xl outline-none focus:border-[#22C55E]" value={createForm.userMobile} onChange={e => setCreateForm({...createForm, userMobile: e.target.value})} />
+                </div>
+                <div>
+                  <label className="block text-[13px] font-semibold text-[#334155] mb-1.5">Service Name *</label>
+                  <input required type="text" className="w-full h-11 px-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] rounded-xl outline-none focus:border-[#22C55E]" value={createForm.serviceName} onChange={e => setCreateForm({...createForm, serviceName: e.target.value})} placeholder="e.g. BIS Registration" />
+                </div>
+                <div>
+                  <label className="block text-[13px] font-semibold text-[#334155] mb-1.5">Applicant Name</label>
+                  <input type="text" className="w-full h-11 px-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] rounded-xl outline-none focus:border-[#22C55E]" value={createForm.applicantName} onChange={e => setCreateForm({...createForm, applicantName: e.target.value})} />
+                </div>
+                <div>
+                  <label className="block text-[13px] font-semibold text-[#334155] mb-1.5">Company Name</label>
+                  <input type="text" className="w-full h-11 px-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] rounded-xl outline-none focus:border-[#22C55E]" value={createForm.companyName} onChange={e => setCreateForm({...createForm, companyName: e.target.value})} />
+                </div>
+                <div>
+                  <label className="block text-[13px] font-semibold text-[#334155] mb-1.5">Email</label>
+                  <input type="email" className="w-full h-11 px-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] rounded-xl outline-none focus:border-[#22C55E]" value={createForm.email} onChange={e => setCreateForm({...createForm, email: e.target.value})} />
+                </div>
+                <div>
+                  <label className="block text-[13px] font-semibold text-[#334155] mb-1.5">Service Group</label>
+                  <select className="w-full h-11 px-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] rounded-xl outline-none focus:border-[#22C55E]" value={createForm.serviceGroup} onChange={e => setCreateForm({...createForm, serviceGroup: e.target.value})}>
+                    <option value="">Select Group (Optional)</option>
+                    {SERVICE_GROUPS.map(g => <option key={g} value={g}>{g}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div className="mt-4">
+                <label className="block text-[13px] font-semibold text-[#334155] mb-1.5">Initial Remarks</label>
+                <textarea className="w-full p-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] rounded-xl outline-none focus:border-[#22C55E] resize-none min-h-[80px]" value={createForm.remarks} onChange={e => setCreateForm({...createForm, remarks: e.target.value})} />
+              </div>
+              <div className="mt-6 pt-5 border-t border-[#F1F5F9] flex gap-3 justify-end">
+                <button type="button" onClick={() => setShowCreateModal(false)} className="h-11 px-5 text-[14px] font-semibold text-[#64748B] hover:bg-slate-100 rounded-xl">Cancel</button>
+                <button type="submit" disabled={creating} className="h-11 px-6 bg-[#22C55E] hover:bg-[#16A34A] disabled:opacity-70 text-white text-[14px] font-semibold rounded-xl flex items-center gap-2">
+                  {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Create
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

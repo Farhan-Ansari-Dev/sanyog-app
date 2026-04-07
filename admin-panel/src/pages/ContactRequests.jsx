@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { PhoneCall, Loader2, RefreshCw, Phone } from "lucide-react";
+import { PhoneCall, Loader2, RefreshCw, Phone, Trash2 } from "lucide-react";
 import api from "../services/api";
 
 const STATUSES = ["Open", "In Progress", "Closed"];
@@ -50,6 +50,16 @@ export default function ContactRequests() {
       setError(e?.response?.data?.error || "Failed to update request");
     } finally {
       setSavingId("");
+    }
+  };
+
+  const deleteRequest = async (id) => {
+    if (!window.confirm("Are you sure you want to permanently delete this contact request?")) return;
+    try {
+      await api.delete(`/admin/contact/${id}`);
+      await load();
+    } catch (e) {
+      alert(e?.response?.data?.error || "Failed to delete request");
     }
   };
 
@@ -139,21 +149,30 @@ export default function ContactRequests() {
                         <span className="text-[13px] font-medium text-[#64748B]">{formatDate(r.createdAt)}</span>
                       </td>
                       <td className="px-6 py-5 whitespace-nowrap text-right">
-                        <select
-                          className="h-10 pl-4 pr-8 bg-[#F8FAFC] border border-[#E2E8F0] text-[13px] font-semibold text-[#0F172A] rounded-xl outline-none focus:border-[#22C55E] focus:bg-white transition-all min-w-[140px] appearance-none relative"
-                          style={{
-                             backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
-                             backgroundRepeat: 'no-repeat',
-                             backgroundPosition: 'right 12px center'
-                          }}
-                          value={r.status || "Open"}
-                          onChange={(e) => updateStatus(r._id, e.target.value)}
-                          disabled={savingId === r._id}
-                        >
-                          {STATUSES.map((s) => (
-                            <option key={s} value={s}>{s}</option>
-                          ))}
-                        </select>
+                        <div className="flex justify-end gap-3 items-center">
+                          <select
+                            className="h-10 pl-4 pr-8 bg-[#F8FAFC] border border-[#E2E8F0] text-[13px] font-semibold text-[#0F172A] rounded-xl outline-none focus:border-[#22C55E] focus:bg-white transition-all min-w-[140px] appearance-none relative"
+                            style={{
+                               backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                               backgroundRepeat: 'no-repeat',
+                               backgroundPosition: 'right 12px center'
+                            }}
+                            value={r.status || "Open"}
+                            onChange={(e) => updateStatus(r._id, e.target.value)}
+                            disabled={savingId === r._id}
+                          >
+                            {STATUSES.map((s) => (
+                              <option key={s} value={s}>{s}</option>
+                            ))}
+                          </select>
+                          <button
+                            onClick={() => deleteRequest(r._id)}
+                            className="p-2 text-[#64748B] hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-100"
+                            title="Delete Request"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
