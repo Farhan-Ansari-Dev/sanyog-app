@@ -2,6 +2,8 @@ export type RootStackParamList = {
   Login: undefined;
   OTP: { mobile: string };
   Home: undefined;
+  Services: undefined;
+  ServiceDetails: { groupName: string; services: ServiceCatalogService[] };
   Certifications: undefined;
   ApplicationForm: { serviceGroup: string; serviceName: string };
   Upload: { applicationId: string };

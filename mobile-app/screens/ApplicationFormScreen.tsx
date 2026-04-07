@@ -3,7 +3,7 @@ import { Text, TextInput, Pressable, ActivityIndicator, ScrollView } from 'react
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import api from '../services/api';
-import { ui } from './_ui';
+import { ui, colors } from './_ui';
 import type { RootStackParamList } from '../types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ApplicationForm'>;
@@ -51,8 +51,8 @@ export default function ApplicationFormScreen({ route, navigation }: Props) {
   return (
     <ScrollView style={ui.screen} contentContainerStyle={{ paddingBottom: 24 }}>
       <Text style={ui.title}>Application Details</Text>
-      <Text style={{ color: '#6b7280' }}>Service Group: {serviceGroup}</Text>
-      <Text style={{ color: '#6b7280', marginBottom: 6 }}>Service: {serviceName}</Text>
+      <Text style={{ color: colors.muted }}>Service Group: {serviceGroup}</Text>
+      <Text style={{ color: colors.muted, marginBottom: 6 }}>Service: {serviceName}</Text>
 
       <Text style={ui.label}>Company Name *</Text>
       <TextInput style={ui.input} value={companyName} onChangeText={setCompanyName} placeholder="Company name" />

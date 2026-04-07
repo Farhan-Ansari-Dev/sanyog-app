@@ -4,7 +4,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import * as DocumentPicker from 'expo-document-picker';
 
 import api from '../services/api';
-import { ui } from './_ui';
+import { ui, colors } from './_ui';
 import type { RootStackParamList } from '../types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Upload'>;
@@ -76,15 +76,15 @@ export default function UploadDocumentsScreen({ route, navigation }: Props) {
   return (
     <ScrollView style={ui.screen} contentContainerStyle={{ paddingBottom: 24 }}>
       <Text style={ui.title}>Upload Documents</Text>
-      <Text style={{ color: '#6b7280' }}>Application ID: {applicationId}</Text>
+      <Text style={{ color: colors.muted }}>Application ID: {applicationId}</Text>
 
       <Pressable style={ui.button} onPress={pick} disabled={loading}>
         <Text style={ui.buttonText}>Select Documents (PDF/JPG/PNG)</Text>
       </Pressable>
 
       <View style={[ui.card, { marginTop: 12 }]}>
-        <Text style={{ fontWeight: '700', marginBottom: 8 }}>Selected</Text>
-        <Text style={{ color: '#111827', lineHeight: 20 }}>{pickedSummary}</Text>
+        <Text style={{ fontWeight: '700', marginBottom: 8, color: colors.text }}>Selected</Text>
+        <Text style={{ color: colors.text, lineHeight: 20 }}>{pickedSummary}</Text>
       </View>
 
       <Pressable style={ui.button} onPress={upload} disabled={loading}>
@@ -93,7 +93,7 @@ export default function UploadDocumentsScreen({ route, navigation }: Props) {
 
       {!!error && <Text style={ui.error}>{error}</Text>}
 
-      <Text style={{ marginTop: 12, color: '#6b7280' }}>Max 5 files, 10MB each.</Text>
+      <Text style={{ marginTop: 12, color: colors.muted }}>Max 5 files, 10MB each.</Text>
     </ScrollView>
   );
 }

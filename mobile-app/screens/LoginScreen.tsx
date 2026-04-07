@@ -3,7 +3,7 @@ import { View, Text, TextInput, Pressable, ActivityIndicator } from 'react-nativ
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import api from '../services/api';
-import { ui } from './_ui';
+import { ui, colors } from './_ui';
 import type { RootStackParamList } from '../types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
@@ -35,7 +35,7 @@ export default function LoginScreen({ navigation }: Props) {
   return (
     <View style={ui.screen}>
       <Text style={ui.title}>Welcome</Text>
-      <Text>Enter your mobile number to continue.</Text>
+      <Text style={{ color: colors.muted }}>Enter your mobile number to continue.</Text>
 
       <Text style={ui.label}>Mobile Number</Text>
       <TextInput
@@ -52,7 +52,7 @@ export default function LoginScreen({ navigation }: Props) {
 
       {!!error && <Text style={ui.error}>{error}</Text>}
 
-      <Text style={{ marginTop: 12, color: '#6b7280' }}>
+      <Text style={{ marginTop: 12, color: colors.muted }}>
         Tip: In dev mode (mock OTP), the OTP prints in backend logs.
       </Text>
     </View>

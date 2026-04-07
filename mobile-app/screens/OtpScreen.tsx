@@ -4,7 +4,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import api from '../services/api';
 import { setToken } from '../services/authStorage';
-import { ui } from './_ui';
+import { ui, colors } from './_ui';
 import type { RootStackParamList } from '../types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'OTP'>;
@@ -38,7 +38,7 @@ export default function OtpScreen({ route, navigation }: Props) {
   return (
     <View style={ui.screen}>
       <Text style={ui.title}>Verify OTP</Text>
-      <Text>OTP sent to {mobile}</Text>
+      <Text style={{ color: colors.muted }}>OTP sent to {mobile}</Text>
 
       <Text style={ui.label}>OTP</Text>
       <TextInput

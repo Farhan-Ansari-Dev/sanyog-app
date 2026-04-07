@@ -1,320 +1,453 @@
-import { useState, useEffect, useCallback } from 'react';
-import {
-  Search, Filter, RefreshCw, Loader2, Save, FileText,
-  AlertCircle, CheckCircle, XCircle, Clock, ChevronLeft, ChevronRight, X, Trash2
-} from 'lucide-react';
-import AdminLayout from '../components/AdminLayout';
-import api from '../services/api';
+import React, { useEffect, useState } from "react";
+import api from "../services/api";
 
 const STATUS_OPTIONS = [
-  { value: '', label: 'All Statuses' },
-  { value: 'submitted', label: 'Submitted' },
-  { value: 'documents-received', label: 'Documents Received' },
-  { value: 'under-review', label: 'Under Review' },
-  { value: 'additional-docs-required', label: 'Additional Docs Required' },
-  { value: 'approved', label: 'Approved' },
-  { value: 'rejected', label: 'Rejected' },
-  { value: 'certificate-issued', label: 'Certificate Issued' },
+  "Documents Received",
+  "Under Review",
+  "Submitted to Authority",
+  "Query Raised",
+  "Approved / Completed",
 ];
 
-const STATUS_STYLE = {
-  submitted: 'bg-blue-100 text-blue-800',
-  'documents-received': 'bg-blue-100 text-blue-800',
-  'under-review': 'bg-yellow-100 text-yellow-800',
-  pending: 'bg-yellow-100 text-yellow-800',
-  'additional-docs-required': 'bg-orange-100 text-orange-800',
-  documents_required: 'bg-orange-100 text-orange-800',
-  approved: 'bg-green-100 text-green-800',
-  rejected: 'bg-red-100 text-red-800',
-  'certificate-issued': 'bg-emerald-100 text-emerald-800',
+const STATUS_BADGE = {
+  "Documents Received": "badge-blue",
+  "Under Review": "badge-orange",
+  "Submitted to Authority": "badge-purple",
+  "Query Raised": "badge-red",
+  "Approved / Completed": "badge-green",
 };
 
-function StatusBadge({ status }) {
-  const s = (status || '').toLowerCase().replace(/ /g, '-');
-  return <span className={`badge ${STATUS_STYLE[s] || 'bg-gray-100 text-gray-700'} capitalize whitespace-nowrap`}>{(status || '').replace(/-/g, ' ') || '—'}</span>;
+const SERVICE_GROUPS = [
+  "Domestic Certification",
+  "International Certification",
+  "Testing Services",
+  "Inspection Services",
+];
+
+function formatDate(v) {
+  if (!v) return "";
+  const d = new Date(v);
+  return isNaN(d.getTime()) ? "" : d.toLocaleString();
 }
 
-const PAGE_SIZE = 10;
+function formatBytes(bytes) {
+  if (!bytes) return "";
+  if (bytes < 1024) return bytes + " B";
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+  return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+}
+
+function getDocIcon(mime) {
+  if (mime === "application/pdf") return "📄";
+  if (mime?.startsWith("image/")) return "🖼️";
+  return "📎";
+}
 
 export default function Applications() {
   const [apps, setApps] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
-  const [groupFilter, setGroupFilter] = useState('');
-  const [groups, setGroups] = useState([]);
-  const [page, setPage] = useState(1);
-  const [saving, setSaving] = useState({});
-  const [deleting, setDeleting] = useState({});
-  const [edits, setEdits] = useState({});
-  const [feedback, setFeedback] = useState({});
-  const [toast, setToast] = useState(null);
+  const [error, setError] = useState("");
 
-  const showToast = (msg, type = 'success') => {
-    setToast({ msg, type });
-    setTimeout(() => setToast(null), 3000);
-  };
+  // Filters
+  const [filterStatus, setFilterStatus] = useState("");
+  const [filterGroup, setFilterGroup] = useState("");
+  const [search, setSearch] = useState("");
 
-  const fetchApps = useCallback(async () => {
+  // Expanded row
+  const [expandedId, setExpandedId] = useState(null);
+
+  // Editing
+  const [editStatus, setEditStatus] = useState("");
+  const [editRemarks, setEditRemarks] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [saveMsg, setSaveMsg] = useState("");
+
+  // Document download
+  const [downloadingDoc, setDownloadingDoc] = useState("");
+
+  const load = async () => {
+    setError("");
     setLoading(true);
     try {
-      const params = new URLSearchParams();
-      if (statusFilter) params.set('status', statusFilter);
-      if (groupFilter) params.set('serviceGroup', groupFilter);
-      const { data } = await api.get(`/admin/applications?${params}`);
-      const list = Array.isArray(data) ? data : data?.applications || [];
-      setApps(list);
-      const uniqueGroups = [...new Set(list.map(a => a.serviceGroup).filter(Boolean))];
-      setGroups(uniqueGroups);
-    } catch (e) { console.error(e); }
-    finally { setLoading(false); }
-  }, [statusFilter, groupFilter]);
+      const params = {};
+      if (filterStatus) params.status = filterStatus;
+      if (filterGroup) params.serviceGroup = filterGroup;
+      const res = await api.get("/admin/applications", { params });
+      setApps(res.data || []);
+    } catch (e) {
+      setError(e?.response?.data?.error || "Failed to load applications");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  useEffect(() => { fetchApps(); }, [fetchApps]);
+  useEffect(() => {
+    load();
+  }, [filterStatus, filterGroup]);
 
-  const filtered = apps.filter(app => {
+  const toggleExpand = (app) => {
+    if (expandedId === app._id) {
+      setExpandedId(null);
+    } else {
+      setExpandedId(app._id);
+      setEditStatus(app.status || "Documents Received");
+      setEditRemarks(app.remarks || "");
+      setSaveMsg("");
+    }
+  };
+
+  const saveChanges = async (appId) => {
+    setSaving(true);
+    setSaveMsg("");
+    try {
+      await api.patch(`/admin/applications/${appId}`, {
+        status: editStatus,
+        remarks: editRemarks,
+      });
+      setSaveMsg("Saved successfully!");
+      await load();
+    } catch (e) {
+      setSaveMsg(e?.response?.data?.error || "Failed to save");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const downloadDocument = async (docId, fileName) => {
+    setDownloadingDoc(docId);
+    try {
+      const res = await api.get(`/admin/documents/${docId}/signed-url`);
+      const url = res.data?.url;
+      if (url) {
+        window.open(url, "_blank");
+      }
+    } catch (e) {
+      alert("Failed to get download link: " + (e?.response?.data?.error || e.message));
+    } finally {
+      setDownloadingDoc("");
+    }
+  };
+
+  // Client-side search filter
+  const filtered = apps.filter((a) => {
+    if (!search) return true;
     const q = search.toLowerCase();
-    return !q ||
-      (app.companyName || '').toLowerCase().includes(q) ||
-      (app.applicantName || '').toLowerCase().includes(q) ||
-      (app.mobile || '').includes(q) ||
-      (app.serviceName || app.certName || '').toLowerCase().includes(q);
+    return (
+      (a.companyName || "").toLowerCase().includes(q) ||
+      (a.applicantName || "").toLowerCase().includes(q) ||
+      (a.serviceName || "").toLowerCase().includes(q) ||
+      (a.email || "").toLowerCase().includes(q) ||
+      (a.userMobile || "").includes(q)
+    );
   });
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-
-  const getEdit = (id, field, fallback) => edits[id]?.[field] ?? fallback;
-  const setEdit = (id, field, val) => setEdits(prev => ({ ...prev, [id]: { ...prev[id], [field]: val } }));
-
-  const handleSave = async (app) => {
-    const id = app._id || app.id;
-    setSaving(s => ({ ...s, [id]: true }));
-    try {
-      const payload = {};
-      if (edits[id]?.status) payload.status = edits[id].status;
-      if (edits[id]?.remarks !== undefined) payload.remarks = edits[id].remarks;
-      await api.patch(`/admin/applications/${id}`, payload);
-      setFeedback(f => ({ ...f, [id]: 'success' }));
-      setTimeout(() => setFeedback(f => { const n = {...f}; delete n[id]; return n; }), 3000);
-      setApps(prev => prev.map(a => (a._id || a.id) === id ? { ...a, ...payload } : a));
-      setEdits(e => { const n = {...e}; delete n[id]; return n; });
-    } catch {
-      setFeedback(f => ({ ...f, [id]: 'error' }));
-      setTimeout(() => setFeedback(f => { const n = {...f}; delete n[id]; return n; }), 3000);
-    } finally {
-      setSaving(s => ({ ...s, [id]: false }));
-    }
-  };
-
-  const handleDelete = async (app) => {
-    const id = app._id || app.id;
-    if (!window.confirm(`Move "${app.companyName || 'this application'}" to trash?`)) return;
-    setDeleting(d => ({ ...d, [id]: true }));
-    try {
-      await api.delete(`/admin/applications/${id}`);
-      setApps(prev => prev.filter(a => (a._id || a.id) !== id));
-      showToast('Application moved to trash. Restore from Trash page.');
-    } catch (err) {
-      showToast(err.response?.data?.error || 'Delete failed', 'error');
-    } finally {
-      setDeleting(d => ({ ...d, [id]: false }));
-    }
-  };
-
-  const clearFilters = () => { setSearch(''); setStatusFilter(''); setGroupFilter(''); setPage(1); };
-
-  const stats = [
-    { label: 'Total', value: apps.length, color: 'text-slate-900', bg: 'bg-slate-100' },
-    { label: 'Pending', value: apps.filter(a => ['submitted','pending','under-review'].includes(a.status)).length, color: 'text-amber-700', bg: 'bg-amber-50' },
-    { label: 'Approved', value: apps.filter(a => ['approved','certificate-issued'].includes(a.status)).length, color: 'text-green-700', bg: 'bg-green-50' },
-    { label: 'Rejected', value: apps.filter(a => a.status === 'rejected').length, color: 'text-red-700', bg: 'bg-red-50' },
-  ];
-
   return (
-    <AdminLayout title="Applications Management" subtitle="Review and update certification applications">
-      {/* Toast */}
-      {toast && (
-        <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium animate-fade-in ${toast.type === 'error' ? 'bg-red-600 text-white' : 'bg-green-600 text-white'}`}>
-          {toast.msg}
-        </div>
-      )}
-      {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-5">
-        {stats.map(({ label, value, color, bg }) => (
-          <div key={label} className={`card p-4 border-0 ${bg}`}>
-            <p className={`text-2xl font-bold ${color}`}>{loading ? '—' : value}</p>
-            <p className="text-xs text-slate-500 mt-0.5 font-medium">{label}</p>
-          </div>
-        ))}
+    <>
+      <div className="page-header">
+        <h2>Applications</h2>
+        <p>Manage all client certification applications</p>
       </div>
 
-      {/* Filters */}
-      <div className="card p-4 mb-5">
-        <div className="flex flex-wrap gap-3 items-center">
-          <div className="relative flex-1 min-w-48">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input type="text" placeholder="Search company, applicant, mobile..." value={search}
-              onChange={e => { setSearch(e.target.value); setPage(1); }}
-              className="input-field pl-9 h-9 text-xs" />
-          </div>
-          <div className="relative">
-            <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1); }}
-              className="select-field h-9 text-xs pr-8 min-w-40">
-              {STATUS_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
-            </select>
-          </div>
-          {groups.length > 0 && (
-            <div className="relative">
-              <select value={groupFilter} onChange={e => { setGroupFilter(e.target.value); setPage(1); }}
-                className="select-field h-9 text-xs pr-8 min-w-40">
-                <option value="">All Groups</option>
-                {groups.map(g => <option key={g} value={g}>{g}</option>)}
-              </select>
-            </div>
-          )}
-          {(search || statusFilter || groupFilter) && (
-            <button onClick={clearFilters} className="btn-ghost h-9 text-xs gap-1.5">
-              <X className="w-3.5 h-3.5" /> Clear
-            </button>
-          )}
-          <button onClick={fetchApps} className="btn-ghost h-9 ml-auto">
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+      <div className="page-body">
+        {error && <p className="text-error mb-16">{error}</p>}
+
+        {/* Filters */}
+        <div className="filters-bar">
+          <input
+            className="input input-inline"
+            placeholder="Search company, name, mobile..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            style={{ minWidth: 240 }}
+          />
+
+          <select
+            className="select input-inline"
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+          >
+            <option value="">All Statuses</option>
+            {STATUS_OPTIONS.map((s) => (
+              <option key={s} value={s}>{s}</option>
+            ))}
+          </select>
+
+          <select
+            className="select input-inline"
+            value={filterGroup}
+            onChange={(e) => setFilterGroup(e.target.value)}
+          >
+            <option value="">All Service Groups</option>
+            {SERVICE_GROUPS.map((g) => (
+              <option key={g} value={g}>{g}</option>
+            ))}
+          </select>
+
+          <button className="btn btn-secondary btn-sm" onClick={load}>
+            ↻ Refresh
           </button>
-        </div>
-      </div>
 
-      {/* Table */}
-      <div className="card overflow-hidden">
+          <span className="text-muted text-sm" style={{ marginLeft: "auto" }}>
+            {filtered.length} application{filtered.length !== 1 ? "s" : ""}
+          </span>
+        </div>
+
+        {/* Loading */}
         {loading ? (
-          <div className="flex items-center justify-center py-16">
-            <Loader2 className="w-6 h-6 animate-spin text-primary" />
+          <div className="flex-center" style={{ padding: 48 }}>
+            <div className="spinner"></div>
           </div>
-        ) : paginated.length === 0 ? (
-          <div className="text-center py-16 text-slate-400">
-            <FileText className="w-10 h-10 mx-auto mb-3 opacity-30" />
-            <p className="text-sm font-medium">{apps.length === 0 ? 'No applications found' : 'No results match your filters'}</p>
+        ) : !filtered.length ? (
+          <div className="card">
+            <div className="empty-state">
+              <div className="empty-icon">📋</div>
+              <h3>No applications found</h3>
+              <p>Try adjusting your filters or wait for new submissions.</p>
+            </div>
           </div>
         ) : (
-          <>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-slate-50 border-b border-slate-200">
-                  <tr>
-                    <th className="table-header">Client & Company</th>
-                    <th className="table-header hidden md:table-cell">Service</th>
-                    <th className="table-header hidden lg:table-cell">City</th>
-                    <th className="table-header">Status</th>
-                    <th className="table-header hidden lg:table-cell">Remarks</th>
-                    <th className="table-header hidden xl:table-cell">Date</th>
-                    <th className="table-header">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginated.map((app) => {
-                    const id = app._id || app.id;
-                    const isSaving = saving[id];
-                    const fb = feedback[id];
-                    const hasEdits = !!edits[id];
-                    return (
-                      <tr key={id} className="table-row">
-                        <td className="table-cell">
-                          <p className="font-semibold text-slate-900 text-xs">{app.companyName || '—'}</p>
-                          <p className="text-slate-500 text-xs">{app.applicantName || '—'}</p>
-                          <p className="text-slate-400 text-xs">{app.mobile || ''}</p>
+          <div className="table-wrap">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th style={{ width: 36 }}></th>
+                  <th>Company</th>
+                  <th>Applicant</th>
+                  <th>Service</th>
+                  <th>Status</th>
+                  <th>Docs</th>
+                  <th>Created</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((app) => {
+                  const isExpanded = expandedId === app._id;
+                  const badgeCls = STATUS_BADGE[app.status] || "badge-default";
+                  const docCount = (app.documentsMeta || []).length;
+
+                  return (
+                    <React.Fragment key={app._id}>
+                      <tr
+                        key={app._id}
+                        onClick={() => toggleExpand(app)}
+                        style={{ cursor: "pointer" }}
+                      >
+                        <td style={{ fontSize: 14, color: "var(--text-muted)" }}>
+                          {isExpanded ? "▼" : "▶"}
                         </td>
-                        <td className="table-cell hidden md:table-cell">
-                          <p className="text-xs font-medium max-w-[140px] truncate">{app.serviceName || app.certName || '—'}</p>
-                          <p className="text-slate-400 text-xs truncate max-w-[140px]">{app.serviceGroup || ''}</p>
+                        <td className="text-bold">
+                          {app.companyName || "—"}
                         </td>
-                        <td className="table-cell hidden lg:table-cell text-xs text-slate-500">{app.city || '—'}</td>
-                        <td className="table-cell">
-                          <select
-                            value={getEdit(id, 'status', app.status || '')}
-                            onChange={e => setEdit(id, 'status', e.target.value)}
-                            className="select-field text-xs h-8 min-w-36"
-                          >
-                            {STATUS_OPTIONS.slice(1).map(s => (
-                              <option key={s.value} value={s.value}>{s.label}</option>
-                            ))}
-                          </select>
-                        </td>
-                        <td className="table-cell hidden lg:table-cell">
-                          <input
-                            type="text"
-                            placeholder="Add remarks..."
-                            value={getEdit(id, 'remarks', app.remarks || '')}
-                            onChange={e => setEdit(id, 'remarks', e.target.value)}
-                            className="input-field text-xs h-8 min-w-40"
-                          />
-                        </td>
-                        <td className="table-cell hidden xl:table-cell text-xs text-slate-400">
-                          {app.createdAt ? new Date(app.createdAt).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) : '—'}
-                        </td>
-                        <td className="table-cell">
-                          <div className="flex items-center gap-1.5">
-                            {fb === 'success' && <CheckCircle className="w-4 h-4 text-green-500 shrink-0" />}
-                            {fb === 'error' && <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />}
-                            {(hasEdits || !fb) && (
-                              <button
-                                onClick={() => handleSave(app)}
-                                disabled={isSaving || !hasEdits}
-                                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                                  hasEdits
-                                    ? 'bg-primary text-white hover:bg-primary-dark'
-                                    : 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                                }`}
-                              >
-                                {isSaving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />}
-                                Save
-                              </button>
-                            )}
-                            <button
-                              onClick={() => handleDelete(app)}
-                              disabled={deleting[id]}
-                              className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
-                              title="Move to trash"
-                            >
-                              {deleting[id] ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
-                            </button>
+                        <td>
+                          <div>{app.applicantName || "—"}</div>
+                          <div className="text-xs text-muted">
+                            {app.userMobile}
                           </div>
                         </td>
+                        <td>
+                          <div className="text-sm">
+                            {app.serviceName || app.certification || "—"}
+                          </div>
+                          {app.serviceGroup && (
+                            <div className="text-xs text-muted">
+                              {app.serviceGroup}
+                            </div>
+                          )}
+                        </td>
+                        <td>
+                          <span className={`badge ${badgeCls}`}>
+                            {app.status || "Documents Received"}
+                          </span>
+                        </td>
+                        <td className="text-sm">
+                          {docCount > 0 ? (
+                            <span className="badge badge-default">
+                              📎 {docCount}
+                            </span>
+                          ) : (
+                            <span className="text-muted">—</span>
+                          )}
+                        </td>
+                        <td className="text-muted text-sm">
+                          {formatDate(app.createdAt)}
+                        </td>
                       </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
 
-            {/* Pagination */}
-            <div className="flex items-center justify-between px-5 py-3 border-t border-slate-100 bg-slate-50">
-              <p className="text-xs text-slate-500">
-                Showing {Math.min((page-1)*PAGE_SIZE+1, filtered.length)}–{Math.min(page*PAGE_SIZE, filtered.length)} of {filtered.length}
-              </p>
-              <div className="flex items-center gap-1">
-                <button onClick={() => setPage(p => Math.max(1, p-1))} disabled={page === 1}
-                  className="p-1.5 rounded hover:bg-slate-200 disabled:opacity-40 transition-colors">
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                  const pg = page <= 3 ? i+1 : page - 2 + i;
-                  if (pg < 1 || pg > totalPages) return null;
-                  return (
-                    <button key={pg} onClick={() => setPage(pg)}
-                      className={`w-7 h-7 rounded text-xs font-medium transition-colors ${pg === page ? 'bg-primary text-white' : 'hover:bg-slate-200 text-slate-600'}`}>
-                      {pg}
-                    </button>
+                      {isExpanded && (
+                        <tr key={`${app._id}-row`} className="expand-row">
+                          <td colSpan={7}>
+                            <div className="expand-content">
+                              {/* Application Details */}
+                              <div className="expand-grid">
+                                <div className="expand-field">
+                                  <span className="label">Company</span>
+                                  <span className="value">
+                                    {app.companyName || "—"}
+                                  </span>
+                                </div>
+                                <div className="expand-field">
+                                  <span className="label">Applicant</span>
+                                  <span className="value">
+                                    {app.applicantName || "—"}
+                                  </span>
+                                </div>
+                                <div className="expand-field">
+                                  <span className="label">Email</span>
+                                  <span className="value">
+                                    {app.email || "—"}
+                                  </span>
+                                </div>
+                                <div className="expand-field">
+                                  <span className="label">City</span>
+                                  <span className="value">
+                                    {app.city || "—"}
+                                  </span>
+                                </div>
+                                <div className="expand-field">
+                                  <span className="label">Mobile</span>
+                                  <span className="value">
+                                    {app.userMobile}
+                                  </span>
+                                </div>
+                                <div className="expand-field">
+                                  <span className="label">Service Group</span>
+                                  <span className="value">
+                                    {app.serviceGroup || "—"}
+                                  </span>
+                                </div>
+                                {app.description && (
+                                  <div
+                                    className="expand-field"
+                                    style={{ gridColumn: "1 / -1" }}
+                                  >
+                                    <span className="label">Description</span>
+                                    <span className="value">
+                                      {app.description}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Documents */}
+                              {(app.documentsMeta || []).length > 0 && (
+                                <div style={{ marginTop: 20 }}>
+                                  <div className="text-xs text-bold text-muted" style={{ textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>
+                                    Documents ({app.documentsMeta.length})
+                                  </div>
+                                  <div className="docs-list">
+                                    {app.documentsMeta.map((doc) => (
+                                      <div className="doc-item" key={doc._id}>
+                                        <span className="doc-icon">
+                                          {getDocIcon(doc.mimeType)}
+                                        </span>
+                                        <div className="doc-info">
+                                          <div className="doc-name">
+                                            {doc.originalName}
+                                          </div>
+                                          <div className="doc-meta">
+                                            {doc.mimeType} · {formatBytes(doc.sizeBytes)} · {formatDate(doc.createdAt)}
+                                          </div>
+                                        </div>
+                                        <button
+                                          className="btn btn-secondary btn-sm"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            downloadDocument(doc._id, doc.originalName);
+                                          }}
+                                          disabled={downloadingDoc === doc._id}
+                                        >
+                                          {downloadingDoc === doc._id ? (
+                                            <span className="spinner" style={{ width: 14, height: 14 }}></span>
+                                          ) : (
+                                            "Download"
+                                          )}
+                                        </button>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Edit Status & Remarks */}
+                              <div className="edit-section">
+                                <div className="text-xs text-bold text-muted" style={{ textTransform: "uppercase", letterSpacing: 1, marginBottom: 12 }}>
+                                  Update Application
+                                </div>
+
+                                <div className="edit-row">
+                                  <div className="input-group" style={{ minWidth: 220 }}>
+                                    <label>Status</label>
+                                    <select
+                                      className="select"
+                                      value={editStatus}
+                                      onChange={(e) =>
+                                        setEditStatus(e.target.value)
+                                      }
+                                    >
+                                      {STATUS_OPTIONS.map((s) => (
+                                        <option key={s} value={s}>
+                                          {s}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  </div>
+
+                                  <div
+                                    className="input-group"
+                                    style={{ flex: 1, minWidth: 280 }}
+                                  >
+                                    <label>Remarks (visible to client)</label>
+                                    <input
+                                      className="input"
+                                      value={editRemarks}
+                                      onChange={(e) =>
+                                        setEditRemarks(e.target.value)
+                                      }
+                                      placeholder="Add remarks for the client..."
+                                    />
+                                  </div>
+
+                                  <button
+                                    className="btn btn-primary"
+                                    onClick={() => saveChanges(app._id)}
+                                    disabled={saving}
+                                    style={{ alignSelf: "flex-end" }}
+                                  >
+                                    {saving ? (
+                                      <>
+                                        <span className="spinner" style={{ width: 14, height: 14 }}></span>
+                                        Saving...
+                                      </>
+                                    ) : (
+                                      "Save Changes"
+                                    )}
+                                  </button>
+                                </div>
+
+                                {saveMsg && (
+                                  <p
+                                    className={
+                                      saveMsg.includes("success")
+                                        ? "text-success mt-8 text-sm"
+                                        : "text-error mt-8 text-sm"
+                                    }
+                                  >
+                                    {saveMsg}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
                   );
                 })}
-                <button onClick={() => setPage(p => Math.min(totalPages, p+1))} disabled={page === totalPages}
-                  className="p-1.5 rounded hover:bg-slate-200 disabled:opacity-40 transition-colors">
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </>
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
-    </AdminLayout>
+    </>
   );
 }

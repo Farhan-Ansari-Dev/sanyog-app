@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Pressable, ActivityIndicator } from 'react-native';
 
 import api from '../services/api';
-import { ui } from './_ui';
+import { ui, colors } from './_ui';
 
 export default function ContactExpertScreen() {
   const [message, setMessage] = useState('');
@@ -29,7 +29,7 @@ export default function ContactExpertScreen() {
   return (
     <View style={ui.screen}>
       <Text style={ui.title}>Need Assistance?</Text>
-      <Text style={{ color: '#6b7280' }}>Submit a callback request and our compliance expert will reach out.</Text>
+      <Text style={{ color: colors.muted }}>Submit a callback request and our compliance expert will reach out.</Text>
 
       <Text style={ui.label}>Message (optional)</Text>
       <TextInput
@@ -44,7 +44,7 @@ export default function ContactExpertScreen() {
         {loading ? <ActivityIndicator color="#fff" /> : <Text style={ui.buttonText}>Request Callback</Text>}
       </Pressable>
 
-      {!!status && <Text style={{ marginTop: 12, color: '#065f46', fontWeight: '700' }}>{status}</Text>}
+      {!!status && <Text style={{ marginTop: 12, color: colors.accent, fontWeight: '700' }}>{status}</Text>}
       {!!error && <Text style={ui.error}>{error}</Text>}
     </View>
   );
