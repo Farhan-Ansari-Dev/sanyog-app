@@ -263,28 +263,7 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={otpLoading || mobile.length !== 10}
-                className="w-full h-14 text-[16px] font-[600] rounded-[10px] flex items-center justify-center gap-2 transition-all duration-200"
-                style={{
-                  backgroundColor: otpLoading || mobile.length !== 10 ? '#E5E7EB' : '#22C55E',
-                  color: otpLoading || mobile.length !== 10 ? '#9CA3AF' : '#FFFFFF',
-                  cursor: otpLoading || mobile.length !== 10 ? 'not-allowed' : 'pointer',
-                  transform: otpLoading || mobile.length !== 10 ? 'none' : 'var(--btn-transform, translateY(0))',
-                  boxShadow: otpLoading || mobile.length !== 10 ? 'none' : 'var(--btn-shadow, none)'
-                }}
-                onMouseEnter={(e) => {
-                  if(!otpLoading && mobile.length === 10) {
-                    e.currentTarget.style.backgroundColor = '#16A34A';
-                    e.currentTarget.style.setProperty('--btn-transform', 'translateY(-1px)');
-                    e.currentTarget.style.setProperty('--btn-shadow', '0 8px 20px rgba(34, 197, 94, 0.3)');
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if(!otpLoading && mobile.length === 10) {
-                    e.currentTarget.style.backgroundColor = '#22C55E';
-                    e.currentTarget.style.setProperty('--btn-transform', 'translateY(0)');
-                    e.currentTarget.style.setProperty('--btn-shadow', 'none');
-                  }
-                }}
+                className="w-full h-14 text-[16px] text-white font-[600] rounded-[10px] bg-[#22C55E] flex items-center justify-center gap-2 transition-all duration-200 hover:bg-[#16A34A] hover:-translate-y-[1px] hover:shadow-[0_8px_20px_rgba(34,197,94,0.3)] disabled:opacity-65 disabled:pointer-events-none disabled:transform-none disabled:shadow-none"
               >
                 {otpLoading ? <><Loader2 className="w-5 h-5 animate-spin" /> Sending...</> : "Send OTP"}
               </button>
@@ -339,28 +318,7 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={otpLoading || otpCode.length < 6}
-                className="w-full h-14 text-[16px] font-[600] rounded-[10px] flex items-center justify-center gap-2 transition-all duration-200"
-                style={{
-                  backgroundColor: otpLoading || otpCode.length < 6 ? '#E5E7EB' : '#22C55E',
-                  color: otpLoading || otpCode.length < 6 ? '#9CA3AF' : '#FFFFFF',
-                  cursor: otpLoading || otpCode.length < 6 ? 'not-allowed' : 'pointer',
-                  transform: otpLoading || otpCode.length < 6 ? 'none' : 'var(--btn-transform, translateY(0))',
-                  boxShadow: otpLoading || otpCode.length < 6 ? 'none' : 'var(--btn-shadow, none)'
-                }}
-                onMouseEnter={(e) => {
-                  if(!otpLoading && otpCode.length === 6) {
-                    e.currentTarget.style.backgroundColor = '#16A34A';
-                    e.currentTarget.style.setProperty('--btn-transform', 'translateY(-1px)');
-                    e.currentTarget.style.setProperty('--btn-shadow', '0 8px 20px rgba(34, 197, 94, 0.3)');
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if(!otpLoading && otpCode.length === 6) {
-                    e.currentTarget.style.backgroundColor = '#22C55E';
-                    e.currentTarget.style.setProperty('--btn-transform', 'translateY(0)');
-                    e.currentTarget.style.setProperty('--btn-shadow', 'none');
-                  }
-                }}
+                className="w-full h-14 text-[16px] text-white font-[600] rounded-[10px] bg-[#22C55E] flex items-center justify-center gap-2 transition-all duration-200 hover:bg-[#16A34A] hover:-translate-y-[1px] hover:shadow-[0_8px_20px_rgba(34,197,94,0.3)] disabled:opacity-65 disabled:pointer-events-none disabled:transform-none disabled:shadow-none"
               >
                 {otpLoading ? <><Loader2 className="w-5 h-5 animate-spin" /> Verifying...</> : "Verify & Sign In"}
               </button>
