@@ -10,6 +10,7 @@ import {
   Menu,
   X,
   ChevronRight,
+  MessageSquare
 } from "lucide-react";
 
 const navItems = [
@@ -17,6 +18,7 @@ const navItems = [
   { label: "My Applications", icon: FileText, path: "/my-applications" },
   { label: "Apply", icon: PlusCircle, path: "/apply" },
   { label: "Profile", icon: User, path: "/profile" },
+  { label: "Support", icon: MessageSquare, path: "/support" },
 ];
 
 export default function Sidebar() {

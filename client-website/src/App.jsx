@@ -5,6 +5,7 @@ import Dashboard from "./pages/Dashboard";
 import Apply from "./pages/Apply";
 import MyApplications from "./pages/MyApplications";
 import Profile from "./pages/Profile";
+import Support from "./pages/Support";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
@@ -53,6 +54,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Profile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/support"
+          element={
+            <ProtectedRoute>
+              <Support />
             </ProtectedRoute>
           }
         />

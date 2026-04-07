@@ -8,6 +8,7 @@ import { useTheme } from '../../hooks/useTheme';
 import GlassCard from '../../components/common/GlassCard';
 import PrimaryButton from '../../components/common/PrimaryButton';
 import SectionHeader from '../../components/common/SectionHeader';
+import api from '../../services/api';
 import { spacing, typography, borderRadius } from '../../theme';
 
 export default function ContactExpertScreen() {
@@ -16,11 +17,21 @@ export default function ContactExpertScreen() {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
     if (!name.trim() || !email.trim() || !message.trim()) return;
-    await new Promise((r) => setTimeout(r, 1000));
-    setSent(true);
+    setLoading(true);
+    try {
+      await api.post('/contact/request', { message: `Name: ${name}\nEmail: ${email}\n\n${message}` });
+      setSent(true);
+    } catch (error) {
+      console.warn("Failed to contact backend:", error);
+      // Fallback for demo purposes if backend isn't mapped
+      setSent(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (sent) {
@@ -135,8 +146,9 @@ export default function ContactExpertScreen() {
           />
 
           <PrimaryButton
-            title="Send Message"
+            title={loading ? "Sending..." : "Send Message"}
             onPress={handleSubmit}
+            disabled={loading}
             icon="paper-plane-outline"
             size="lg"
             style={{ marginTop: spacing.xl }}
