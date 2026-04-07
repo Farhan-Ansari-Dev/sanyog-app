@@ -75,7 +75,7 @@ export default function Login() {
             )}
 
             <div className="mb-6">
-              <label className="block text-[14px] font-semibold text-[#0F172A] mb-2">Email Address</label>
+              <label className="block text-[14px] font-semibold text-[#0F172A] mb-2">Email</label>
               <div className="relative flex items-center group">
                 <span className="absolute left-4 text-[#6B7280]">
                   <Mail className="w-5 h-5" />
