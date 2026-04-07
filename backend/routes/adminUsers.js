@@ -110,6 +110,26 @@ router.get('/clients', adminAuth, async (req, res) => {
   }
 });
 
+// POST /admin/users/clients — add a client manually
+router.post('/clients', adminAuth, requireRole('admin'), async (req, res) => {
+  try {
+    const { mobile, email } = req.body;
+    if (!mobile) return res.status(400).json({ error: 'Mobile number is required' });
+    
+    const exists = await User.findOne({ mobile });
+    if (exists) return res.status(409).json({ error: 'Client with this mobile already exists' });
+
+    const client = await User.create({ 
+      mobile, 
+      email: email || '',
+      isVerified: true 
+    });
+    return res.status(201).json({ ok: true, _id: client._id });
+  } catch (e) {
+    return res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // DELETE /admin/users/clients/:id — delete a client user
 router.delete('/clients/:id', adminAuth, requireRole('admin'), async (req, res) => {
   try {

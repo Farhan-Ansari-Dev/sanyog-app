@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import { Download, ChevronDown, ChevronRight, Inbox, Search, RefreshCw, Loader2, Save, FileText, Plus, Trash2, X } from "lucide-react";
 import api from "../services/api";
 
@@ -174,8 +175,8 @@ export default function Applications() {
     <div className="animate-fade-in pb-12">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-[#0F172A] tracking-tight">Applications</h1>
-          <p className="text-[15px] text-[#64748B] mt-1">Manage all client certification applications sequentially.</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#0F172A] dark:text-white tracking-tight">Applications</h1>
+          <p className="text-[15px] text-[#64748B] dark:text-[#94A3B8] mt-1">Manage all client certification applications sequentially.</p>
         </div>
         <button 
           onClick={() => setShowCreateModal(true)}
@@ -193,7 +194,7 @@ export default function Applications() {
       )}
 
       {/* Filters */}
-      <div className="bg-white dark:bg-[#0F172A] p-4 rounded-2xl border border-[#E2E8F0] shadow-sm mb-6 flex flex-col md:flex-row gap-4 items-center">
+      <div className="bg-white dark:bg-[#111111] p-4 rounded-2xl border border-[#E2E8F0] dark:border-[#333333] shadow-sm mb-6 flex flex-col md:flex-row gap-4 items-center transition-colors">
         <div className="relative flex-1 w-full">
           <Search className="w-4 h-4 text-[#94A3B8] absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
@@ -204,27 +205,33 @@ export default function Applications() {
           />
         </div>
 
-        <select
-          className="h-10 px-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] text-[#334155] font-medium rounded-xl outline-none focus:border-[#22C55E] focus:bg-white dark:bg-[#0F172A] transition-all w-full md:w-auto min-w-[180px]"
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value)}
-        >
-          <option value="">All Statuses</option>
-          {STATUS_OPTIONS.map((s) => (
-            <option key={s} value={s}>{s}</option>
-          ))}
-        </select>
+        <div className="relative w-full md:w-auto">
+          <select
+            className="w-full h-10 pl-10 pr-4 bg-[#F8FAFC] dark:bg-[#1A1A1A] border border-[#E2E8F0] dark:border-[#333333] text-[14px] text-[#0F172A] dark:text-[#F8FAFC] rounded-xl outline-none focus:border-[#22C55E] appearance-none cursor-pointer"
+            value={filterStatus}
+            onChange={e => setFilterStatus(e.target.value)}
+          >
+            <option value="">All Statuses</option>
+            {STATUS_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
+          </select>
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#94A3B8]">
+            <ChevronDown className="w-4 h-4" />
+          </div>
+        </div>
 
-        <select
-          className="h-10 px-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] text-[#334155] font-medium rounded-xl outline-none focus:border-[#22C55E] focus:bg-white dark:bg-[#0F172A] transition-all w-full md:w-auto min-w-[200px]"
-          value={filterGroup}
-          onChange={(e) => setFilterGroup(e.target.value)}
-        >
-          <option value="">All Service Groups</option>
-          {SERVICE_GROUPS.map((g) => (
-            <option key={g} value={g}>{g}</option>
-          ))}
-        </select>
+        <div className="relative w-full md:w-56">
+          <FolderTree className="w-4 h-4 text-[#94A3B8] absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <select
+            className="w-full h-10 pl-10 pr-4 bg-[#F8FAFC] dark:bg-[#1A1A1A] border border-[#E2E8F0] dark:border-[#333333] text-[14px] text-[#0F172A] dark:text-[#F8FAFC] rounded-xl outline-none focus:border-[#22C55E] appearance-none cursor-pointer"
+            value={filterGroup}
+            onChange={(e) => setFilterGroup(e.target.value)}
+          >
+            <option value="">All Service Groups</option>
+            {SERVICE_GROUPS.map((g) => (
+              <option key={g} value={g}>{g}</option>
+            ))}
+          </select>
+        </div>
 
         <button 
           className="h-10 px-5 bg-white dark:bg-[#0F172A] border border-[#E2E8F0] text-[14px] text-[#0F172A] font-medium rounded-xl hover:bg-slate-50 dark:bg-[#1E293B] flex items-center gap-2 transition-colors w-full md:w-auto justify-center shadow-sm"
@@ -240,67 +247,42 @@ export default function Applications() {
       </div>
 
       {/* Main Content Area */}
-      <div className="bg-white dark:bg-[#0F172A] border border-[#E2E8F0] rounded-2xl shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-[#111111] border border-[#E2E8F0] dark:border-[#333333] rounded-2xl shadow-sm overflow-hidden transition-colors">
         {loading ? (
           <div className="w-full h-64 flex flex-col items-center justify-center">
             <Loader2 className="w-8 h-8 animate-spin text-[#22C55E] mb-4" />
-            <p className="text-[#64748B] font-medium text-[15px]">Loading applications...</p>
+            <p className="text-[#64748B] dark:text-[#94A3B8] font-medium text-[15px]">Loading applications...</p>
           </div>
         ) : !filtered.length ? (
           <div className="flex flex-col items-center justify-center p-16 text-center h-full">
-            <div className="w-20 h-20 bg-slate-50 dark:bg-[#1E293B] rounded-full flex items-center justify-center mb-5 border border-slate-100">
-              <Inbox className="w-10 h-10 text-slate-300" />
-            </div>
-            <h3 className="text-[18px] font-bold text-[#0F172A] mb-2">No applications found</h3>
-            <p className="text-[15px] text-[#64748B] max-w-[300px]">Adjust your filters or wait for new client submissions to arrive.</p>
+            <Inbox className="w-12 h-12 text-slate-300 dark:text-slate-600 mb-4" />
+            <h3 className="text-[18px] font-bold text-[#0F172A] dark:text-white mb-2">No applications found</h3>
+            <p className="text-[14px] text-[#64748B] dark:text-[#94A3B8]">Client submissions will appear here.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse min-w-[900px]">
+            <table className="w-full text-left border-collapse min-w-[800px]">
               <thead>
-                <tr className="bg-[#F8FAFC] border-b border-[#E2E8F0]">
-                  <th className="w-12 px-4 py-3.5 text-center"></th>
-                  <th className="px-6 py-3.5 text-[12px] font-bold text-[#64748B] uppercase tracking-wider">Company</th>
-                  <th className="px-6 py-3.5 text-[12px] font-bold text-[#64748B] uppercase tracking-wider">Applicant</th>
-                  <th className="px-6 py-3.5 text-[12px] font-bold text-[#64748B] uppercase tracking-wider">Service</th>
-                  <th className="px-6 py-3.5 text-[12px] font-bold text-[#64748B] uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3.5 text-[12px] font-bold text-[#64748B] uppercase tracking-wider">Docs</th>
-                  <th className="px-6 py-3.5 text-[12px] font-bold text-[#64748B] uppercase tracking-wider text-right">Created</th>
+                <tr className="bg-[#F8FAFC] dark:bg-[#080808] border-b border-[#E2E8F0] dark:border-[#333333]">
+                  <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider">Company & Service</th>
+                  <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider">Applicant</th>
+                  <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider text-right">Date</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#F1F5F9] bg-white dark:bg-[#0F172A]">
-                {filtered.map((app) => {
-                  const isExpanded = expandedId === app._id;
-                  const badgeCls = STATUS_BADGE[app.status || "Documents Received"] || "bg-slate-100 text-slate-700 border-slate-200";
-                  const docCount = (app.documentsMeta || []).length;
-
+              <tbody className="divide-y divide-[#F1F5F9] dark:divide-[#222222] bg-white dark:bg-[#111111]">
+                {filtered.map((a) => {
+                  const isExpanded = expandedId === a._id;
+                  const badgeClasses = STATUS_BADGE[a.status] || "bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700";
                   return (
-                    <React.Fragment key={app._id}>
-                      {/* Main Row */}
-                      <tr
-                        onClick={() => toggleExpand(app)}
-                        className={`cursor-pointer transition-colors ${isExpanded ? 'bg-blue-50/30' : 'hover:bg-slate-50 dark:bg-[#1E293B]/50'}`}
+                    <React.Fragment key={a._id}>
+                      {/* Main row */}
+                      <tr 
+                        onClick={() => toggleExpand(a)}
+                        className={`cursor-pointer transition-colors ${
+                          isExpanded ? 'bg-slate-50 dark:bg-[#1A1A1A]' : 'hover:bg-slate-50 dark:hover:bg-[#1A1A1A]'
+                        }`}
                       >
-                        <td className="px-4 py-4 text-center">
-                          {isExpanded ? (
-                            <ChevronDown className="w-5 h-5 text-[#22C55E] mx-auto" />
-                          ) : (
-                            <ChevronRight className="w-5 h-5 text-[#94A3B8] mx-auto group-hover:text-[#64748B]" />
-                          )}
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className="text-[14px] font-bold text-[#0F172A]">{app.companyName || "—"}</span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="text-[14px] font-semibold text-[#334155]">{app.applicantName || "—"}</div>
-                          <div className="text-[12px] font-medium text-[#64748B]">{app.userMobile}</div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="text-[14px] text-[#0F172A] font-medium">{app.serviceName || app.certification || "—"}</div>
-                          {app.serviceGroup && (
-                            <div className="text-[12px] text-[#64748B] bg-slate-100 inline-block px-2 py-0.5 rounded mt-1">
-                              {app.serviceGroup}
-                            </div>
                           )}
                         </td>
                         <td className="px-6 py-4">

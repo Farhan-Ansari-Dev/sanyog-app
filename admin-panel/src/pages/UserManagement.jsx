@@ -18,9 +18,15 @@ export default function UserManagement() {
     const [search, setSearch] = useState("");
 
     // Modal
+    // Staff Modal
     const [showModal, setShowModal] = useState(false);
     const [form, setForm] = useState({ name: "", email: "", role: "ops", password: "" });
     const [saving, setSaving] = useState(false);
+
+    // Client Modal
+    const [showClientModal, setShowClientModal] = useState(false);
+    const [clientForm, setClientForm] = useState({ mobile: "+91", email: "" });
+    const [clientSaving, setClientSaving] = useState(false);
 
     const loadData = async () => {
         setError("");
@@ -74,6 +80,31 @@ export default function UserManagement() {
         }
     };
 
+    const handleCreateClient = async (e) => {
+        e.preventDefault();
+        setClientSaving(true);
+        try {
+            await api.post("/admin/users/clients", clientForm);
+            setShowClientModal(false);
+            setClientForm({ mobile: "+91", email: "" });
+            loadData();
+        } catch (err) {
+            alert(err?.response?.data?.error || "Failed to create client.");
+        } finally {
+            setClientSaving(false);
+        }
+    };
+
+    const handleDeleteClient = async (id) => {
+        if (!window.confirm("Are you sure you want to permanently delete this client and unlink their resources?")) return;
+        try {
+            await api.delete(`/admin/users/clients/${id}`);
+            loadData();
+        } catch (err) {
+            alert(err?.response?.data?.error || "Failed to delete client.");
+        }
+    };
+
     const filteredUsers = users.filter((u) => {
         if (!search) return true;
         const q = search.toLowerCase();
@@ -95,13 +126,21 @@ export default function UserManagement() {
                 </div>
                 
                 <div className="flex gap-3 w-full sm:w-auto">
-                    {activeTab === "staff" && (
+                    {activeTab === "staff" ? (
                         <button 
                             onClick={() => setShowModal(true)}
                             className="flex-1 sm:flex-none h-11 px-5 bg-[#22C55E] hover:bg-[#16A34A] text-white text-[14px] font-semibold rounded-xl transition-all shadow-sm flex items-center justify-center gap-2"
                         >
                             <UserPlus className="w-4 h-4" />
                             Add Staff
+                        </button>
+                    ) : (
+                        <button 
+                            onClick={() => setShowClientModal(true)}
+                            className="flex-1 sm:flex-none h-11 px-5 bg-[#22C55E] hover:bg-[#16A34A] text-white text-[14px] font-semibold rounded-xl transition-all shadow-sm flex items-center justify-center gap-2"
+                        >
+                            <UserPlus className="w-4 h-4" />
+                            Add Client
                         </button>
                     )}
                     <button 
@@ -178,17 +217,27 @@ export default function UserManagement() {
                                         <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] uppercase tracking-wider">Email Address</th>
                                         <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] uppercase tracking-wider">Applications</th>
                                         <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] uppercase tracking-wider text-right">Joined</th>
+                                        <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] uppercase tracking-wider text-right">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-[#F1F5F9]">
+                                <tbody className="divide-y divide-[#F1F5F9] dark:divide-[#1E293B]">
                                     {filteredUsers.map((u) => (
-                                        <tr key={u._id} className="hover:bg-slate-50 dark:bg-[#1E293B]/50">
-                                            <td className="px-6 py-4 whitespace-nowrap font-bold text-[#0F172A]">{u.mobile}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-[14px] text-[#475569]">{u.email || <span className="text-slate-400 italic">None</span>}</td>
+                                        <tr key={u._id} className="hover:bg-slate-50 dark:hover:bg-[#1E293B]/50 transition-colors">
+                                            <td className="px-6 py-4 whitespace-nowrap font-bold text-[#0F172A] dark:text-[#F8FAFC]">{u.mobile}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-[14px] text-[#475569] dark:text-[#94A3B8]">{u.email || <span className="text-slate-400 dark:text-slate-600 italic">None</span>}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className="bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full text-xs font-bold border border-slate-200">{u.applicationCount || 0}</span>
+                                                <span className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2.5 py-1 rounded-md text-xs font-bold border border-slate-200 dark:border-slate-700">{u.applicationCount || 0}</span>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-right text-[13px] text-[#64748B]">{formatDate(u.createdAt)}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-right text-[13px] text-[#64748B] dark:text-[#CBD5E1] font-medium">{formatDate(u.createdAt)}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-right">
+                                                <button 
+                                                    onClick={() => handleDeleteClient(u._id)}
+                                                    className="p-1.5 text-[#64748B] dark:text-[#94A3B8] hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded transition-colors"
+                                                    title="Delete Client"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -315,11 +364,57 @@ export default function UserManagement() {
                                     </select>
                                 </div>
                             </div>
-                            <div className="mt-8 pt-5 border-t border-[#F1F5F9] flex gap-3 justify-end">
-                                <button type="button" onClick={() => setShowModal(false)} className="h-11 px-5 text-[14px] font-semibold text-[#64748B] hover:bg-slate-100 rounded-xl">Cancel</button>
+                            <div className="mt-8 pt-5 border-t border-[#F1F5F9] dark:border-[#1E293B] flex gap-3 justify-end">
+                                <button type="button" onClick={() => setShowModal(false)} className="h-11 px-5 text-[14px] font-semibold text-[#64748B] dark:text-[#94A3B8] hover:bg-slate-100 dark:hover:bg-[#1E293B] rounded-xl">Cancel</button>
                                 <button type="submit" disabled={saving} className="h-11 px-6 bg-[#22C55E] hover:bg-[#16A34A] disabled:opacity-70 text-white text-[14px] font-semibold rounded-xl flex items-center justify-center gap-2">
                                     {saving && <Loader2 className="w-4 h-4 animate-spin" />}
                                     Create Provision
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* CREATE CLIENT MODAL */}
+            {showClientModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setShowClientModal(false)}></div>
+                    <div className="relative bg-white dark:bg-[#0F172A] w-full max-w-md rounded-2xl shadow-xl border border-[#E2E8F0] dark:border-[#1E293B] overflow-hidden animate-fade-in">
+                        <div className="flex justify-between items-center p-6 border-b border-[#F1F5F9] dark:border-[#1E293B]">
+                            <h2 className="text-[18px] font-bold text-[#0F172A] dark:text-[#F8FAFC]">Provision Mobile Client</h2>
+                            <button onClick={() => setShowClientModal(false)} className="text-[#64748B] dark:text-[#94A3B8] hover:text-[#0F172A] dark:hover:text-[#F8FAFC]">
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+                        <form onSubmit={handleCreateClient} className="p-6">
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-[13px] font-semibold text-[#334155] dark:text-[#CBD5E1] mb-1.5">Mobile Number (Login ID)</label>
+                                    <input 
+                                        type="tel" 
+                                        required 
+                                        className="w-full h-11 px-4 bg-[#F8FAFC] dark:bg-[#1E293B] border border-[#E2E8F0] dark:border-[#334155] text-[14px] text-[#0F172A] dark:text-[#F8FAFC] rounded-xl outline-none focus:border-[#22C55E]"
+                                        value={clientForm.mobile}
+                                        onChange={e => setClientForm({...clientForm, mobile: e.target.value})}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-[13px] font-semibold text-[#334155] dark:text-[#CBD5E1] mb-1.5">Email (Optional)</label>
+                                    <input 
+                                        type="email" 
+                                        className="w-full h-11 px-4 bg-[#F8FAFC] dark:bg-[#1E293B] border border-[#E2E8F0] dark:border-[#334155] text-[14px] text-[#0F172A] dark:text-[#F8FAFC] rounded-xl outline-none focus:border-[#22C55E]"
+                                        value={clientForm.email}
+                                        onChange={e => setClientForm({...clientForm, email: e.target.value})}
+                                        placeholder="client@company.com"
+                                    />
+                                </div>
+                            </div>
+                            <div className="mt-8 pt-5 border-t border-[#F1F5F9] dark:border-[#1E293B] flex gap-3 justify-end">
+                                <button type="button" onClick={() => setShowClientModal(false)} className="h-11 px-5 text-[14px] font-semibold text-[#64748B] dark:text-[#94A3B8] hover:bg-slate-100 dark:hover:bg-[#1E293B] rounded-xl">Cancel</button>
+                                <button type="submit" disabled={clientSaving} className="h-11 px-6 bg-[#22C55E] hover:bg-[#16A34A] disabled:opacity-70 text-white text-[14px] font-semibold rounded-xl flex items-center justify-center gap-2">
+                                    {clientSaving && <Loader2 className="w-4 h-4 animate-spin" />}
+                                    Create Client
                                 </button>
                             </div>
                         </form>

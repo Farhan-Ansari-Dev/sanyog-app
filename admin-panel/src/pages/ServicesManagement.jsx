@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Plus, Edit2, Trash2, Loader2, FolderTree, X } from "lucide-react";
 import api from "../services/api";
 

@@ -45,7 +45,7 @@ export default function Layout() {
   };
 
   return (
-    <div className="flex h-screen bg-[#F8FAFC] font-['Inter'] antialiased selection:bg-[#22C55E]/10 selection:text-[#16A34A]">
+    <div className="flex h-screen bg-[#F8FAFC] dark:bg-[#000000] font-['Inter'] text-[#0F172A] dark:text-[#F8FAFC] antialiased selection:bg-[#22C55E]/10 selection:text-[#16A34A]">
       
       {/* Sidebar */}
       <aside className="w-64 bg-white dark:bg-[#0F172A] border-r border-[#E2E8F0] flex flex-col justify-between shadow-sm relative z-20">
