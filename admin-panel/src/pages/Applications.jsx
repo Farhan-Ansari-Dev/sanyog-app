@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Download, ChevronDown, ChevronRight, Inbox, Search, RefreshCw, Loader2, Save, FileText, Plus, Trash2, X } from "lucide-react";
+import { Download, ChevronDown, ChevronRight, Inbox, Search, RefreshCw, Loader2, Save, FileText, Plus, Trash2, X, FolderTree } from "lucide-react";
 import api from "../services/api";
 
 const STATUS_OPTIONS = [
