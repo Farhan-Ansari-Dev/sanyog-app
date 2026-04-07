@@ -99,7 +99,7 @@ export default function ServicesManagement() {
         </div>
       )}
 
-      <div className="bg-white border border-[#E2E8F0] rounded-2xl shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-[#0F172A] border border-[#E2E8F0] rounded-2xl shadow-sm overflow-hidden">
         {loading ? (
           <div className="w-full h-64 flex flex-col items-center justify-center">
             <Loader2 className="w-8 h-8 animate-spin text-[#22C55E] mb-4" />
@@ -117,12 +117,12 @@ export default function ServicesManagement() {
                   <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] uppercase tracking-wider text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#F1F5F9] bg-white">
+              <tbody className="divide-y divide-[#F1F5F9] bg-white dark:bg-[#0F172A]">
                 {services.length === 0 ? (
                   <tr>
                     <td colSpan="5">
                       <div className="flex flex-col items-center justify-center p-16 text-center h-full">
-                        <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-5 border border-slate-100">
+                        <div className="w-20 h-20 bg-slate-50 dark:bg-[#1E293B] rounded-full flex items-center justify-center mb-5 border border-slate-100">
                           <FolderTree className="w-10 h-10 text-slate-300" />
                         </div>
                         <h3 className="text-[18px] font-bold text-[#0F172A] mb-2">No services configured</h3>
@@ -132,7 +132,7 @@ export default function ServicesManagement() {
                   </tr>
                 ) : (
                   services.map((svc) => (
-                    <tr key={svc._id} className="hover:bg-slate-50/50 transition-colors">
+                    <tr key={svc._id} className="hover:bg-slate-50 dark:bg-[#1E293B]/50 transition-colors">
                       <td className="px-6 py-5 whitespace-nowrap">
                         <span className="text-[14px] font-bold text-[#0F172A]">{svc.name}</span>
                       </td>
@@ -186,7 +186,7 @@ export default function ServicesManagement() {
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
           <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={handleCloseModal}></div>
-          <div className="relative bg-white w-full max-w-lg rounded-2xl shadow-[0_20px_40px_rgba(0,0,0,0.1)] border border-[#E2E8F0] overflow-hidden animate-fade-in">
+          <div className="relative bg-white dark:bg-[#0F172A] w-full max-w-lg rounded-2xl shadow-[0_20px_40px_rgba(0,0,0,0.1)] border border-[#E2E8F0] overflow-hidden animate-fade-in">
             <div className="flex justify-between items-center p-6 border-b border-[#F1F5F9]">
               <h2 className="text-[18px] font-bold text-[#0F172A]">{isEditing ? "Edit Service" : "Add New Service"}</h2>
               <button onClick={handleCloseModal} className="text-[#64748B] hover:text-[#0F172A] transition-colors">
@@ -200,7 +200,7 @@ export default function ServicesManagement() {
                   <label className="block text-[13px] font-semibold text-[#334155] mb-1.5">Service Group / Category</label>
                   <input 
                     type="text" 
-                    className="w-full h-11 px-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] text-[#0F172A] rounded-xl outline-none focus:border-[#22C55E] focus:bg-white transition-all shadow-sm"
+                    className="w-full h-11 px-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] text-[#0F172A] rounded-xl outline-none focus:border-[#22C55E] focus:bg-white dark:bg-[#0F172A] transition-all shadow-sm"
                     value={form.category} 
                     onChange={e => setForm({...form, category: e.target.value})} 
                     required 
@@ -212,7 +212,7 @@ export default function ServicesManagement() {
                   <label className="block text-[13px] font-semibold text-[#334155] mb-1.5">Service Name</label>
                   <input 
                     type="text" 
-                    className="w-full h-11 px-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] text-[#0F172A] rounded-xl outline-none focus:border-[#22C55E] focus:bg-white transition-all shadow-sm"
+                    className="w-full h-11 px-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] text-[#0F172A] rounded-xl outline-none focus:border-[#22C55E] focus:bg-white dark:bg-[#0F172A] transition-all shadow-sm"
                     value={form.name} 
                     onChange={e => setForm({
                         ...form, 
@@ -228,7 +228,7 @@ export default function ServicesManagement() {
                   <label className="block text-[13px] font-semibold text-[#334155] mb-1.5">URL Slug Path</label>
                   <input 
                     type="text" 
-                    className="w-full h-11 px-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] text-[#0F172A] rounded-xl outline-none focus:border-[#22C55E] focus:bg-white transition-all shadow-sm font-mono"
+                    className="w-full h-11 px-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] text-[#0F172A] rounded-xl outline-none focus:border-[#22C55E] focus:bg-white dark:bg-[#0F172A] transition-all shadow-sm font-mono"
                     value={form.slug} 
                     onChange={e => setForm({...form, slug: e.target.value})} 
                     required 
@@ -244,7 +244,7 @@ export default function ServicesManagement() {
                         checked={form.isActive} 
                         onChange={e => setForm({...form, isActive: e.target.checked})} 
                       />
-                      <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#22C55E]"></div>
+                      <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white dark:bg-[#0F172A] after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#22C55E]"></div>
                     </div>
                     <span className="text-[14px] font-bold text-[#0F172A] group-hover:text-[#22C55E] transition-colors">Visible to public</span>
                   </label>

@@ -75,7 +75,7 @@ export default function ContactRequests() {
         
         <button 
           onClick={load}
-          className="h-11 px-5 bg-white border border-[#E2E8F0] text-[14px] text-[#0F172A] font-semibold rounded-xl hover:bg-slate-50 transition-colors shadow-sm flex items-center gap-2"
+          className="h-11 px-5 bg-white dark:bg-[#0F172A] border border-[#E2E8F0] text-[14px] text-[#0F172A] font-semibold rounded-xl hover:bg-slate-50 dark:bg-[#1E293B] transition-colors shadow-sm flex items-center gap-2"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           Refresh Data
@@ -90,17 +90,17 @@ export default function ContactRequests() {
 
       {/* Metrics Row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white p-5 rounded-2xl border border-[#E2E8F0] shadow-sm flex flex-col items-start">
+        <div className="bg-white dark:bg-[#0F172A] p-5 rounded-2xl border border-[#E2E8F0] shadow-sm flex flex-col items-start">
           <p className="text-[13px] font-bold text-[#64748B] uppercase tracking-wider mb-1">Total</p>
           <div className="text-2xl font-bold text-[#0F172A]">{items.length}</div>
         </div>
-        <div className="bg-white p-5 rounded-2xl border border-[#E2E8F0] shadow-sm flex flex-col items-start border-l-4 border-l-red-500">
+        <div className="bg-white dark:bg-[#0F172A] p-5 rounded-2xl border border-[#E2E8F0] shadow-sm flex flex-col items-start border-l-4 border-l-red-500">
           <p className="text-[13px] font-bold text-red-500 uppercase tracking-wider mb-1">Open</p>
           <div className="text-2xl font-bold text-[#0F172A]">{openCount}</div>
         </div>
       </div>
 
-      <div className="bg-white border border-[#E2E8F0] rounded-2xl shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-[#0F172A] border border-[#E2E8F0] rounded-2xl shadow-sm overflow-hidden">
         {loading ? (
           <div className="w-full h-64 flex flex-col items-center justify-center">
             <Loader2 className="w-8 h-8 animate-spin text-[#22C55E] mb-4" />
@@ -108,7 +108,7 @@ export default function ContactRequests() {
           </div>
         ) : !items.length ? (
           <div className="flex flex-col items-center justify-center p-16 text-center h-full">
-            <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-5 border border-slate-100">
+            <div className="w-20 h-20 bg-slate-50 dark:bg-[#1E293B] rounded-full flex items-center justify-center mb-5 border border-slate-100">
               <PhoneCall className="w-10 h-10 text-slate-300" />
             </div>
             <h3 className="text-[18px] font-bold text-[#0F172A] mb-2">No contact requests yet</h3>
@@ -125,14 +125,14 @@ export default function ContactRequests() {
                   <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] uppercase tracking-wider text-right">Status Control</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#F1F5F9] bg-white">
+              <tbody className="divide-y divide-[#F1F5F9] bg-white dark:bg-[#0F172A]">
                 {items.map((r) => {
                   const isNew = r.status === "Open" || !r.status;
                   return (
-                    <tr key={r._id} className="hover:bg-slate-50/50 transition-colors">
+                    <tr key={r._id} className="hover:bg-slate-50 dark:bg-[#1E293B]/50 transition-colors">
                       <td className="px-6 py-5 whitespace-nowrap">
                         <div className="flex items-center gap-3">
-                          <div className={`p-2 rounded-lg ${isNew ? 'bg-red-50 text-red-500' : 'bg-slate-50 text-slate-400'}`}>
+                          <div className={`p-2 rounded-lg ${isNew ? 'bg-red-50 text-red-500' : 'bg-slate-50 dark:bg-[#1E293B] text-slate-400'}`}>
                             <Phone className="w-4 h-4" />
                           </div>
                           <span className="text-[14px] font-bold text-[#0F172A]">{r.userMobile}</span>
@@ -151,7 +151,7 @@ export default function ContactRequests() {
                       <td className="px-6 py-5 whitespace-nowrap text-right">
                         <div className="flex justify-end gap-3 items-center">
                           <select
-                            className="h-10 pl-4 pr-8 bg-[#F8FAFC] border border-[#E2E8F0] text-[13px] font-semibold text-[#0F172A] rounded-xl outline-none focus:border-[#22C55E] focus:bg-white transition-all min-w-[140px] appearance-none relative"
+                            className="h-10 pl-4 pr-8 bg-[#F8FAFC] border border-[#E2E8F0] text-[13px] font-semibold text-[#0F172A] rounded-xl outline-none focus:border-[#22C55E] focus:bg-white dark:bg-[#0F172A] transition-all min-w-[140px] appearance-none relative"
                             style={{
                                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
                                backgroundRepeat: 'no-repeat',

@@ -55,7 +55,7 @@ export default function AdminLayout({ children, title, subtitle }) {
     const sz = size === 'sm' ? 'w-7 h-7 text-xs' : 'w-9 h-9 text-sm';
     return admin?.avatar
       ? <img src={admin.avatar} alt="avatar" className={`${sz} rounded-lg object-cover border border-white/20 ${className}`} />
-      : <div className={`${sz} rounded-lg bg-white/20 flex items-center justify-center font-bold text-white ${className}`}>
+      : <div className={`${sz} rounded-lg bg-white dark:bg-[#0F172A]/20 flex items-center justify-center font-bold text-white ${className}`}>
           {(admin?.name || 'A').charAt(0).toUpperCase()}
         </div>;
   };
@@ -76,7 +76,7 @@ export default function AdminLayout({ children, title, subtitle }) {
             }}
           />
           <div style={{ display: 'none' }} className="items-center gap-3">
-            <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center shadow-inner">
+            <div className="w-9 h-9 bg-white dark:bg-[#0F172A]/20 rounded-xl flex items-center justify-center shadow-inner">
               <Shield className="w-5 h-5 text-white" />
             </div>
             <div>
@@ -89,7 +89,7 @@ export default function AdminLayout({ children, title, subtitle }) {
 
       {/* ── Admin Profile ── */}
       {admin && (
-        <Link to="/settings" className="px-5 py-4 border-b border-white/10 hover:bg-white/5 transition-colors group">
+        <Link to="/settings" className="px-5 py-4 border-b border-white/10 hover:bg-white dark:bg-[#0F172A]/5 transition-colors group">
           <div className="flex items-center gap-3">
             <AvatarBubble size="sm" />
             <div className="min-w-0 flex-1">
@@ -156,7 +156,7 @@ export default function AdminLayout({ children, title, subtitle }) {
       {/* Main area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top header */}
-        <header className="bg-white border-b border-slate-200 px-6 h-14 flex items-center justify-between shrink-0 shadow-sm z-20 sticky top-0">
+        <header className="bg-white dark:bg-[#0F172A] border-b border-slate-200 px-6 h-14 flex items-center justify-between shrink-0 shadow-sm z-20 sticky top-0">
           <div className="flex items-center gap-3">
             <button onClick={() => setSidebarOpen(!sidebarOpen)} className="md:hidden btn-ghost p-2">
               {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -175,13 +175,13 @@ export default function AdminLayout({ children, title, subtitle }) {
                 <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
               </button>
               {notifOpen && (
-                <div className="absolute right-0 top-10 w-72 bg-white rounded-xl shadow-xl border border-slate-100 z-50 overflow-hidden animate-fade-in">
+                <div className="absolute right-0 top-10 w-72 bg-white dark:bg-[#0F172A] rounded-xl shadow-xl border border-slate-100 z-50 overflow-hidden animate-fade-in">
                   <div className="px-4 py-3 border-b border-slate-100 flex justify-between items-center">
                     <p className="text-sm font-bold text-slate-900">Notifications</p>
                     <button className="text-xs text-primary font-medium hover:underline">Mark all read</button>
                   </div>
                   <div className="p-3 space-y-2">
-                    <div className="flex gap-3 p-2 hover:bg-slate-50 rounded-lg cursor-pointer">
+                    <div className="flex gap-3 p-2 hover:bg-slate-50 dark:bg-[#1E293B] rounded-lg cursor-pointer">
                       <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center shrink-0">
                         <FileText className="w-4 h-4 text-blue-600" />
                       </div>

@@ -27,7 +27,7 @@ function ConfirmModal({ open, title, message, onConfirm, onCancel, loading }) {
   if (!open) return null;
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full animate-fade-in">
+      <div className="bg-white dark:bg-[#0F172A] rounded-2xl shadow-2xl p-6 max-w-sm w-full animate-fade-in">
         <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mx-auto mb-4">
           <Trash2 className="w-6 h-6 text-red-600" />
         </div>
@@ -73,7 +73,7 @@ function AddStaffModal({ open, onClose, onSuccess }) {
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md animate-fade-in">
+      <div className="bg-white dark:bg-[#0F172A] rounded-2xl shadow-2xl w-full max-w-md animate-fade-in">
         <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 bg-primary-50 rounded-xl flex items-center justify-center">
@@ -145,7 +145,7 @@ function AddStaffModal({ open, onClose, onSuccess }) {
           </div>
 
           {/* Role info */}
-          <div className="bg-slate-50 rounded-lg p-3 text-xs text-slate-500 space-y-1">
+          <div className="bg-slate-50 dark:bg-[#1E293B] rounded-lg p-3 text-xs text-slate-500 space-y-1">
             <p><span className="font-semibold text-purple-700">Super Admin:</span> Full access, can manage staff</p>
             <p><span className="font-semibold text-blue-700">Operations:</span> Manage applications & contacts</p>
             <p><span className="font-semibold text-gray-600">Viewer:</span> Read-only access</p>
@@ -195,7 +195,7 @@ function EditStaffModal({ open, user, onClose, onSuccess }) {
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md animate-fade-in">
+      <div className="bg-white dark:bg-[#0F172A] rounded-2xl shadow-2xl w-full max-w-md animate-fade-in">
         <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 bg-blue-50 rounded-xl flex items-center justify-center">
@@ -385,7 +385,7 @@ function StaffTab() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-slate-50 border-b border-slate-200">
+              <thead className="bg-slate-50 dark:bg-[#1E293B] border-b border-slate-200">
                 <tr>
                   <th className="table-header">Staff Member</th>
                   <th className="table-header hidden sm:table-cell">Role</th>
@@ -587,7 +587,7 @@ function ClientsTab() {
           <>
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-slate-50 border-b border-slate-200">
+                <thead className="bg-slate-50 dark:bg-[#1E293B] border-b border-slate-200">
                   <tr>
                     <th className="table-header">Mobile Number</th>
                     <th className="table-header hidden sm:table-cell">Status</th>
@@ -654,7 +654,7 @@ function ClientsTab() {
                 </tbody>
               </table>
             </div>
-            <div className="px-5 py-3 border-t border-slate-100 bg-slate-50">
+            <div className="px-5 py-3 border-t border-slate-100 bg-slate-50 dark:bg-[#1E293B]">
               <p className="text-xs text-slate-400">Showing {filtered.length} of {clients.length} clients</p>
             </div>
           </>
@@ -679,7 +679,7 @@ export default function UserManagement() {
           <button key={id} onClick={() => setTab(id)}
             className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
               tab === id
-                ? 'bg-white text-primary shadow-sm'
+                ? 'bg-white dark:bg-[#0F172A] text-primary shadow-sm'
                 : 'text-slate-500 hover:text-slate-700'
             }`}>
             <Icon className="w-4 h-4" />

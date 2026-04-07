@@ -17,7 +17,7 @@ const FILE_TYPES = {
 
 function getFileType(filename) {
   const ext = (filename || '').split('.').pop().toLowerCase();
-  return { ext, ...(FILE_TYPES[ext] || { icon: File, color: 'text-slate-500', bg: 'bg-slate-50', badge: 'bg-slate-100 text-slate-700' }) };
+  return { ext, ...(FILE_TYPES[ext] || { icon: File, color: 'text-slate-500', bg: 'bg-slate-50 dark:bg-[#1E293B]', badge: 'bg-slate-100 text-slate-700' }) };
 }
 
 function formatBytes(bytes) {
@@ -174,7 +174,7 @@ export default function Documents() {
             return (
               <div key={appId} className="card overflow-hidden">
                 {/* App header */}
-                <div className="flex items-center justify-between px-5 py-3.5 bg-slate-50 border-b border-slate-100">
+                <div className="flex items-center justify-between px-5 py-3.5 bg-slate-50 dark:bg-[#1E293B] border-b border-slate-100">
                   <div>
                     <p className="text-sm font-bold text-slate-900">{app?.companyName || 'Unknown Company'}</p>
                     <p className="text-xs text-slate-500 mt-0.5">

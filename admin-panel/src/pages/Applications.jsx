@@ -193,11 +193,11 @@ export default function Applications() {
       )}
 
       {/* Filters */}
-      <div className="bg-white p-4 rounded-2xl border border-[#E2E8F0] shadow-sm mb-6 flex flex-col md:flex-row gap-4 items-center">
+      <div className="bg-white dark:bg-[#0F172A] p-4 rounded-2xl border border-[#E2E8F0] shadow-sm mb-6 flex flex-col md:flex-row gap-4 items-center">
         <div className="relative flex-1 w-full">
           <Search className="w-4 h-4 text-[#94A3B8] absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
-            className="w-full pl-10 pr-4 h-10 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] rounded-xl outline-none focus:border-[#22C55E] focus:bg-white transition-all"
+            className="w-full pl-10 pr-4 h-10 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] rounded-xl outline-none focus:border-[#22C55E] focus:bg-white dark:bg-[#0F172A] transition-all"
             placeholder="Search company, name, mobile..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -205,7 +205,7 @@ export default function Applications() {
         </div>
 
         <select
-          className="h-10 px-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] text-[#334155] font-medium rounded-xl outline-none focus:border-[#22C55E] focus:bg-white transition-all w-full md:w-auto min-w-[180px]"
+          className="h-10 px-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] text-[#334155] font-medium rounded-xl outline-none focus:border-[#22C55E] focus:bg-white dark:bg-[#0F172A] transition-all w-full md:w-auto min-w-[180px]"
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
         >
@@ -216,7 +216,7 @@ export default function Applications() {
         </select>
 
         <select
-          className="h-10 px-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] text-[#334155] font-medium rounded-xl outline-none focus:border-[#22C55E] focus:bg-white transition-all w-full md:w-auto min-w-[200px]"
+          className="h-10 px-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] text-[#334155] font-medium rounded-xl outline-none focus:border-[#22C55E] focus:bg-white dark:bg-[#0F172A] transition-all w-full md:w-auto min-w-[200px]"
           value={filterGroup}
           onChange={(e) => setFilterGroup(e.target.value)}
         >
@@ -227,7 +227,7 @@ export default function Applications() {
         </select>
 
         <button 
-          className="h-10 px-5 bg-white border border-[#E2E8F0] text-[14px] text-[#0F172A] font-medium rounded-xl hover:bg-slate-50 flex items-center gap-2 transition-colors w-full md:w-auto justify-center shadow-sm"
+          className="h-10 px-5 bg-white dark:bg-[#0F172A] border border-[#E2E8F0] text-[14px] text-[#0F172A] font-medium rounded-xl hover:bg-slate-50 dark:bg-[#1E293B] flex items-center gap-2 transition-colors w-full md:w-auto justify-center shadow-sm"
           onClick={load}
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -240,7 +240,7 @@ export default function Applications() {
       </div>
 
       {/* Main Content Area */}
-      <div className="bg-white border border-[#E2E8F0] rounded-2xl shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-[#0F172A] border border-[#E2E8F0] rounded-2xl shadow-sm overflow-hidden">
         {loading ? (
           <div className="w-full h-64 flex flex-col items-center justify-center">
             <Loader2 className="w-8 h-8 animate-spin text-[#22C55E] mb-4" />
@@ -248,7 +248,7 @@ export default function Applications() {
           </div>
         ) : !filtered.length ? (
           <div className="flex flex-col items-center justify-center p-16 text-center h-full">
-            <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-5 border border-slate-100">
+            <div className="w-20 h-20 bg-slate-50 dark:bg-[#1E293B] rounded-full flex items-center justify-center mb-5 border border-slate-100">
               <Inbox className="w-10 h-10 text-slate-300" />
             </div>
             <h3 className="text-[18px] font-bold text-[#0F172A] mb-2">No applications found</h3>
@@ -268,7 +268,7 @@ export default function Applications() {
                   <th className="px-6 py-3.5 text-[12px] font-bold text-[#64748B] uppercase tracking-wider text-right">Created</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#F1F5F9] bg-white">
+              <tbody className="divide-y divide-[#F1F5F9] bg-white dark:bg-[#0F172A]">
                 {filtered.map((app) => {
                   const isExpanded = expandedId === app._id;
                   const badgeCls = STATUS_BADGE[app.status || "Documents Received"] || "bg-slate-100 text-slate-700 border-slate-200";
@@ -279,7 +279,7 @@ export default function Applications() {
                       {/* Main Row */}
                       <tr
                         onClick={() => toggleExpand(app)}
-                        className={`cursor-pointer transition-colors ${isExpanded ? 'bg-blue-50/30' : 'hover:bg-slate-50/50'}`}
+                        className={`cursor-pointer transition-colors ${isExpanded ? 'bg-blue-50/30' : 'hover:bg-slate-50 dark:bg-[#1E293B]/50'}`}
                       >
                         <td className="px-4 py-4 text-center">
                           {isExpanded ? (
@@ -325,7 +325,7 @@ export default function Applications() {
 
                       {/* Expanding Configuration Row */}
                       {isExpanded && (
-                        <tr className="bg-slate-50/50">
+                        <tr className="bg-slate-50 dark:bg-[#1E293B]/50">
                           <td colSpan={7} className="border-b-2 border-[#22C55E]/20 p-0">
                             <div className="p-6 lg:p-8 animate-fade-in grid grid-cols-1 lg:grid-cols-2 gap-8">
                               
@@ -340,7 +340,7 @@ export default function Applications() {
                                     <div><p className="text-[12px] text-[#64748B] mb-0.5">City</p><p className="text-[14px] font-semibold text-[#0F172A]">{app.city || "—"}</p></div>
                                   </div>
                                   {app.description && (
-                                    <div className="mt-4 bg-white p-3 rounded-lg border border-slate-200 text-[14px] text-[#475569]">
+                                    <div className="mt-4 bg-white dark:bg-[#0F172A] p-3 rounded-lg border border-slate-200 text-[14px] text-[#475569]">
                                       <span className="font-semibold text-slate-700 block mb-1">Description:</span>
                                       {app.description}
                                     </div>
@@ -352,8 +352,8 @@ export default function Applications() {
                                     <h4 className="text-[12px] font-bold text-[#64748B] uppercase tracking-wider mb-4 border-b border-slate-200 pb-2">Uploaded Documents</h4>
                                     <div className="space-y-3 lg:max-h-[300px] lg:overflow-y-auto pr-2">
                                       {app.documentsMeta.map((doc) => (
-                                        <div key={doc._id} className="bg-white border border-[#E2E8F0] p-3 rounded-xl flex items-center gap-3 shadow-sm hover:border-[#22C55E]/50 transition-colors">
-                                          <div className="p-2 bg-slate-50 rounded-lg">
+                                        <div key={doc._id} className="bg-white dark:bg-[#0F172A] border border-[#E2E8F0] p-3 rounded-xl flex items-center gap-3 shadow-sm hover:border-[#22C55E]/50 transition-colors">
+                                          <div className="p-2 bg-slate-50 dark:bg-[#1E293B] rounded-lg">
                                             {getDocIcon(doc.mimeType)}
                                           </div>
                                           <div className="flex-1 min-w-0">
@@ -377,14 +377,14 @@ export default function Applications() {
 
                               {/* Right Column: Edit Status/Remarks */}
                               <div>
-                                <div className="bg-white p-5 rounded-2xl border border-[#E2E8F0] shadow-sm sticky top-4">
+                                <div className="bg-white dark:bg-[#0F172A] p-5 rounded-2xl border border-[#E2E8F0] shadow-sm sticky top-4">
                                   <h4 className="text-[12px] font-bold text-[#64748B] uppercase tracking-wider mb-4">Update Pipeline Stage</h4>
                                   
                                   <div className="space-y-4">
                                     <div>
                                       <label className="block text-[13px] font-semibold text-[#334155] mb-1.5">Official Status</label>
                                       <select
-                                        className="w-full h-11 px-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] font-medium text-[#0F172A] rounded-xl outline-none focus:border-[#22C55E] focus:bg-white transition-all shadow-sm"
+                                        className="w-full h-11 px-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] font-medium text-[#0F172A] rounded-xl outline-none focus:border-[#22C55E] focus:bg-white dark:bg-[#0F172A] transition-all shadow-sm"
                                         value={editStatus}
                                         onChange={(e) => setEditStatus(e.target.value)}
                                       >
@@ -400,7 +400,7 @@ export default function Applications() {
                                         <span className="text-[#94A3B8] font-normal text-xs">Visible to Client</span>
                                       </label>
                                       <textarea
-                                        className="w-full p-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] rounded-xl outline-none focus:border-[#22C55E] focus:bg-white transition-all shadow-sm resize-none min-h-[100px]"
+                                        className="w-full p-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] rounded-xl outline-none focus:border-[#22C55E] focus:bg-white dark:bg-[#0F172A] transition-all shadow-sm resize-none min-h-[100px]"
                                         value={editRemarks}
                                         onChange={(e) => setEditRemarks(e.target.value)}
                                         placeholder="Add notes, next steps, or specific queries..."
@@ -453,7 +453,7 @@ export default function Applications() {
       {showCreateModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setShowCreateModal(false)}></div>
-          <div className="relative bg-white w-full max-w-2xl rounded-2xl shadow-xl border border-[#E2E8F0] overflow-hidden animate-fade-in">
+          <div className="relative bg-white dark:bg-[#0F172A] w-full max-w-2xl rounded-2xl shadow-xl border border-[#E2E8F0] overflow-hidden animate-fade-in">
             <div className="flex justify-between items-center p-6 border-b border-[#F1F5F9]">
               <h2 className="text-[18px] font-bold text-[#0F172A]">Create New Application</h2>
               <button onClick={() => setShowCreateModal(false)} className="text-[#64748B] hover:text-[#0F172A]">

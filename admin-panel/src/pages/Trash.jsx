@@ -62,7 +62,7 @@ export default function Trash() {
       {/* Purge Confirm Modal */}
       {confirmPurge && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl p-6 max-w-sm w-full animate-fade-in">
+          <div className="bg-white dark:bg-[#0F172A] rounded-2xl shadow-xl p-6 max-w-sm w-full animate-fade-in">
             <div className="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <AlertTriangle className="w-6 h-6 text-red-600" />
             </div>
@@ -120,7 +120,7 @@ export default function Trash() {
         ) : (
           <div className="divide-y divide-slate-50">
             {apps.map(app => (
-              <div key={app._id} className="px-5 py-4 flex items-center gap-4 hover:bg-slate-50 transition-colors">
+              <div key={app._id} className="px-5 py-4 flex items-center gap-4 hover:bg-slate-50 dark:bg-[#1E293B] transition-colors">
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-slate-800 text-sm">{app.companyName || '—'}</p>
                   <p className="text-xs text-slate-500">{app.applicantName} • {app.serviceName || app.certification}</p>

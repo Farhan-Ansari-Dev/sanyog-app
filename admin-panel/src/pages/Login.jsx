@@ -50,7 +50,7 @@ export default function Login() {
               e.target.nextSibling.style.display = 'flex';
             }}
           />
-          <div style={{ display: 'none' }} className="items-center justify-center w-14 h-14 bg-white border border-slate-200 rounded-2xl shadow-sm">
+          <div style={{ display: 'none' }} className="items-center justify-center w-14 h-14 bg-white dark:bg-[#0F172A] border border-slate-200 rounded-2xl shadow-sm">
             <Shield className="w-7 h-7 text-slate-800" />
           </div>
         </div>
@@ -85,7 +85,7 @@ export default function Login() {
                   value={email}
                   onChange={(e) => { setEmail(e.target.value); setError(""); }}
                   placeholder="Email"
-                  className="w-full pl-[46px] pr-4 h-14 bg-white border border-[#E5E7EB] outline-none rounded-xl text-[15px] font-medium text-[#0F172A] transition-all duration-200 focus:border-[#22C55E] placeholder:text-[#9CA3AF] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.2)]"
+                  className="w-full pl-[46px] pr-4 h-14 bg-white dark:bg-[#0F172A] border border-[#E5E7EB] outline-none rounded-xl text-[15px] font-medium text-[#0F172A] transition-all duration-200 focus:border-[#22C55E] placeholder:text-[#9CA3AF] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.2)]"
                   required
                   autoFocus
                 />
@@ -103,7 +103,7 @@ export default function Login() {
                   value={password}
                   onChange={(e) => { setPassword(e.target.value); setError(""); }}
                   placeholder="Password"
-                  className="w-full pl-[46px] pr-4 h-14 bg-white border border-[#E5E7EB] outline-none rounded-xl text-[15px] font-medium text-[#0F172A] transition-all duration-200 focus:border-[#22C55E] placeholder:text-[#9CA3AF] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.2)]"
+                  className="w-full pl-[46px] pr-4 h-14 bg-white dark:bg-[#0F172A] border border-[#E5E7EB] outline-none rounded-xl text-[15px] font-medium text-[#0F172A] transition-all duration-200 focus:border-[#22C55E] placeholder:text-[#9CA3AF] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.2)]"
                   required
                 />
               </div>

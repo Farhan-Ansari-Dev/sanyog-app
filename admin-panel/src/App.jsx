@@ -5,6 +5,7 @@ import Applications from "./pages/Applications";
 import ContactRequests from "./pages/ContactRequests";
 import ServicesManagement from "./pages/ServicesManagement";
 import UserManagement from "./pages/UserManagement";
+import Settings from "./pages/Settings";
 import Layout from "./components/Layout";
 import { getAdminToken } from "./services/auth";
 
@@ -32,6 +33,7 @@ function App() {
           <Route path="services" element={<ServicesManagement />} />
           <Route path="contacts" element={<ContactRequests />} />
           <Route path="users" element={<UserManagement />} />
+          <Route path="settings" element={<Settings />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

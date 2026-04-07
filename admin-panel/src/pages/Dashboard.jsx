@@ -71,7 +71,7 @@ export default function Dashboard() {
 
       {/* High-Level Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white rounded-2xl p-5 border border-[#E2E8F0] shadow-sm flex items-start gap-4">
+        <div className="bg-white dark:bg-[#0F172A] rounded-2xl p-5 border border-[#E2E8F0] shadow-sm flex items-start gap-4">
           <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
             <FileText className="w-6 h-6" />
           </div>
@@ -82,7 +82,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-5 border border-[#E2E8F0] shadow-sm flex items-start gap-4">
+        <div className="bg-white dark:bg-[#0F172A] rounded-2xl p-5 border border-[#E2E8F0] shadow-sm flex items-start gap-4">
           <div className="p-3 bg-orange-50 text-orange-600 rounded-xl">
             <Activity className="w-6 h-6" />
           </div>
@@ -93,7 +93,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-5 border border-[#E2E8F0] shadow-sm flex items-start gap-4">
+        <div className="bg-white dark:bg-[#0F172A] rounded-2xl p-5 border border-[#E2E8F0] shadow-sm flex items-start gap-4">
           <div className="p-3 bg-green-50 text-emerald-600 rounded-xl">
             <CheckCircle className="w-6 h-6" />
           </div>
@@ -104,7 +104,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-5 border border-[#E2E8F0] shadow-sm flex items-start gap-4">
+        <div className="bg-white dark:bg-[#0F172A] rounded-2xl p-5 border border-[#E2E8F0] shadow-sm flex items-start gap-4">
           <div className="p-3 bg-rose-50 text-rose-600 rounded-xl">
             <PhoneCall className="w-6 h-6" />
           </div>
@@ -120,8 +120,8 @@ export default function Dashboard() {
         
         {/* Main Table Area */}
         <div className="xl:col-span-2">
-          <div className="bg-white border border-[#E2E8F0] rounded-2xl shadow-sm overflow-hidden flex flex-col h-full">
-            <div className="px-6 py-5 border-b border-[#F1F5F9] flex justify-between items-center bg-white">
+          <div className="bg-white dark:bg-[#0F172A] border border-[#E2E8F0] rounded-2xl shadow-sm overflow-hidden flex flex-col h-full">
+            <div className="px-6 py-5 border-b border-[#F1F5F9] flex justify-between items-center bg-white dark:bg-[#0F172A]">
               <h2 className="text-[18px] font-bold text-[#0F172A]">Recent Applications</h2>
               <button 
                 onClick={() => navigate("/applications")}
@@ -135,7 +135,7 @@ export default function Dashboard() {
             <div className="p-0 overflow-x-auto flex-1">
               {!recent.length ? (
                 <div className="flex flex-col items-center justify-center p-12 text-center h-full">
-                  <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4 border border-slate-100">
+                  <div className="w-16 h-16 bg-slate-50 dark:bg-[#1E293B] rounded-full flex items-center justify-center mb-4 border border-slate-100">
                     <Inbox className="w-8 h-8 text-slate-300" />
                   </div>
                   <h3 className="text-[16px] font-bold text-[#0F172A] mb-1">No applications found</h3>
@@ -151,13 +151,13 @@ export default function Dashboard() {
                       <th className="px-6 py-3.5 text-[12px] font-bold text-[#64748B] uppercase tracking-wider text-right">Date</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#F1F5F9] bg-white">
+                  <tbody className="divide-y divide-[#F1F5F9] bg-white dark:bg-[#0F172A]">
                     {recent.map((app) => {
                       const statusRaw = app.status || "Documents Received";
-                      const statusClass = STATUS_MAP[statusRaw] || "bg-slate-50 text-slate-700 border-slate-200";
+                      const statusClass = STATUS_MAP[statusRaw] || "bg-slate-50 dark:bg-[#1E293B] text-slate-700 border-slate-200";
                       
                       return (
-                        <tr key={app._id} className="hover:bg-slate-50/50 transition-colors">
+                        <tr key={app._id} className="hover:bg-slate-50 dark:bg-[#1E293B]/50 transition-colors">
                           <td className="px-6 py-4">
                             <span className="text-[14px] font-semibold text-[#0F172A]">{app.companyName || "—"}</span>
                           </td>
@@ -184,8 +184,8 @@ export default function Dashboard() {
 
         {/* Status Pipeline Summary */}
         <div className="xl:col-span-1">
-          <div className="bg-white border border-[#E2E8F0] rounded-2xl shadow-sm overflow-hidden sticky top-6">
-            <div className="px-6 py-5 border-b border-[#F1F5F9] bg-white">
+          <div className="bg-white dark:bg-[#0F172A] border border-[#E2E8F0] rounded-2xl shadow-sm overflow-hidden sticky top-6">
+            <div className="px-6 py-5 border-b border-[#F1F5F9] bg-white dark:bg-[#0F172A]">
               <h2 className="text-[18px] font-bold text-[#0F172A]">Pipeline Distribution</h2>
               <p className="text-[13px] text-[#64748B] mt-1 font-medium">Volumetric breakdown by stage</p>
             </div>

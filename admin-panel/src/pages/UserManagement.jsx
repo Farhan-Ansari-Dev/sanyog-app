@@ -60,7 +60,11 @@ export default function UserManagement() {
         }
     };
 
-    const handleDeleteStaff = async (id) => {
+    const handleDeleteStaff = async (id, email) => {
+        if (email === "admin@sanyog.com") {
+            alert("The primary super admin account cannot be deleted.");
+            return;
+        }
         if (!window.confirm("Are you sure you want to completely revoke and delete this admin user?")) return;
         try {
             await api.delete(`/admin/users/staff/${id}`);
@@ -102,7 +106,7 @@ export default function UserManagement() {
                     )}
                     <button 
                         onClick={loadData}
-                        className="flex-1 sm:flex-none h-11 px-5 bg-white border border-[#E2E8F0] text-[14px] text-[#0F172A] font-semibold rounded-xl hover:bg-slate-50 transition-colors shadow-sm flex items-center justify-center gap-2"
+                        className="flex-1 sm:flex-none h-11 px-5 bg-white dark:bg-[#0F172A] border border-[#E2E8F0] text-[14px] text-[#0F172A] font-semibold rounded-xl hover:bg-slate-50 dark:bg-[#1E293B] transition-colors shadow-sm flex items-center justify-center gap-2"
                     >
                         <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
                         Refresh
@@ -115,7 +119,7 @@ export default function UserManagement() {
                 <button 
                     onClick={() => setActiveTab("clients")}
                     className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-[14px] font-bold rounded-lg transition-all ${
-                        activeTab === "clients" ? 'bg-white text-[#0F172A] shadow-sm' : 'text-[#64748B] hover:text-[#0F172A]'
+                        activeTab === "clients" ? 'bg-white dark:bg-[#0F172A] text-[#0F172A] shadow-sm' : 'text-[#64748B] hover:text-[#0F172A]'
                     }`}
                 >
                     <UserCircle2 className="w-4 h-4" />
@@ -124,7 +128,7 @@ export default function UserManagement() {
                 <button 
                     onClick={() => setActiveTab("staff")}
                     className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-[14px] font-bold rounded-lg transition-all ${
-                        activeTab === "staff" ? 'bg-white text-[#0F172A] shadow-sm' : 'text-[#64748B] hover:text-[#0F172A]'
+                        activeTab === "staff" ? 'bg-white dark:bg-[#0F172A] text-[#0F172A] shadow-sm' : 'text-[#64748B] hover:text-[#0F172A]'
                     }`}
                 >
                     <Shield className="w-4 h-4" />
@@ -138,13 +142,13 @@ export default function UserManagement() {
                 </div>
             )}
 
-            <div className="bg-white border border-[#E2E8F0] rounded-2xl shadow-sm overflow-hidden min-h-[400px]">
+            <div className="bg-white dark:bg-[#0F172A] border border-[#E2E8F0] rounded-2xl shadow-sm overflow-hidden min-h-[400px]">
                 {/* Search Bar matching inside container for clean look */}
                 <div className="p-4 border-b border-[#F1F5F9] bg-[#F8FAFC]">
                     <div className="relative max-w-md">
                         <Search className="w-4 h-4 text-[#94A3B8] absolute left-3.5 top-1/2 -translate-y-1/2" />
                         <input
-                            className="w-full pl-10 pr-4 h-10 bg-white border border-[#E2E8F0] text-[14px] rounded-xl outline-none focus:border-[#22C55E] transition-all"
+                            className="w-full pl-10 pr-4 h-10 bg-white dark:bg-[#0F172A] border border-[#E2E8F0] text-[14px] rounded-xl outline-none focus:border-[#22C55E] transition-all"
                             placeholder={activeTab === "clients" ? "Search clients by phone or email..." : "Search staff by name or email..."}
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
@@ -169,7 +173,7 @@ export default function UserManagement() {
                         <div className="overflow-x-auto">
                             <table className="w-full text-left border-collapse">
                                 <thead>
-                                    <tr className="bg-white border-b border-[#E2E8F0]">
+                                    <tr className="bg-white dark:bg-[#0F172A] border-b border-[#E2E8F0]">
                                         <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] uppercase tracking-wider">Mobile Number</th>
                                         <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] uppercase tracking-wider">Email Address</th>
                                         <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] uppercase tracking-wider">Applications</th>
@@ -178,7 +182,7 @@ export default function UserManagement() {
                                 </thead>
                                 <tbody className="divide-y divide-[#F1F5F9]">
                                     {filteredUsers.map((u) => (
-                                        <tr key={u._id} className="hover:bg-slate-50/50">
+                                        <tr key={u._id} className="hover:bg-slate-50 dark:bg-[#1E293B]/50">
                                             <td className="px-6 py-4 whitespace-nowrap font-bold text-[#0F172A]">{u.mobile}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-[14px] text-[#475569]">{u.email || <span className="text-slate-400 italic">None</span>}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">
@@ -203,7 +207,7 @@ export default function UserManagement() {
                         <div className="overflow-x-auto">
                             <table className="w-full text-left border-collapse">
                                 <thead>
-                                    <tr className="bg-white border-b border-[#E2E8F0]">
+                                    <tr className="bg-white dark:bg-[#0F172A] border-b border-[#E2E8F0]">
                                         <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] uppercase tracking-wider">Staff Name</th>
                                         <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] uppercase tracking-wider">Email</th>
                                         <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] uppercase tracking-wider">Access Role</th>
@@ -213,7 +217,7 @@ export default function UserManagement() {
                                 </thead>
                                 <tbody className="divide-y divide-[#F1F5F9]">
                                     {filteredStaff.map((s) => (
-                                        <tr key={s._id} className="hover:bg-slate-50/50">
+                                        <tr key={s._id} className="hover:bg-slate-50 dark:bg-[#1E293B]/50">
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs uppercase">
@@ -236,13 +240,15 @@ export default function UserManagement() {
                                                 )}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right">
-                                                <button 
-                                                    onClick={() => handleDeleteStaff(s._id)}
-                                                    className="p-1.5 text-[#64748B] hover:text-red-500 hover:bg-red-50 rounded transition-colors"
-                                                    title="Revoke & Delete"
-                                                >
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
+                                                {s.email !== "admin@sanyog.com" && (
+                                                    <button 
+                                                        onClick={() => handleDeleteStaff(s._id, s.email)}
+                                                        className="p-1.5 text-[#64748B] hover:text-red-500 hover:bg-red-50 rounded transition-colors"
+                                                        title="Revoke & Delete"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                )}
                                             </td>
                                         </tr>
                                     ))}
@@ -257,7 +263,7 @@ export default function UserManagement() {
             {showModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setShowModal(false)}></div>
-                    <div className="relative bg-white w-full max-w-md rounded-2xl shadow-xl border border-[#E2E8F0] overflow-hidden animate-fade-in">
+                    <div className="relative bg-white dark:bg-[#0F172A] w-full max-w-md rounded-2xl shadow-xl border border-[#E2E8F0] overflow-hidden animate-fade-in">
                         <div className="flex justify-between items-center p-6 border-b border-[#F1F5F9]">
                             <h2 className="text-[18px] font-bold text-[#0F172A]">Provision Admin User</h2>
                             <button onClick={() => setShowModal(false)} className="text-[#64748B] hover:text-[#0F172A]">
@@ -271,7 +277,7 @@ export default function UserManagement() {
                                     <input 
                                         type="text" 
                                         required 
-                                        className="w-full h-11 px-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] rounded-xl outline-none focus:border-[#22C55E]"
+                                        className="w-full h-11 px-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] text-[#0F172A] rounded-xl outline-none focus:border-[#22C55E]"
                                         value={form.name}
                                         onChange={e => setForm({...form, name: e.target.value})}
                                     />
@@ -281,7 +287,7 @@ export default function UserManagement() {
                                     <input 
                                         type="email" 
                                         required 
-                                        className="w-full h-11 px-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] rounded-xl outline-none focus:border-[#22C55E]"
+                                        className="w-full h-11 px-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] text-[#0F172A] rounded-xl outline-none focus:border-[#22C55E]"
                                         value={form.email}
                                         onChange={e => setForm({...form, email: e.target.value})}
                                     />
@@ -291,7 +297,7 @@ export default function UserManagement() {
                                     <input 
                                         type="password" 
                                         required 
-                                        className="w-full h-11 px-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] rounded-xl outline-none focus:border-[#22C55E]"
+                                        className="w-full h-11 px-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] text-[#0F172A] rounded-xl outline-none focus:border-[#22C55E]"
                                         value={form.password}
                                         onChange={e => setForm({...form, password: e.target.value})}
                                     />
@@ -299,7 +305,7 @@ export default function UserManagement() {
                                 <div>
                                     <label className="block text-[13px] font-semibold text-[#334155] mb-1.5">Access Clearance (Role)</label>
                                     <select 
-                                        className="w-full h-11 px-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] rounded-xl outline-none focus:border-[#22C55E]"
+                                        className="w-full h-11 px-4 bg-[#F8FAFC] border border-[#E2E8F0] text-[14px] text-[#0F172A] rounded-xl outline-none focus:border-[#22C55E]"
                                         value={form.role}
                                         onChange={e => setForm({...form, role: e.target.value})}
                                     >
