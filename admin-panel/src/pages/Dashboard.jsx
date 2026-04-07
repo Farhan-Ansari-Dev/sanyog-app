@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Loader2, FileText, Activity, CheckCircle, PhoneAlert, ChevronRight, Inbox } from "lucide-react";
+import { Loader2, FileText, Activity, CheckCircle, PhoneCall, ChevronRight, Inbox } from "lucide-react";
 import api from "../services/api";
 
 const STATUS_MAP = {
@@ -106,7 +106,7 @@ export default function Dashboard() {
 
         <div className="bg-white rounded-2xl p-5 border border-[#E2E8F0] shadow-sm flex items-start gap-4">
           <div className="p-3 bg-rose-50 text-rose-600 rounded-xl">
-            <PhoneAlert className="w-6 h-6" />
+            <PhoneCall className="w-6 h-6" />
           </div>
           <div>
             <p className="text-[13px] font-semibold text-[#64748B] uppercase tracking-wider mb-1">Callbacks</p>
