@@ -68,6 +68,9 @@ export default function Applications() {
   });
   const [creating, setCreating] = useState(false);
 
+  const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+
   const load = async () => {
     setError("");
     setLoading(true);
@@ -116,14 +119,22 @@ export default function Applications() {
     }
   };
 
-  const deleteApplication = async (appId) => {
-    if (!window.confirm("Are you sure you want to delete this application? It will be moved to the trash.")) return;
+  const triggerDelete = (appId) => {
+    setDeleteConfirmId(appId);
+  };
+
+  const executeDelete = async () => {
+    if (!deleteConfirmId) return;
+    setDeleting(true);
     try {
-      await api.delete(`/admin/applications/${appId}`);
+      await api.delete(`/admin/applications/${deleteConfirmId}`);
       await load();
-      if (expandedId === appId) setExpandedId(null);
+      if (expandedId === deleteConfirmId) setExpandedId(null);
+      setDeleteConfirmId(null);
     } catch (e) {
       alert(e?.response?.data?.error || "Failed to delete");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -404,9 +415,9 @@ export default function Applications() {
                                             )}
                                         </div>
                                         <div className="flex gap-3">
-                                          <button
-                                            onClick={() => deleteApplication(a._id)}
-                                            className="h-9 px-4 border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 text-[13px] font-bold rounded-lg transition-colors flex items-center gap-1.5"
+                                          <button 
+                                            onClick={() => setDeleteConfirmId(a._id)}
+                                            className="flex items-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 dark:bg-red-500/10 dark:hover:bg-red-500/20 text-red-600 dark:text-red-400 text-[13px] font-bold rounded-xl transition-colors border border-red-100 dark:border-red-500/20"
                                           >
                                             <Trash2 className="w-4 h-4" />
                                             Purge
@@ -489,6 +500,40 @@ export default function Applications() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Custom Delete Confirmation Modal */}
+      {deleteConfirmId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 dark:bg-[#000000]/60 backdrop-blur-sm">
+          <div className="bg-white dark:bg-[#0F172A] w-full max-w-md rounded-2xl shadow-xl border border-[#E2E8F0] dark:border-[#334155] overflow-hidden animate-fade-in-up">
+            <div className="p-6 text-center">
+              <div className="w-16 h-16 bg-red-100 dark:bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Trash2 className="w-8 h-8 text-red-600 dark:text-red-500" />
+              </div>
+              <h3 className="text-xl font-bold text-[#0F172A] dark:text-white mb-2">Delete Application</h3>
+              <p className="text-[14px] text-[#64748B] dark:text-[#94A3B8]">
+                Are you completely sure you want to permanently delete this application? It will be moved to the trash and cannot be undone from this panel.
+              </p>
+            </div>
+            <div className="p-6 pt-0 flex gap-3 justify-center">
+              <button 
+                onClick={() => setDeleteConfirmId(null)}
+                disabled={deleting}
+                className="flex-1 h-11 bg-slate-100 hover:bg-slate-200 dark:bg-[#1E293B] dark:hover:bg-[#334155] text-[#334155] dark:text-white font-semibold rounded-xl text-[14px] transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={executeDelete}
+                disabled={deleting}
+                className="flex-1 h-11 bg-red-600 hover:bg-red-700 disabled:opacity-70 text-white font-semibold rounded-xl text-[14px] transition-colors flex items-center justify-center gap-2"
+              >
+                {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                {deleting ? "Deleting..." : "Yes, Delete It"}
+              </button>
+            </div>
           </div>
         </div>
       )}
