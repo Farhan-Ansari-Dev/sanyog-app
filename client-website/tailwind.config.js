@@ -8,15 +8,15 @@ module.exports = {
       },
       colors: {
         primary: {
-          DEFAULT: '#1e3a8a',
-          light: '#3b82f6',
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          600: '#2563eb',
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a8a',
+          DEFAULT: '#16A34A', // Sanyog Green 600
+          light: '#22C55E',   // Green 500
+          50: '#F0FDF4',
+          100: '#DCFCE7',
+          200: '#BBF7D0',
+          600: '#16A34A',
+          700: '#15803D',
+          800: '#166534',
+          900: '#14532D',
         },
       },
       animation: {

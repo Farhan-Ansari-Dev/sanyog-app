@@ -12,7 +12,8 @@ import {
   ChevronRight,
   MessageSquare,
   Sun,
-  Moon
+  Moon,
+  Settings as SettingsIcon
 } from "lucide-react";
 
 const navItems = [
@@ -21,6 +22,7 @@ const navItems = [
   { label: "Apply", icon: PlusCircle, path: "/apply" },
   { label: "Profile", icon: User, path: "/profile" },
   { label: "Support", icon: MessageSquare, path: "/support" },
+  { label: "Settings", icon: SettingsIcon, path: "/settings" },
 ];
 
 export default function Sidebar() {

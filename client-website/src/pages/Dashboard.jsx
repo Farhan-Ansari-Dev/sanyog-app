@@ -4,7 +4,6 @@ import {
   FileText, Clock, CheckCircle, XCircle, PlusCircle,
   Phone, RefreshCw, ArrowRight, TrendingUp, AlertCircle, Loader2
 } from "lucide-react";
-import Sidebar from "../components/Sidebar";
 import API from "../services/api";
 
 function decodeToken(token) {
@@ -16,11 +15,11 @@ function decodeToken(token) {
 
 function StatusBadge({ status }) {
   const map = {
-    submitted: { label: "Submitted", color: "bg-blue-100 text-blue-700" },
-    pending: { label: "Pending", color: "bg-yellow-100 text-yellow-700" },
-    "in-progress": { label: "In Progress", color: "bg-indigo-100 text-indigo-700" },
+    submitted: { label: "Submitted", color: "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" },
+    pending: { label: "Pending", color: "bg-amber-100 text-amber-700" },
+    "in-progress": { label: "In Progress", color: "bg-slate-100 text-slate-700" },
     "documents_required": { label: "Docs Required", color: "bg-orange-100 text-orange-700" },
-    approved: { label: "Approved", color: "bg-green-100 text-green-700" },
+    approved: { label: "Approved", color: "bg-emerald-100 text-emerald-700" },
     rejected: { label: "Rejected", color: "bg-red-100 text-red-700" },
   };
   const s = map[status] || { label: status, color: "bg-gray-100 dark:bg-[#1E293B] text-gray-600 dark:text-slate-400" };
@@ -56,33 +55,33 @@ export default function Dashboard() {
       label: "Total Applications",
       value: applications.length,
       icon: FileText,
-      color: "text-blue-600",
-      bg: "bg-blue-50",
-      border: "border-blue-100",
+      color: "text-emerald-600",
+      bg: "bg-emerald-50 dark:bg-emerald-900/20",
+      border: "border-emerald-100 dark:border-emerald-900/10",
     },
     {
       label: "Pending Review",
       value: applications.filter((a) => ["submitted", "pending", "in-progress"].includes(a.status)).length,
       icon: Clock,
-      color: "text-amber-600",
-      bg: "bg-amber-50",
-      border: "border-amber-100",
+      color: "text-emerald-600",
+      bg: "bg-emerald-50 dark:bg-emerald-900/20",
+      border: "border-emerald-100 dark:border-emerald-900/10",
     },
     {
       label: "Approved",
       value: applications.filter((a) => a.status === "approved").length,
       icon: CheckCircle,
-      color: "text-green-600",
-      bg: "bg-green-50",
-      border: "border-green-100",
+      color: "text-emerald-600",
+      bg: "bg-emerald-50 dark:bg-emerald-900/20",
+      border: "border-emerald-100 dark:border-emerald-900/10",
     },
     {
       label: "Rejected",
       value: applications.filter((a) => a.status === "rejected").length,
       icon: XCircle,
-      color: "text-red-600",
-      bg: "bg-red-50",
-      border: "border-red-100",
+      color: "text-emerald-600",
+      bg: "bg-emerald-50 dark:bg-emerald-900/20",
+      border: "border-emerald-100 dark:border-emerald-900/10",
     },
   ];
 
@@ -93,9 +92,9 @@ export default function Dashboard() {
       await API.post("/contact/request", {
         message: "Client has requested a callback from the Sanyog team.",
       });
-      setCallbackMsg("✅ Callback request sent! Our team will contact you shortly.");
+      setCallbackMsg("✅ Callback request sent!");
     } catch {
-      setCallbackMsg("❌ Failed to send request. Please try again.");
+      setCallbackMsg("❌ Failed to send request.");
     } finally {
       setCallbackLoading(false);
       setTimeout(() => setCallbackMsg(""), 5000);
@@ -105,134 +104,143 @@ export default function Dashboard() {
   const recentApps = applications.slice(0, 5);
 
   return (
-    <div className="flex min-h-screen bg-gray-50 dark:bg-[#020617]">
-      <Sidebar />
-      <main className="flex-1 p-6 pt-20 md:pt-6 overflow-x-hidden">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Welcome back, {user.name || "Client"} 👋
-            </h1>
-            <p className="text-gray-500 dark:text-slate-400 text-sm mt-1">
-              Here's an overview of your certification applications.
-            </p>
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight leading-none mb-2">
+            Welcome back, {user.name || "Sanyog Partner"} 👋
+          </h1>
+          <p className="text-gray-500 dark:text-slate-400 text-sm font-medium">
+            Reviewing your active certification pipeline and security status.
+          </p>
+        </div>
+        <button onClick={fetchApps} className="hidden md:flex items-center gap-2 text-sm text-gray-500 dark:text-slate-400 hover:text-emerald-600 transition-colors font-bold">
+          <RefreshCw className="w-4 h-4" /> Sync Stats
+        </button>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {stats.map(({ label, value, icon: Icon, color, bg, border }) => (
+          <div key={label} className={`stat-card relative overflow-hidden group border ${border}`}>
+            <div className={`absolute top-0 right-0 w-16 h-16 ${bg} blur-3xl opacity-0 group-hover:opacity-100 transition-opacity`}></div>
+            <div className={`w-12 h-12 ${bg} rounded-2xl flex items-center justify-center mb-4 shadow-sm`}>
+              <Icon className={`w-6 h-6 ${color}`} />
+            </div>
+            <div className="text-3xl font-black text-gray-900 dark:text-white tracking-tight leading-none">{loading ? "—" : value}</div>
+            <div className="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mt-2">{label}</div>
           </div>
-          <button onClick={fetchApps} className="hidden md:flex items-center gap-2 text-sm text-gray-500 dark:text-slate-400 hover:text-primary transition-colors">
-            <RefreshCw className="w-4 h-4" /> Refresh
+        ))}
+      </div>
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        <div className="card-premium bg-gradient-to-br from-[#16A34A] to-[#15803d] text-white relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 blur-[80px] -mr-32 -mt-32"></div>
+          <TrendingUp className="w-12 h-12 mb-4 text-white/40" />
+          <h3 className="font-black text-2xl tracking-tighter mb-2">Launch Application</h3>
+          <p className="text-emerald-50/70 text-sm font-medium mb-6 max-w-xs">
+            Begin the certification process for BIS, ISI, CE, marking, and 60+ global schemes instantly.
+          </p>
+          <button
+            onClick={() => navigate("/apply")}
+            className="flex items-center gap-2 bg-white text-[#16A34A] font-black px-6 py-3 rounded-xl text-xs hover:scale-105 transition-transform shadow-xl shadow-emerald-900/20"
+          >
+            NEW APPLICATION <PlusCircle className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          {stats.map(({ label, value, icon: Icon, color, bg, border }) => (
-            <div key={label} className={`stat-card border ${border}`}>
-              <div className={`w-10 h-10 ${bg} rounded-lg flex items-center justify-center mb-3`}>
-                <Icon className={`w-5 h-5 ${color}`} />
-              </div>
-              <div className="text-2xl font-bold text-gray-900 dark:text-white">{loading ? "—" : value}</div>
-              <div className="text-xs text-gray-500 dark:text-slate-400 mt-1 font-medium">{label}</div>
+        <div className="card-premium flex flex-col justify-between">
+          <div>
+            <div className="w-12 h-12 bg-gray-100 dark:bg-[#161923] rounded-2xl flex items-center justify-center mb-4">
+               <Phone className="w-6 h-6 text-gray-400 dark:text-slate-600" />
             </div>
-          ))}
-        </div>
-
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-          <div className="bg-gradient-to-r from-primary to-primary-light rounded-xl p-6 text-white">
-            <TrendingUp className="w-8 h-8 mb-3 opacity-80" />
-            <h3 className="font-bold text-lg mb-1">Apply for Certification</h3>
-            <p className="text-blue-100 text-sm mb-4">
-              Start a new application for BIS, CE, or 60+ other certifications.
+            <h3 className="font-black text-xl text-gray-900 dark:text-white mb-2 leading-tight">Expert Consultation</h3>
+            <p className="text-gray-500 dark:text-slate-400 text-sm font-medium mb-6">
+              Need immediate regulatory guidance? Request a back-call from our compliance architects.
             </p>
-            <button
-              onClick={() => navigate("/apply")}
-              className="flex items-center gap-2 bg-white dark:bg-[#0F172A] text-primary font-semibold px-5 py-2.5 rounded-lg text-sm hover:bg-blue-50 transition-colors"
-            >
-              <PlusCircle className="w-4 h-4" /> Apply Now
-            </button>
           </div>
-
-          <div className="bg-white dark:bg-[#0F172A] border border-gray-100 dark:border-[#1E293B] rounded-xl p-6 shadow-sm">
-            <Phone className="w-8 h-8 mb-3 text-gray-400" />
-            <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-1">Need Help?</h3>
-            <p className="text-gray-500 dark:text-slate-400 text-sm mb-4">
-              Request a callback from our certification experts — available 24/7.
-            </p>
-            {callbackMsg && (
-              <p className="text-sm mb-3 font-medium">{callbackMsg}</p>
-            )}
+          <div className="flex items-center gap-4">
             <button
               onClick={handleCallback}
               disabled={callbackLoading}
-              className="btn-secondary text-sm px-5 py-2.5"
+              className="btn-primary text-xs px-6 py-3 bg-emerald-600 hover:bg-emerald-700"
             >
               {callbackLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Phone className="w-4 h-4" />}
-              {callbackLoading ? "Sending..." : "Request Callback"}
+              {callbackLoading ? "SENDING..." : "REQUEST CALLBACK"}
             </button>
+            {callbackMsg && (
+              <p className="text-xs font-black text-emerald-500 animate-in fade-in slide-in-from-left-2">{callbackMsg}</p>
+            )}
           </div>
         </div>
+      </div>
 
-        {/* Recent Applications */}
-        <div className="bg-white dark:bg-[#0F172A] rounded-xl border border-gray-100 dark:border-[#1E293B] shadow-sm">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-50">
-            <h2 className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-              <FileText className="w-4 h-4 text-primary" /> Recent Applications
+      {/* Recent Applications Table */}
+      <div className="card-premium">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-xl font-black text-gray-900 dark:text-white tracking-tight flex items-center gap-3">
+              <PlusCircle className="w-5 h-5 text-primary" /> Active Pipeline
             </h2>
-            <button
-              onClick={() => navigate("/my-applications")}
-              className="text-sm text-primary font-medium hover:underline flex items-center gap-1"
-            >
-              View all <ArrowRight className="w-3 h-3" />
+            <p className="text-xs text-gray-500 mt-1 font-medium">Tracking your 5 most recently updated compliance file entries.</p>
+          </div>
+          <button
+            onClick={() => navigate("/my-applications")}
+            className="text-xs font-black text-primary hover:underline hover:translate-x-1 transition-all flex items-center gap-2 tracking-widest"
+          >
+            EXPLORE ALL <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
+
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-16 gap-4">
+            <Loader2 className="w-10 h-10 animate-spin text-primary opacity-20" />
+            <p className="text-xs font-black text-gray-300 uppercase tracking-widest">Hydrating data...</p>
+          </div>
+        ) : recentApps.length === 0 ? (
+          <div className="text-center py-20 bg-gray-50/50 dark:bg-[#0B0D13]/50 rounded-[2rem] border-2 border-dashed border-gray-100 dark:border-[#1E293B]">
+            <FileText className="w-16 h-16 text-gray-200 dark:text-slate-800 mx-auto mb-6 opacity-50" />
+            <h4 className="text-lg font-black text-gray-400 dark:text-slate-600 mb-1">Zero Records Found</h4>
+            <p className="text-sm text-gray-300 dark:text-slate-700 font-medium max-w-xs mx-auto mb-8">You haven't initiated any certification sequences yet. Start your first application today.</p>
+            <button onClick={() => navigate("/apply")} className="btn-accent px-8">
+              START NOW
             </button>
           </div>
-
-          {loading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-6 h-6 animate-spin text-primary" />
-            </div>
-          ) : recentApps.length === 0 ? (
-            <div className="text-center py-12">
-              <FileText className="w-10 h-10 text-gray-200 mx-auto mb-3" />
-              <p className="text-gray-400 font-medium">No applications yet</p>
-              <p className="text-gray-300 text-sm">Start your first certification application</p>
-              <button onClick={() => navigate("/apply")} className="btn-primary mt-4 text-sm px-5 py-2.5">
-                <PlusCircle className="w-4 h-4" /> Apply Now
-              </button>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-gray-50">
-                    <th className="text-left text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider px-6 py-3">Service</th>
-                    <th className="text-left text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider px-6 py-3 hidden md:table-cell">Company</th>
-                    <th className="text-left text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider px-6 py-3">Status</th>
-                    <th className="text-left text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider px-6 py-3 hidden lg:table-cell">Date</th>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-100 dark:border-[#2A2D3E]">
+                  <th className="text-left text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-[0.2em] px-6 py-4">Service Layer</th>
+                  <th className="text-left text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-[0.2em] px-6 py-4 hidden md:table-cell">Corporate Unit</th>
+                  <th className="text-left text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-[0.2em] px-6 py-4">Lifecycle Status</th>
+                  <th className="text-left text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-[0.2em] px-6 py-4 hidden lg:table-cell">Submission Date</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50 dark:divide-[#2A2D3E]">
+                {recentApps.map((app) => (
+                  <tr key={app._id || app.id} className="hover:bg-gray-50/80 dark:hover:bg-[#161923]/80 transition-colors cursor-pointer group">
+                    <td className="px-6 py-5 text-sm font-black text-gray-900 dark:text-white group-hover:text-primary transition-colors">
+                      {app.serviceName || app.certName || "—"}
+                    </td>
+                    <td className="px-6 py-5 text-sm text-gray-500 dark:text-slate-400 font-medium hidden md:table-cell">
+                      {app.companyName || "—"}
+                    </td>
+                    <td className="px-6 py-5">
+                      <StatusBadge status={app.status} />
+                    </td>
+                    <td className="px-6 py-5 text-xs text-gray-400 dark:text-slate-500 font-bold hidden lg:table-cell font-mono">
+                      {app.createdAt ? new Date(app.createdAt).toLocaleDateString("en-IN") : "—"}
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-50">
-                  {recentApps.map((app) => (
-                    <tr key={app._id || app.id} className="hover:bg-gray-50 dark:bg-[#020617] transition-colors">
-                      <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
-                        {app.serviceName || app.certName || "—"}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-500 dark:text-slate-400 hidden md:table-cell">
-                        {app.companyName || "—"}
-                      </td>
-                      <td className="px-6 py-4">
-                        <StatusBadge status={app.status} />
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-400 hidden lg:table-cell">
-                        {app.createdAt ? new Date(app.createdAt).toLocaleDateString("en-IN") : "—"}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      </main>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

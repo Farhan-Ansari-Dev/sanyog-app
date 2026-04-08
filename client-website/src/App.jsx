@@ -6,7 +6,9 @@ import Apply from "./pages/Apply";
 import MyApplications from "./pages/MyApplications";
 import Profile from "./pages/Profile";
 import Support from "./pages/Support";
+import Settings from "./pages/Settings";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Layout from "./components/Layout";
 
 function App() {
   const token = localStorage.getItem("token");
@@ -26,48 +28,24 @@ function App() {
 
         {/* Protected routes */}
         <Route
-          path="/dashboard"
+          path="/"
           element={
             <ProtectedRoute>
-              <Dashboard />
+              <Layout />
             </ProtectedRoute>
           }
-        />
-        <Route
-          path="/apply"
-          element={
-            <ProtectedRoute>
-              <Apply />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/my-applications"
-          element={
-            <ProtectedRoute>
-              <MyApplications />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/support"
-          element={
-            <ProtectedRoute>
-              <Support />
-            </ProtectedRoute>
-          }
-        />
+        >
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="apply" element={<Apply />} />
+          <Route path="my-applications" element={<MyApplications />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="settings" element={<Settings />} />
+          <Route path="support" element={<Support />} />
+          <Route index element={<Navigate to="/dashboard" replace />} />
+        </Route>
 
         {/* Fallback */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </BrowserRouter>
   );

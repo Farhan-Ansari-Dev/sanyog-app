@@ -1,6 +1,18 @@
 import { useState } from "react";
-import { User, Mail, Phone, Building2, Globe, Shield, Camera, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
-import Sidebar from "../components/Sidebar";
+import { 
+  User, 
+  Mail, 
+  Phone, 
+  Building2, 
+  Globe, 
+  Shield, 
+  Camera, 
+  CheckCircle, 
+  AlertCircle, 
+  Loader2,
+  Lock,
+  ArrowRight
+} from "lucide-react";
 
 function decodeToken(token) {
   try {
@@ -11,13 +23,13 @@ function decodeToken(token) {
 
 function InfoRow({ icon: Icon, label, value }) {
   return (
-    <div className="flex items-start gap-4 py-4 border-b border-gray-50 last:border-0">
-      <div className="w-9 h-9 bg-primary-50 rounded-lg flex items-center justify-center shrink-0 mt-0.5">
-        <Icon className="w-4 h-4 text-primary" />
+    <div className="flex items-start gap-4 py-5 border-b border-gray-100 dark:border-[#2A2D3E] last:border-0 hover:bg-gray-50/50 dark:hover:bg-white/5 px-2 rounded-xl transition-colors duration-200">
+      <div className="w-10 h-10 bg-primary/10 dark:bg-primary/20 rounded-xl flex items-center justify-center shrink-0">
+        <Icon className="w-5 h-5 text-primary dark:text-blue-400" />
       </div>
-      <div>
-        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-0.5">{label}</p>
-        <p className="text-sm font-medium text-gray-800 dark:text-slate-200">{value || "—"}</p>
+      <div className="flex-1">
+        <p className="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-[0.1em] mb-1">{label}</p>
+        <p className="text-sm font-bold text-gray-900 dark:text-white">{value || "—"}</p>
       </div>
     </div>
   );
@@ -45,13 +57,11 @@ export default function Profile() {
     setLoading(true);
     setMsg({ type: "", text: "" });
     try {
-      // Profile update endpoint (extend when backend supports it)
-      // await API.put("/auth/profile", form);
       await new Promise((r) => setTimeout(r, 800)); // Simulated
       setMsg({ type: "success", text: "Profile updated successfully!" });
       setEditing(false);
     } catch {
-      setMsg({ type: "error", text: "Failed to update profile. Please try again." });
+      setMsg({ type: "error", text: "Failed to update profile." });
     } finally {
       setLoading(false);
       setTimeout(() => setMsg({ type: "", text: "" }), 4000);
@@ -59,158 +69,141 @@ export default function Profile() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50 dark:bg-[#020617]">
-      <Sidebar />
-      <main className="flex-1 p-6 pt-20 md:pt-6 overflow-x-hidden max-w-4xl">
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="page-title">My Profile</h1>
-          <p className="page-subtitle">Manage your account information and settings.</p>
+    <div className="max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="page-header">
+        <h1 className="page-title text-gray-900 dark:text-white">Account Profile</h1>
+        <p className="page-subtitle">Manage your personal identification and corporate credentials.</p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Avatar Card */}
+        <div className="lg:col-span-4">
+          <div className="card-premium text-center relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 to-green-600"></div>
+            
+            <div className="relative inline-block mb-6">
+              <div className="w-24 h-24 bg-gradient-to-br from-[#16A34A] to-emerald-400 rounded-[2.5rem] flex items-center justify-center shadow-xl rotate-3">
+                <span className="text-4xl font-black text-white -rotate-3">{initial}</span>
+              </div>
+              <button className="absolute -bottom-2 -right-2 w-10 h-10 bg-white dark:bg-[#1C1F2E] border-4 border-gray-100 dark:border-[#0B0D13] rounded-2xl flex items-center justify-center hover:scale-110 transition-all shadow-xl">
+                <Camera className="w-4 h-4 text-primary" />
+              </button>
+            </div>
+
+            <h2 className="text-xl font-black text-gray-900 dark:text-white tracking-tight leading-tight uppercase">
+              {user.name || "Sanyog Partner"}
+            </h2>
+            <p className="text-[10px] font-black text-primary dark:text-emerald-400 tracking-[0.2em] mt-2 mb-6 uppercase">{user.email || "No email linked"}</p>
+
+            <div className="flex flex-wrap justify-center gap-2 mb-8">
+              <span className="badge bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 text-[10px] font-black tracking-widest py-1 px-3">
+                 VERIFIED PROTOCOL
+              </span>
+            </div>
+
+            <div className="space-y-4 pt-6 border-t border-slate-100 dark:border-[#2A2D3E] text-left">
+               <div className="flex items-center justify-between text-[10px]">
+                  <span className="text-slate-400 font-black uppercase tracking-widest">Active nodes</span>
+                  <span className="text-gray-900 dark:text-white font-black">12 ACTIVE</span>
+               </div>
+               <div className="flex items-center justify-between text-[10px]">
+                  <span className="text-slate-400 font-black uppercase tracking-widest">Trust Rating</span>
+                  <span className="text-emerald-500 font-black">9.8/10</span>
+               </div>
+            </div>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Avatar Card */}
-          <div className="lg:col-span-1">
-            <div className="bg-white dark:bg-[#0F172A] rounded-xl border border-gray-100 dark:border-[#1E293B] shadow-sm p-6 text-center">
-              {/* Avatar */}
-              <div className="relative inline-block mb-4">
-                <div className="w-20 h-20 bg-gradient-to-br from-primary to-primary-light rounded-2xl flex items-center justify-center shadow-lg">
-                  <span className="text-3xl font-bold text-white">{initial}</span>
-                </div>
-                <button className="absolute -bottom-1 -right-1 w-7 h-7 bg-white dark:bg-[#0F172A] border-2 border-gray-100 dark:border-[#1E293B] rounded-full flex items-center justify-center hover:bg-gray-50 dark:bg-[#020617] transition-colors shadow-sm">
-                  <Camera className="w-3.5 h-3.5 text-gray-500 dark:text-slate-400" />
+        {/* Info Card */}
+        <div className="lg:col-span-8 space-y-6">
+          <div className="card-premium">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h3 className="text-xl font-black text-gray-900 dark:text-white tracking-tighter uppercase">Identity Ledger</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">Verified registered corporate identification data.</p>
+              </div>
+              {!editing && (
+                <button onClick={() => setEditing(true)} className="btn-secondary h-10 px-6 text-[10px] font-black uppercase tracking-widest">
+                  MODIFY
                 </button>
-              </div>
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white">{user.name || "User"}</h2>
-              <p className="text-sm text-gray-400">{user.email || ""}</p>
-
-              {/* Account Status */}
-              <div className="mt-4 pt-4 border-t border-gray-50">
-                <div className="flex items-center justify-center gap-2 text-green-600">
-                  <Shield className="w-4 h-4" />
-                  <span className="text-xs font-semibold">Verified Account</span>
-                </div>
-              </div>
-
-              {/* Account Meta */}
-              <div className="mt-4 pt-4 border-t border-gray-50 space-y-2 text-left">
-                <div className="flex justify-between text-xs">
-                  <span className="text-gray-400">Account Type</span>
-                  <span className="font-medium text-gray-600 dark:text-slate-400">Client</span>
-                </div>
-                {user.iat && (
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-400">Session Since</span>
-                    <span className="font-medium text-gray-600 dark:text-slate-400">
-                      {new Date(user.iat * 1000).toLocaleDateString("en-IN")}
-                    </span>
-                  </div>
-                )}
-              </div>
+              )}
             </div>
+
+            {msg.text && (
+              <div className={`mb-6 p-4 rounded-xl flex items-center gap-3 animate-in slide-in-from-top-4 ${
+                msg.type === "success" ? "bg-emerald-500/10 border border-emerald-500/20 text-emerald-500" : "bg-red-500/10 border border-red-500/20 text-red-500"
+              }`}>
+                {msg.type === "success" ? <CheckCircle className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
+                <span className="text-sm font-bold">{msg.text}</span>
+              </div>
+            )}
+
+            {editing ? (
+              <form onSubmit={handleSave} className="space-y-6 text-left">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {[
+                    { label: "Personal Alias", field: "name", icon: User },
+                    { label: "Network Address", field: "email", icon: Mail, type: "email" },
+                    { label: "Direct Comms", field: "mobile", icon: Phone, type: "tel" },
+                    { label: "Corporate Entity", field: "company", icon: Building2 },
+                    { label: "Global Territory", field: "country", icon: Globe },
+                  ].map(({ label, field, icon: Icon, type }) => (
+                    <div key={field} className={field === "country" ? "md:col-span-2 text-left" : "text-left"}>
+                      <label className="block text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3 leading-none">{label}</label>
+                      <div className="relative">
+                        <Icon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary opacity-50" />
+                        <input
+                          type={type || "text"}
+                          value={form[field]}
+                          onChange={(e) => setForm({ ...form, [field]: e.target.value })}
+                          className="input-field pl-12 h-14 font-black text-xs uppercase tracking-widest bg-slate-50/50 dark:bg-[#0B0D13]"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex gap-4 pt-4">
+                  <button type="button" onClick={() => setEditing(false)} className="btn-secondary h-14 px-8 text-[10px] font-black uppercase flex-1">
+                    ABORT
+                  </button>
+                  <button type="submit" disabled={loading} className="btn-primary h-14 px-10 text-[10px] font-black uppercase flex-[2]">
+                    {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle className="w-5 h-5" />}
+                    {loading ? "TRANSMITTING..." : "COMMIT CHANGES"}
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <InfoRow icon={User} label="Full Identity" value={user.name} />
+                <InfoRow icon={Mail} label="Email Network" value={user.email} />
+                <InfoRow icon={Phone} label="Mobile Access" value={user.mobile || user.phone} />
+                <InfoRow icon={Building2} label="Corporate Entity" value={user.company} />
+                <div className="md:col-span-2">
+                  <InfoRow icon={Globe} label="Global Territory" value={user.country} />
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Info / Edit Card */}
-          <div className="lg:col-span-2">
-            <div className="bg-white dark:bg-[#0F172A] rounded-xl border border-gray-100 dark:border-[#1E293B] shadow-sm">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-50">
-                <h3 className="font-semibold text-gray-900 dark:text-white">Account Information</h3>
-                {!editing && (
-                  <button
-                    onClick={() => setEditing(true)}
-                    className="text-sm text-primary font-semibold hover:underline"
-                  >
-                    Edit Profile
-                  </button>
-                )}
-              </div>
-
-              {/* Alerts */}
-              {msg.text && (
-                <div className={`flex items-center gap-3 mx-6 mt-4 px-4 py-3 rounded-lg text-sm ${
-                  msg.type === "success"
-                    ? "bg-green-50 border border-green-200 text-green-700"
-                    : "bg-red-50 border border-red-200 text-red-700"
-                }`}>
-                  {msg.type === "success"
-                    ? <CheckCircle className="w-4 h-4 shrink-0" />
-                    : <AlertCircle className="w-4 h-4 shrink-0" />}
-                  {msg.text}
+          {/* Infrastructure Security */}
+          <div className="card shadow-lg bg-gradient-to-br from-[#0B0D13] to-[#161923] p-8 text-white border-0 relative overflow-hidden group rounded-[2.5rem]">
+             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-3xl group-hover:bg-primary/40 transition-all duration-700"></div>
+             <div className="relative flex items-center justify-between">
+                <div className="space-y-4">
+                   <h3 className="text-lg font-black tracking-tighter flex items-center gap-3 uppercase">
+                      <Lock className="w-6 h-6 text-emerald-400" />
+                      Protocol Security
+                   </h3>
+                   <p className="text-xs text-slate-400 font-medium max-w-sm">Manage encryption matrices, biometric protocols and active sub-nodes.</p>
                 </div>
-              )}
-
-              {editing ? (
-                <form onSubmit={handleSave} className="p-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    {[
-                      { label: "Full Name", field: "name", icon: User },
-                      { label: "Email Address", field: "email", icon: Mail, type: "email" },
-                      { label: "Mobile Number", field: "mobile", icon: Phone, type: "tel" },
-                      { label: "Company Name", field: "company", icon: Building2 },
-                      { label: "Country", field: "country", icon: Globe },
-                    ].map(({ label, field, icon: Icon, type }) => (
-                      <div key={field} className={field === "country" ? "md:col-span-2" : ""}>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{label}</label>
-                        <div className="relative">
-                          <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                          <input
-                            type={type || "text"}
-                            value={form[field]}
-                            onChange={(e) => setForm({ ...form, [field]: e.target.value })}
-                            className="input-field pl-10"
-                          />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="flex gap-3">
-                    <button
-                      type="button"
-                      onClick={() => { setEditing(false); setMsg({ type: "", text: "" }); }}
-                      className="btn-secondary"
-                    >
-                      Cancel
-                    </button>
-                    <button type="submit" disabled={loading} className="btn-primary">
-                      {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
-                      {loading ? "Saving..." : "Save Changes"}
-                    </button>
-                  </div>
-                </form>
-              ) : (
-                <div className="px-6 py-2">
-                  <InfoRow icon={User} label="Full Name" value={user.name} />
-                  <InfoRow icon={Mail} label="Email Address" value={user.email} />
-                  <InfoRow icon={Phone} label="Mobile Number" value={user.mobile || user.phone} />
-                  <InfoRow icon={Building2} label="Company Name" value={user.company} />
-                  <InfoRow icon={Globe} label="Country" value={user.country} />
-                </div>
-              )}
-            </div>
-
-            {/* Security Card */}
-            <div className="bg-white dark:bg-[#0F172A] rounded-xl border border-gray-100 dark:border-[#1E293B] shadow-sm p-6 mt-4">
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Security & Privacy</h3>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between py-2 border-b border-gray-50">
-                  <div>
-                    <p className="text-sm font-medium text-gray-700 dark:text-slate-300">Password</p>
-                    <p className="text-xs text-gray-400">Keep your account secure with a strong password.</p>
-                  </div>
-                  <button className="text-sm text-primary font-semibold hover:underline">Change</button>
-                </div>
-                <div className="flex items-center justify-between py-2">
-                  <div>
-                    <p className="text-sm font-medium text-gray-700 dark:text-slate-300">Two-Factor Authentication</p>
-                    <p className="text-xs text-gray-400">Add an extra layer of security to your account.</p>
-                  </div>
-                  <span className="badge bg-gray-100 dark:bg-[#1E293B] text-gray-500 dark:text-slate-400 text-xs">Coming Soon</span>
-                </div>
-              </div>
-            </div>
+                <button className="btn-primary h-12 px-6 text-[10px] font-black uppercase tracking-widest shadow-xl shadow-emerald-900/40">
+                   CONFIGURE <ArrowRight className="ml-2 w-4 h-4" />
+                </button>
+             </div>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
+

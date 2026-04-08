@@ -1,21 +1,23 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-sans: 'Inter', sans-serif;
-  --color-primary:     #1B3FA0;   /* Sanyog brand royal blue */
-  --color-primary-light: #3b82f6;
-  --color-primary-50:  #eef2ff;
-  --color-primary-100: #e0e7ff;
-  --color-primary-200: #c7d2fe;
-  --color-primary-700: #1B3FA0;
-  --color-primary-800: #142d73;
-  --color-primary-900: #0e1e4e;
-  --color-brand-green: #22A547;   /* Sanyog brand green */
-  --color-brand-green-dark: #187a35;
-  --color-brand-green-50: #f0fdf4;
+  
+  /* Sanyog Brand Palette — Synchronized with Admin Panel */
+  --color-primary: #16A34A; /* Official Sanyog Green */
+  --color-primary-light: #22C55E;
+  --color-accent-gold: #D4AF37;
+  --color-accent-cyan: #00E5FF;
+  --color-accent-green: #16A34A;
+  
+  /* Surface Tokens */
+  --color-bg-root: #0B0D13;
+  --color-bg-sidebar: #FFFFFF;
+  --color-bg-surface: #F8FAFC;
+  --color-bg-card: #FFFFFF;
+  --color-border-dark: #E2E8F0;
 }
-
 
 @layer base {
   * {
@@ -25,13 +27,17 @@
   }
 
   body {
-    font-family: 'Inter', sans-serif;
-    background-color: #f9fafb;
-    color: #111827;
+    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    background-color: #F8FAFC; /* Administrative Gray/White */
+    color: #0F172A; /* Slate 900 */
     min-height: 100vh;
-    display: block;
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Global dark state */
+  .dark body {
+    background-color: #0B0D13;
+    color: #F8FAFC;
   }
 
   #root {
@@ -41,47 +47,60 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-primary text-white font-semibold px-6 py-3 rounded-lg hover:bg-primary-700 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-sm;
+    @apply bg-primary text-white font-bold px-6 py-3 rounded-xl hover:bg-primary-light transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/10 active:scale-95 uppercase tracking-wider text-[10px];
   }
 
   .btn-secondary {
-    @apply bg-white text-primary font-semibold px-6 py-3 rounded-lg border border-primary hover:bg-primary-50 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2;
+    @apply bg-white dark:bg-[#1C1F2E] text-slate-600 dark:text-slate-300 font-bold px-6 py-3 rounded-xl border border-slate-200 dark:border-[#2A2D3E] hover:bg-slate-50 dark:hover:bg-[#22253A] transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 active:scale-95 uppercase tracking-wider text-[10px];
   }
 
-  .btn-danger {
-    @apply bg-red-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-red-700 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2;
+  .btn-accent {
+    @apply bg-[#16A34A] text-white font-black px-6 py-3 rounded-xl hover:brightness-110 transition-all duration-300 flex items-center justify-center gap-2 shadow-xl shadow-emerald-900/20 active:scale-95 uppercase tracking-widest text-[10px];
   }
 
   .input-field {
-    @apply w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-transparent transition-all duration-200 bg-white;
+    @apply w-full px-4 py-3 border border-slate-200 dark:border-[#2A2D3E] rounded-xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all duration-200 bg-white dark:bg-[#161923];
   }
 
   .card {
-    @apply bg-white rounded-xl shadow-sm border border-gray-100 p-6;
+    @apply bg-white dark:bg-[#1C1F2E] rounded-[2rem] shadow-sm border border-slate-100 dark:border-[#2A2D3E] p-6 transition-all duration-300;
   }
 
-  .badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  .card-premium {
+    @apply bg-white dark:bg-[#1C1F2E] rounded-[2.5rem] shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-[#2A2D3E] p-8 hover:shadow-2xl hover:border-primary/30 transition-all duration-300;
   }
 
   .sidebar-link {
-    @apply flex items-center gap-3 px-4 py-3 rounded-lg text-blue-100 hover:bg-white/10 hover:text-white transition-all duration-200 font-medium cursor-pointer w-full text-left;
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-primary transition-all duration-200 font-bold cursor-pointer w-full text-left active:scale-95 uppercase tracking-widest text-[10px];
   }
 
   .sidebar-link.active {
-    @apply bg-white/20 text-white;
+    @apply bg-primary/10 dark:bg-primary/20 text-primary shadow-sm;
+  }
+
+  .page-header {
+    @apply mb-10;
   }
 
   .page-title {
-    @apply text-2xl font-bold text-gray-900 mb-1;
+    @apply text-4xl font-black text-slate-900 dark:text-white tracking-tighter uppercase;
   }
 
   .page-subtitle {
-    @apply text-gray-500 text-sm;
+    @apply text-slate-500 dark:text-slate-400 text-xs font-medium mt-2;
   }
 
   .stat-card {
-    @apply bg-white rounded-xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-shadow duration-200;
+    @apply bg-white dark:bg-[#1C1F2E] rounded-[2rem] border border-slate-100 dark:border-[#2A2D3E] p-6 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-widest;
+  }
+
+  /* Custom Glows */
+  .glow-primary {
+    text-shadow: 0 0 20px rgba(22,163,74,0.3);
   }
 }
 
@@ -90,12 +109,17 @@
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  @apply bg-slate-50 dark:bg-[#0B0D13];
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 3px;
+  @apply bg-slate-200 dark:bg-[#2A2D3E] rounded-full;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  @apply bg-primary/40;
 }
+
+/* Glassmorphism Classes */
+.glass {
+  @apply bg-white/70 dark:bg-[#161923]/70 backdrop-blur-xl border border-white/20 dark:border-white/5;
+}
+
