@@ -12,7 +12,7 @@
   --color-accent-green: #16A34A;
   
   /* Surface Tokens */
-  --color-bg-root: #0B0D13;
+  --color-bg-root: #10141D;
   --color-bg-sidebar: #FFFFFF;
   --color-bg-surface: #F8FAFC;
   --color-bg-card: #FFFFFF;
@@ -36,8 +36,8 @@
 
   /* Global dark state */
   .dark body {
-    background-color: #0B0D13;
-    color: #F8FAFC;
+    background-color: #10141D;
+    color: #F1F5F9;
   }
 
   #root {
@@ -51,7 +51,7 @@
   }
 
   .btn-secondary {
-    @apply bg-white dark:bg-[#1C1F2E] text-slate-600 dark:text-slate-300 font-bold px-6 py-3 rounded-xl border border-slate-200 dark:border-[#2A2D3E] hover:bg-slate-50 dark:hover:bg-[#22253A] transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 active:scale-95 uppercase tracking-wider text-[10px];
+    @apply bg-white dark:bg-[#1E242E] text-slate-600 dark:text-slate-300 font-bold px-6 py-3 rounded-xl border border-slate-200 dark:border-[#2A2D3E] hover:bg-slate-50 dark:hover:bg-[#252C38] transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 active:scale-95 uppercase tracking-wider text-[10px];
   }
 
   .btn-accent {
@@ -59,15 +59,15 @@
   }
 
   .input-field {
-    @apply w-full px-4 py-3 border border-slate-200 dark:border-[#2A2D3E] rounded-xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all duration-200 bg-white dark:bg-[#161923];
+    @apply w-full px-4 py-3 border border-slate-200 dark:border-[#2A2D3E] rounded-xl text-slate-900 dark:text-[#F1F5F9] placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all duration-200 bg-white dark:bg-[#151921];
   }
 
   .card {
-    @apply bg-white dark:bg-[#1C1F2E] rounded-[2rem] shadow-sm border border-slate-100 dark:border-[#2A2D3E] p-6 transition-all duration-300;
+    @apply bg-white dark:bg-[#1E242E] rounded-[2rem] shadow-sm border border-slate-100 dark:border-[#2A2D3E] p-6 transition-all duration-300;
   }
 
   .card-premium {
-    @apply bg-white dark:bg-[#1C1F2E] rounded-[2.5rem] shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-[#2A2D3E] p-8 hover:shadow-2xl hover:border-primary/30 transition-all duration-300;
+    @apply bg-white dark:bg-[#1E242E] rounded-[2.5rem] shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-[#2A2D3E] p-8 hover:shadow-2xl hover:border-primary/30 transition-all duration-300;
   }
 
   .sidebar-link {
@@ -83,7 +83,7 @@
   }
 
   .page-title {
-    @apply text-4xl font-black text-slate-900 dark:text-white tracking-tighter uppercase;
+    @apply text-4xl font-black text-slate-900 dark:text-[#F1F5F9] tracking-tighter uppercase;
   }
 
   .page-subtitle {
@@ -91,7 +91,7 @@
   }
 
   .stat-card {
-    @apply bg-white dark:bg-[#1C1F2E] rounded-[2rem] border border-slate-100 dark:border-[#2A2D3E] p-6 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300;
+    @apply bg-white dark:bg-[#1E242E] rounded-[2rem] border border-slate-100 dark:border-[#2A2D3E] p-6 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300;
   }
 
   .badge {
@@ -109,7 +109,7 @@
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  @apply bg-slate-50 dark:bg-[#0B0D13];
+  @apply bg-slate-50 dark:bg-[#10141D];
 }
 ::-webkit-scrollbar-thumb {
   @apply bg-slate-200 dark:bg-[#2A2D3E] rounded-full;
@@ -120,6 +120,6 @@
 
 /* Glassmorphism Classes */
 .glass {
-  @apply bg-white/70 dark:bg-[#161923]/70 backdrop-blur-xl border border-white/20 dark:border-white/5;
+  @apply bg-white/70 dark:bg-[#151921]/70 backdrop-blur-xl border border-white/20 dark:border-white/5;
 }
 

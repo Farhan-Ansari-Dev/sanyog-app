@@ -61,10 +61,10 @@ export default function Layout() {
   ];
 
   return (
-    <div className="flex h-screen bg-[#F8FAFC] dark:bg-[#0B0D13] font-sans antialiased">
+    <div className="flex h-screen bg-[#F8FAFC] dark:bg-[#10141D] font-sans antialiased">
       
       {/* Sidebar - Desktop */}
-      <aside className="hidden lg:flex w-72 flex-col bg-white dark:bg-[#10121A] border-r border-[#E2E8F0] dark:border-[#2A2D3E] shadow-sm z-50">
+      <aside className="hidden lg:flex w-72 flex-col bg-white dark:bg-[#161B22] border-r border-[#E2E8F0] dark:border-[#2A2D3E] shadow-sm z-50">
         <div className="h-24 flex items-center px-8 border-b border-[#F1F5F9] dark:border-[#2A2D3E]">
           <div className="flex items-center gap-3">
              <img src="/logo.png" alt="Sanyog" className="h-10 w-auto object-contain" 
@@ -105,7 +105,7 @@ export default function Layout() {
         <div className="p-6 border-t border-[#F1F5F9] dark:border-[#2A2D3E] space-y-3">
            <button 
              onClick={toggleTheme}
-             className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-slate-50 dark:bg-[#161923] border border-slate-100 dark:border-[#2A2D3E] text-slate-700 dark:text-slate-300 transition-all hover:bg-slate-100 dark:hover:bg-[#22253A]"
+             className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-slate-50 dark:bg-[#151921] border border-slate-100 dark:border-[#2A2D3E] text-slate-700 dark:text-slate-300 transition-all hover:bg-slate-100 dark:hover:bg-[#1D222D]"
            >
               {isDark ? <Sun className="w-5 h-5 text-yellow-500" /> : <Moon className="w-5 h-5 text-blue-600" />}
               <span className="text-sm font-bold">{isDark ? "Light Mode" : "Dark Mode"}</span>
@@ -127,13 +127,13 @@ export default function Layout() {
         {/* Top Header */}
         <header className="h-20 glass flex items-center justify-between px-6 lg:px-10 z-40 shrink-0">
           <div className="lg:hidden">
-             <button onClick={() => setMobileOpen(true)} className="p-2 bg-white dark:bg-[#1C1F2E] rounded-xl shadow-sm">
+             <button onClick={() => setMobileOpen(true)} className="p-2 bg-white dark:bg-[#1E242E] rounded-xl shadow-sm">
                 <Menu className="w-6 h-6 text-gray-700 dark:text-white" />
              </button>
           </div>
 
           <div className="hidden lg:block">
-             <div className="flex items-center gap-1.5 px-4 py-2 bg-gray-100 dark:bg-[#161923] rounded-full border border-gray-200 dark:border-[#2A2D3E]">
+             <div className="flex items-center gap-1.5 px-4 py-2 bg-gray-100 dark:bg-[#151921] rounded-full border border-gray-200 dark:border-[#2A2D3E]">
                 <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
                 <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Network Secure</span>
              </div>
@@ -167,13 +167,13 @@ export default function Layout() {
       {mobileOpen && (
         <div className="fixed inset-0 z-[60] lg:hidden">
            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setMobileOpen(false)}></div>
-           <aside className="absolute top-0 left-0 bottom-0 w-80 bg-white dark:bg-[#10121A] p-6 flex flex-col">
+           <aside className="absolute top-0 left-0 bottom-0 w-80 bg-white dark:bg-[#161B22] p-6 flex flex-col">
               <div className="flex items-center justify-between mb-10">
                 <div className="flex items-center gap-3 font-black uppercase tracking-tighter">
                    <Shield className="w-6 h-6 text-primary" />
                    Sanyog
                 </div>
-                <button onClick={() => setMobileOpen(false)} className="p-2 rounded-xl bg-gray-100 dark:bg-[#1C1F2E]">
+                <button onClick={() => setMobileOpen(false)} className="p-2 rounded-xl bg-gray-100 dark:bg-[#1E242E]">
                    <X className="w-5 h-5" />
                 </button>
               </div>
