@@ -36,6 +36,7 @@ function InfoRow({ icon: Icon, label, value }) {
 }
 
 export default function Profile() {
+  const navigate = useNavigate();
   const token = localStorage.getItem("token");
   const user = decodeToken(token);
 
@@ -196,7 +197,10 @@ export default function Profile() {
                    </h3>
                    <p className="text-xs text-slate-400 font-medium max-w-sm">Manage encryption matrices, biometric protocols and active sub-nodes.</p>
                 </div>
-                <button className="btn-primary h-12 px-6 text-[10px] font-black uppercase tracking-widest shadow-xl shadow-emerald-900/40">
+                <button 
+                  onClick={() => navigate("/settings")}
+                  className="btn-primary h-12 px-6 text-[10px] font-black uppercase tracking-widest shadow-xl shadow-emerald-900/40"
+                >
                    CONFIGURE <ArrowRight className="ml-2 w-4 h-4" />
                 </button>
              </div>
