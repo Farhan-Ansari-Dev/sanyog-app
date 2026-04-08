@@ -278,7 +278,7 @@ export default function Login() {
               <div className="mb-8">
                 <label className={`block text-[10px] font-black uppercase tracking-widest mb-4 ml-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Mobile Access Key</label>
                 <div className="relative flex items-center group">
-                  <span className="absolute left-5 text-sm font-black text-[#16A34A] select-none">+91</span>
+                  <span className="absolute left-5 text-sm font-black text-[#15803D] select-none">+91</span>
                   <input
                     type="tel"
                     maxLength={10}
@@ -295,7 +295,7 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={otpLoading || mobile.length !== 10}
-                className="w-full h-16 text-xs text-white font-black rounded-2xl bg-[#16A34A] flex items-center justify-center gap-3 transition-all duration-300 hover:bg-[#15803d] hover:shadow-[0_20px_40px_-10px_rgba(22,163,74,0.4)] disabled:opacity-30 disabled:pointer-events-none uppercase tracking-[0.2em]"
+                className="w-full h-16 text-xs text-white font-black rounded-2xl bg-[#15803D] flex items-center justify-center gap-3 transition-all duration-300 hover:bg-[#166534] hover:shadow-[0_20px_40px_-10px_rgba(21,128,61,0.4)] disabled:opacity-30 disabled:pointer-events-none uppercase tracking-[0.2em]"
               >
                 {otpLoading ? <><Loader2 className="w-5 h-5 animate-spin" /> SYNCHRONIZING...</> : <><RefreshCw className="w-4 h-4" /> REQUEST OTP</>}
               </button>
@@ -303,7 +303,7 @@ export default function Login() {
               <div className="mt-10 text-center pt-8 border-t border-slate-200 dark:border-white/5">
                 <p className={`text-[11px] font-bold uppercase tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
                   New to Sanyog?{" "}
-                  <Link to="/register" className="text-[#16A34A] font-black hover:text-emerald-500 transition-colors">
+                  <Link to="/register" className="text-[#15803D] font-black hover:text-emerald-500 transition-colors">
                     CREATE ACCOUNT
                   </Link>
                 </p>
@@ -325,7 +325,7 @@ export default function Login() {
                 </button>
                 <h2 className={`text-2xl font-black tracking-widest uppercase m-0 leading-none ${isDark ? 'text-white' : 'text-slate-900'}`}>Verify OTP</h2>
                 <p className={`text-[11px] mt-4 font-bold uppercase tracking-[0.2em] opacity-60 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                  Code sent to <span className="text-[#16A34A]">+91 {mobile}</span>
+                  Code sent to <span className="text-[#15803D]">+91 {mobile}</span>
                 </p>
               </div>
 
@@ -350,7 +350,7 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={otpLoading || otpCode.length < 6}
-                className="w-full h-16 text-xs text-white font-black rounded-2xl bg-[#16A34A] flex items-center justify-center gap-3 transition-all duration-300 hover:bg-[#15803d] hover:shadow-[0_20px_40px_-10px_rgba(22,163,74,0.4)] disabled:opacity-30 disabled:pointer-events-none uppercase tracking-[0.2em]"
+                className="w-full h-16 text-xs text-white font-black rounded-2xl bg-[#15803D] flex items-center justify-center gap-3 transition-all duration-300 hover:bg-[#166534] hover:shadow-[0_20px_40px_-10px_rgba(21,128,61,0.4)] disabled:opacity-30 disabled:pointer-events-none uppercase tracking-[0.2em]"
               >
                 {otpLoading ? <><Loader2 className="w-5 h-5 animate-spin" /> VERIFYING...</> : <><CheckCircle className="w-4 h-4" /> VERIFY & SIGN IN</>}
               </button>
