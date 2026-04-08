@@ -102,6 +102,11 @@
   .glow-primary {
     text-shadow: 0 0 20px rgba(22,163,74,0.3);
   }
+
+  /* Manual Dark Utility */
+  .bg-premium-dark {
+    background-color: #10141D !important;
+  }
 }
 
 /* Scrollbar */

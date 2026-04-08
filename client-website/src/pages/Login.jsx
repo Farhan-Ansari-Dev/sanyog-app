@@ -214,10 +214,10 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-[#10141D] font-['Inter'] flex flex-col items-center justify-center p-4 antialiased selection:bg-[#22C55E]/10 selection:text-[#16A34A] transition-colors duration-500 relative overflow-hidden">
+    <div className="min-h-screen bg-premium-dark font-['Inter'] flex flex-col items-center justify-center p-4 antialiased selection:bg-[#22C55E]/10 selection:text-[#16A34A] transition-colors duration-500 relative overflow-hidden">
       {/* Premium Admin-style radial glow */}
       <div 
-        className="absolute inset-0 pointer-events-none opacity-50" 
+        className="absolute inset-0 pointer-events-none opacity-50 bg-premium-dark" 
         style={{ background: 'radial-gradient(circle at center, #1E293B 0%, #10141D 100%)' }}
       />
       
