@@ -214,17 +214,17 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-premium-dark font-['Inter'] flex flex-col items-center justify-center p-4 antialiased selection:bg-[#22C55E]/10 selection:text-[#16A34A] transition-colors duration-500 relative overflow-hidden">
+    <div className={`min-h-screen font-['Inter'] flex flex-col items-center justify-center p-4 antialiased selection:bg-[#22C55E]/10 selection:text-[#16A34A] transition-colors duration-500 relative overflow-hidden ${isDark ? 'bg-premium-dark text-white' : 'bg-slate-50 text-slate-900'}`}>
       {/* Premium Admin-style radial glow */}
       <div 
-        className="absolute inset-0 pointer-events-none opacity-50 bg-premium-dark" 
+        className={`absolute inset-0 pointer-events-none transition-opacity duration-1000 ${isDark ? 'opacity-50' : 'opacity-0'}`} 
         style={{ background: 'radial-gradient(circle at center, #1E293B 0%, #10141D 100%)' }}
       />
       
       <div className="absolute top-8 right-8 z-50">
          <button 
            onClick={toggleTheme}
-           className="w-12 h-12 rounded-full flex items-center justify-center bg-[#1E242E]/80 backdrop-blur-md border border-white/10 text-white hover:scale-110 transition-all shadow-2xl"
+           className={`w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md border transition-all shadow-2xl ${isDark ? 'bg-[#1E242E]/80 border-white/10 text-white hover:scale-110' : 'bg-white/80 border-slate-200 text-slate-900 hover:scale-110 hover:shadow-lg'}`}
          >
             {isDark ? <Sun className="w-5 h-5 text-yellow-400" /> : <Moon className="w-5 h-5 text-blue-400" />}
          </button>
@@ -237,46 +237,46 @@ export default function Login() {
           <img
             src="/logo.png"
             alt="Sanyog"
-            className="h-14 w-auto object-contain drop-shadow-sm transition-all duration-300"
+            className={`h-14 w-auto object-contain drop-shadow-sm transition-all duration-300 ${!isDark ? 'brightness-90' : ''}`}
             onError={(e) => {
               e.target.style.display = 'none';
               e.target.nextSibling.style.display = 'flex';
             }}
           />
           <div style={{ display: 'none' }} className="items-center justify-center w-14 h-14 bg-white dark:bg-[#0F172A] border border-slate-200 rounded-2xl shadow-sm">
-            <Shield className="w-7 h-7 text-slate-800" />
+            <Shield className={`w-7 h-7 ${isDark ? 'text-white' : 'text-slate-800'}`} />
           </div>
         </div>
 
         {/* Premium Logic Card */}
         <div 
-          className="w-full bg-[#161B22] dark:bg-[#161B22] animate-fade-in overflow-hidden relative z-20 border border-white/5 rounded-[2rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)]"
+          className="w-full premium-card animate-fade-in overflow-hidden relative z-20 rounded-[2rem] transition-all duration-500"
         >
           
           {/* Step 1: Mobile Number */}
           {otpStep === 1 && (
             <form onSubmit={handleSendOtp} className="px-10 py-12">
               <div className="text-center mb-10">
-                <h2 className="text-2xl font-black text-white tracking-widest uppercase m-0 leading-none">Welcome Back</h2>
-                <p className="text-[11px] text-slate-400 mt-4 font-bold uppercase tracking-[0.2em] opacity-60">Please authenticate to access the grid</p>
+                <h2 className={`text-2xl font-black tracking-widest uppercase m-0 leading-none ${isDark ? 'text-white' : 'text-slate-900'}`}>Welcome Back</h2>
+                <p className={`text-[11px] mt-4 font-bold uppercase tracking-[0.2em] opacity-60 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Please authenticate to access the grid</p>
               </div>
 
               {/* Minimal Alerts */}
               {error && (
-                <div className="flex items-start gap-2 bg-red-500/10 text-red-400 px-4 py-3 rounded-2xl mb-8 text-xs border border-red-500/20 font-bold uppercase tracking-wider">
+                <div className="flex items-start gap-2 bg-red-500/10 text-red-500 px-4 py-3 rounded-2xl mb-8 text-xs border border-red-500/20 font-bold uppercase tracking-wider">
                   <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                   {error}
                 </div>
               )}
               {success && (
-                <div className="flex items-center gap-2 bg-green-50 text-[#16A34A] px-4 py-3 rounded-xl mb-6 text-[14px] border border-green-100 font-medium">
+                <div className="flex items-center gap-2 bg-green-500/10 text-green-600 px-4 py-3 rounded-2xl mb-8 text-xs border border-green-500/20 font-bold uppercase tracking-wider">
                   <CheckCircle className="w-4 h-4 shrink-0" />
                   {success}
                 </div>
               )}
 
               <div className="mb-8">
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 ml-1">Mobile Access Key</label>
+                <label className={`block text-[10px] font-black uppercase tracking-widest mb-4 ml-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Mobile Access Key</label>
                 <div className="relative flex items-center group">
                   <span className="absolute left-5 text-sm font-black text-[#16A34A] select-none">+91</span>
                   <input
@@ -285,7 +285,7 @@ export default function Login() {
                     placeholder="10-digit mobile number"
                     value={mobile}
                     onChange={(e) => { setMobile(e.target.value.replace(/\D/g, "")); setError(""); }}
-                    className="w-full pl-[60px] pr-4 h-16 bg-[#0B0D13]/60 border border-white/5 outline-none rounded-2xl text-base font-black text-white transition-all duration-300 focus:border-[#16A34A]/50 focus:bg-[#0B0D13] placeholder:text-slate-700"
+                    className={`w-full pl-[60px] pr-4 h-16 border outline-none rounded-2xl text-base font-black transition-all duration-300 focus:border-[#16A34A]/50 placeholder:text-slate-400 ${isDark ? 'bg-[#0B0D13]/60 border-white/5 text-white focus:bg-[#0B0D13]' : 'bg-slate-50 border-slate-200 text-slate-900 focus:bg-white'}`}
                     required
                     autoFocus
                   />
@@ -300,10 +300,10 @@ export default function Login() {
                 {otpLoading ? <><Loader2 className="w-5 h-5 animate-spin" /> SYNCHRONIZING...</> : <><RefreshCw className="w-4 h-4" /> REQUEST OTP</>}
               </button>
 
-              <div className="mt-10 text-center pt-8 border-t border-white/5">
-                <p className="text-[11px] text-slate-500 font-bold uppercase tracking-widest">
+              <div className="mt-10 text-center pt-8 border-t border-slate-200 dark:border-white/5">
+                <p className={`text-[11px] font-bold uppercase tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
                   New to Sanyog?{" "}
-                  <Link to="/register" className="text-[#16A34A] font-black hover:text-emerald-400 transition-colors">
+                  <Link to="/register" className="text-[#16A34A] font-black hover:text-emerald-500 transition-colors">
                     CREATE ACCOUNT
                   </Link>
                 </p>
@@ -318,26 +318,26 @@ export default function Login() {
                 <button
                   type="button"
                   onClick={() => { setOtpStep(1); setError(""); setOtpCode(""); }}
-                  className="absolute left-0 top-1.5 text-slate-500 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/5"
+                  className={`absolute left-0 top-1.5 transition-colors p-1 rounded-lg ${isDark ? 'text-slate-500 hover:text-white hover:bg-white/5' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-100'}`}
                   aria-label="Back"
                 >
                   <ArrowLeft className="w-5 h-5" />
                 </button>
-                <h2 className="text-2xl font-black text-white tracking-widest uppercase m-0 leading-none">Verify OTP</h2>
-                <p className="text-[11px] text-slate-400 mt-4 font-bold uppercase tracking-[0.2em] opacity-60">
+                <h2 className={`text-2xl font-black tracking-widest uppercase m-0 leading-none ${isDark ? 'text-white' : 'text-slate-900'}`}>Verify OTP</h2>
+                <p className={`text-[11px] mt-4 font-bold uppercase tracking-[0.2em] opacity-60 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                   Code sent to <span className="text-[#16A34A]">+91 {mobile}</span>
                 </p>
               </div>
 
               {/* Alerts */}
               {error && (
-                <div className="flex items-start gap-2 bg-red-500/10 text-red-400 px-4 py-3 rounded-2xl mb-8 text-xs border border-red-500/20 font-bold uppercase tracking-wider">
+                <div className="flex items-start gap-2 bg-red-500/10 text-red-500 px-4 py-3 rounded-2xl mb-8 text-xs border border-red-500/20 font-bold uppercase tracking-wider">
                   <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                   {error}
                 </div>
               )}
               {success && (
-                <div className="flex items-center gap-2 bg-emerald-500/10 text-emerald-400 px-4 py-3 rounded-2xl mb-8 text-xs border border-emerald-500/20 font-bold uppercase tracking-wider">
+                <div className="flex items-center gap-2 bg-emerald-500/10 text-emerald-500 px-4 py-3 rounded-2xl mb-8 text-xs border border-emerald-500/20 font-bold uppercase tracking-wider">
                   <CheckCircle className="w-4 h-4 shrink-0" />
                   {success}
                 </div>
@@ -363,7 +363,7 @@ export default function Login() {
         </div>
 
         <div className="mt-10 mb-4 text-center z-10 w-full relative">
-          <p className="text-slate-600 text-[11px] font-bold uppercase tracking-widest">
+          <p className={`${isDark ? 'text-slate-600' : 'text-slate-400'} text-[11px] font-bold uppercase tracking-widest`}>
             © {new Date().getFullYear()} Sanyog Conformity Solutions
           </p>
         </div>

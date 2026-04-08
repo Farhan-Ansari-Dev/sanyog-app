@@ -105,7 +105,15 @@
 
   /* Manual Dark Utility */
   .bg-premium-dark {
-    background-color: #10141D !important;
+    background-color: #10141D;
+  }
+
+  .premium-card {
+    @apply bg-white border-slate-200 shadow-xl;
+  }
+
+  .dark .premium-card {
+    @apply bg-[#161B22] border-white/5 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)];
   }
 }
 
