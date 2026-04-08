@@ -2,7 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import {
   Shield, Phone, Lock, Eye, EyeOff, Loader2,
-  ArrowRight, AlertCircle, CheckCircle, RefreshCw, ArrowLeft
+  ArrowRight, AlertCircle, CheckCircle, RefreshCw, ArrowLeft,
+  Sun, Moon
 } from "lucide-react";
 import API from "../services/api";
 
@@ -111,6 +112,32 @@ export default function Login() {
   const [otpLoading, setOtpLoading] = useState(false);
   const [resendKey, setResendKey] = useState(0); // increment to reset countdown
 
+  // Theme state
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+      setIsDark(true);
+    } else {
+      document.documentElement.classList.remove('dark');
+      setIsDark(false);
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const html = document.documentElement;
+    if (html.classList.contains('dark')) {
+      html.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+      setIsDark(false);
+    } else {
+      html.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+      setIsDark(true);
+    }
+  };
+
   // Shared
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -187,12 +214,21 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] font-['Inter'] flex flex-col items-center justify-center p-4 antialiased selection:bg-[#22C55E]/10 selection:text-[#16A34A] relative">
-      {/* Super subtle radial glow in background */}
+    <div className="min-h-screen bg-[#10141D] font-['Inter'] flex flex-col items-center justify-center p-4 antialiased selection:bg-[#22C55E]/10 selection:text-[#16A34A] transition-colors duration-500 relative overflow-hidden">
+      {/* Premium Admin-style radial glow */}
       <div 
-        className="absolute inset-0 pointer-events-none" 
-        style={{ background: 'radial-gradient(circle at center, rgba(238,242,255,0.7) 0%, transparent 70%)' }}
+        className="absolute inset-0 pointer-events-none opacity-50" 
+        style={{ background: 'radial-gradient(circle at center, #1E293B 0%, #10141D 100%)' }}
       />
+      
+      <div className="absolute top-8 right-8 z-50">
+         <button 
+           onClick={toggleTheme}
+           className="w-12 h-12 rounded-full flex items-center justify-center bg-[#1E242E]/80 backdrop-blur-md border border-white/10 text-white hover:scale-110 transition-all shadow-2xl"
+         >
+            {isDark ? <Sun className="w-5 h-5 text-yellow-400" /> : <Moon className="w-5 h-5 text-blue-400" />}
+         </button>
+      </div>
 
       <div className="w-full max-w-[440px] flex flex-col items-center relative z-10">
         
@@ -212,23 +248,22 @@ export default function Login() {
           </div>
         </div>
 
-        {/* The Premium Light Card */}
+        {/* Premium Logic Card */}
         <div 
-          className="w-full bg-[#FFFFFF] animate-fade-in overflow-hidden relative z-20"
-          style={{ borderRadius: '16px', boxShadow: '0 20px 40px rgba(0, 0, 0, 0.08)', border: '1px solid rgba(226, 232, 240, 0.8)' }}
+          className="w-full bg-[#161B22] dark:bg-[#161B22] animate-fade-in overflow-hidden relative z-20 border border-white/5 rounded-[2rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)]"
         >
           
           {/* Step 1: Mobile Number */}
           {otpStep === 1 && (
-            <form onSubmit={handleSendOtp} className="px-8 py-10 sm:px-10">
-              <div className="text-center mb-8">
-                <h2 className="text-[26px] font-bold text-[#0F172A] tracking-tight m-0">Welcome Back</h2>
-                <p className="text-[14px] text-[#6B7280] mt-2 font-medium">Enter your mobile number to securely sign in.</p>
+            <form onSubmit={handleSendOtp} className="px-10 py-12">
+              <div className="text-center mb-10">
+                <h2 className="text-2xl font-black text-white tracking-widest uppercase m-0 leading-none">Welcome Back</h2>
+                <p className="text-[11px] text-slate-400 mt-4 font-bold uppercase tracking-[0.2em] opacity-60">Please authenticate to access the grid</p>
               </div>
 
               {/* Minimal Alerts */}
               {error && (
-                <div className="flex items-start gap-2 bg-red-50 text-red-600 px-4 py-3 rounded-xl mb-6 text-[14px] border border-red-100 font-medium">
+                <div className="flex items-start gap-2 bg-red-500/10 text-red-400 px-4 py-3 rounded-2xl mb-8 text-xs border border-red-500/20 font-bold uppercase tracking-wider">
                   <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                   {error}
                 </div>
@@ -241,16 +276,16 @@ export default function Login() {
               )}
 
               <div className="mb-8">
-                <label className="block text-[14px] font-semibold text-[#0F172A] mb-2">Mobile Number</label>
+                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 ml-1">Mobile Access Key</label>
                 <div className="relative flex items-center group">
-                  <span className="absolute left-4 text-[16px] font-semibold text-[#6B7280] select-none">+91</span>
+                  <span className="absolute left-5 text-sm font-black text-[#16A34A] select-none">+91</span>
                   <input
                     type="tel"
                     maxLength={10}
                     placeholder="10-digit mobile number"
                     value={mobile}
                     onChange={(e) => { setMobile(e.target.value.replace(/\D/g, "")); setError(""); }}
-                    className="w-full pl-[56px] pr-4 h-14 bg-white dark:bg-[#0F172A] border border-[#E5E7EB] outline-none rounded-xl text-[16px] font-medium text-[#0F172A] transition-all duration-200 focus:border-[#22C55E] placeholder:text-[#9CA3AF] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.2)]"
+                    className="w-full pl-[60px] pr-4 h-16 bg-[#0B0D13]/60 border border-white/5 outline-none rounded-2xl text-base font-black text-white transition-all duration-300 focus:border-[#16A34A]/50 focus:bg-[#0B0D13] placeholder:text-slate-700"
                     required
                     autoFocus
                   />
@@ -260,16 +295,16 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={otpLoading || mobile.length !== 10}
-                className="w-full h-14 text-[16px] text-white font-[600] rounded-[10px] bg-[#22C55E] flex items-center justify-center gap-2 transition-all duration-200 hover:bg-[#16A34A] hover:-translate-y-[1px] hover:shadow-[0_8px_20px_rgba(34,197,94,0.3)] disabled:opacity-65 disabled:pointer-events-none disabled:transform-none disabled:shadow-none"
+                className="w-full h-16 text-xs text-white font-black rounded-2xl bg-[#16A34A] flex items-center justify-center gap-3 transition-all duration-300 hover:bg-[#15803d] hover:shadow-[0_20px_40px_-10px_rgba(22,163,74,0.4)] disabled:opacity-30 disabled:pointer-events-none uppercase tracking-[0.2em]"
               >
-                {otpLoading ? <><Loader2 className="w-5 h-5 animate-spin" /> Sending...</> : "Send OTP"}
+                {otpLoading ? <><Loader2 className="w-5 h-5 animate-spin" /> SYNCHRONIZING...</> : <><RefreshCw className="w-4 h-4" /> REQUEST OTP</>}
               </button>
 
-              <div className="mt-8 text-center pt-6 border-t border-slate-100">
-                <p className="text-[14px] text-[#6B7280] font-medium">
+              <div className="mt-10 text-center pt-8 border-t border-white/5">
+                <p className="text-[11px] text-slate-500 font-bold uppercase tracking-widest">
                   New to Sanyog?{" "}
-                  <Link to="/register" className="text-[#0F172A] font-bold hover:text-[#22C55E] hover:underline transition-colors">
-                    Create Account
+                  <Link to="/register" className="text-[#16A34A] font-black hover:text-emerald-400 transition-colors">
+                    CREATE ACCOUNT
                   </Link>
                 </p>
               </div>
@@ -278,31 +313,31 @@ export default function Login() {
 
           {/* Step 2: Verification */}
           {otpStep === 2 && (
-            <form onSubmit={handleVerifyOtp} className="px-8 py-10 sm:px-10">
-              <div className="text-center mb-8 relative">
+            <form onSubmit={handleVerifyOtp} className="px-10 py-12">
+              <div className="text-center mb-10 relative">
                 <button
                   type="button"
                   onClick={() => { setOtpStep(1); setError(""); setOtpCode(""); }}
-                  className="absolute left-0 top-1.5 text-[#6B7280] hover:text-[#0F172A] transition-colors p-1 rounded-lg hover:bg-slate-100"
+                  className="absolute left-0 top-1.5 text-slate-500 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/5"
                   aria-label="Back"
                 >
                   <ArrowLeft className="w-5 h-5" />
                 </button>
-                <h2 className="text-[26px] font-bold text-[#0F172A] tracking-tight m-0">Verify OTP</h2>
-                <p className="text-[14px] text-[#6B7280] mt-2 font-medium">
-                  Code sent to <span className="font-semibold text-[#0F172A]">+91 {mobile}</span>
+                <h2 className="text-2xl font-black text-white tracking-widest uppercase m-0 leading-none">Verify OTP</h2>
+                <p className="text-[11px] text-slate-400 mt-4 font-bold uppercase tracking-[0.2em] opacity-60">
+                  Code sent to <span className="text-[#16A34A]">+91 {mobile}</span>
                 </p>
               </div>
 
               {/* Alerts */}
               {error && (
-                <div className="flex items-start gap-2 bg-red-50 text-red-600 px-4 py-3 rounded-xl mb-6 text-[14px] border border-red-100 font-medium">
+                <div className="flex items-start gap-2 bg-red-500/10 text-red-400 px-4 py-3 rounded-2xl mb-8 text-xs border border-red-500/20 font-bold uppercase tracking-wider">
                   <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                   {error}
                 </div>
               )}
               {success && (
-                <div className="flex items-center gap-2 bg-green-50 text-[#16A34A] px-4 py-3 rounded-xl mb-6 text-[14px] border border-green-100 font-medium">
+                <div className="flex items-center gap-2 bg-emerald-500/10 text-emerald-400 px-4 py-3 rounded-2xl mb-8 text-xs border border-emerald-500/20 font-bold uppercase tracking-wider">
                   <CheckCircle className="w-4 h-4 shrink-0" />
                   {success}
                 </div>
@@ -315,9 +350,9 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={otpLoading || otpCode.length < 6}
-                className="w-full h-14 text-[16px] text-white font-[600] rounded-[10px] bg-[#22C55E] flex items-center justify-center gap-2 transition-all duration-200 hover:bg-[#16A34A] hover:-translate-y-[1px] hover:shadow-[0_8px_20px_rgba(34,197,94,0.3)] disabled:opacity-65 disabled:pointer-events-none disabled:transform-none disabled:shadow-none"
+                className="w-full h-16 text-xs text-white font-black rounded-2xl bg-[#16A34A] flex items-center justify-center gap-3 transition-all duration-300 hover:bg-[#15803d] hover:shadow-[0_20px_40px_-10px_rgba(22,163,74,0.4)] disabled:opacity-30 disabled:pointer-events-none uppercase tracking-[0.2em]"
               >
-                {otpLoading ? <><Loader2 className="w-5 h-5 animate-spin" /> Verifying...</> : "Verify & Sign In"}
+                {otpLoading ? <><Loader2 className="w-5 h-5 animate-spin" /> VERIFYING...</> : <><CheckCircle className="w-4 h-4" /> VERIFY & SIGN IN</>}
               </button>
 
               <div className="mt-8 transition-opacity text-center">
@@ -328,7 +363,7 @@ export default function Login() {
         </div>
 
         <div className="mt-10 mb-4 text-center z-10 w-full relative">
-          <p className="text-[#6B7280] text-[13px] font-medium tracking-wide">
+          <p className="text-slate-600 text-[11px] font-bold uppercase tracking-widest">
             © {new Date().getFullYear()} Sanyog Conformity Solutions
           </p>
         </div>
