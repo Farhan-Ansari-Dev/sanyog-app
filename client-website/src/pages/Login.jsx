@@ -8,7 +8,7 @@ import {
 import API from "../services/api";
 
 // ─── Resend Countdown Timer ───────────────────────────────────────────────────
-function ResendTimer({ onResend, loading }) {
+function ResendTimer({ onResend, loading, isDark }) {
   const [seconds, setSeconds] = useState(30);
   const [canResend, setCanResend] = useState(false);
 
@@ -22,7 +22,7 @@ function ResendTimer({ onResend, loading }) {
       });
     }, 1000);
     return () => clearInterval(timer);
-  }, []);  // only run on mount (each time OTP is sent, parent re-mounts this)
+  }, []);
 
   return (
     <div className="text-center mt-3">
@@ -31,14 +31,14 @@ function ResendTimer({ onResend, loading }) {
           type="button"
           onClick={onResend}
           disabled={loading}
-          className="text-sm text-primary font-semibold hover:underline flex items-center gap-1 mx-auto"
+          className="text-sm text-[#16A34A] font-semibold hover:underline flex items-center gap-1 mx-auto"
         >
           <RefreshCw className="w-3.5 h-3.5" />
           Resend OTP
         </button>
       ) : (
-        <p className="text-sm text-gray-400">
-          Resend OTP in <span className="font-semibold text-gray-600 dark:text-slate-400">{seconds}s</span>
+        <p className={`text-sm ${isDark ? 'text-slate-500' : 'text-gray-400'}`}>
+          Resend OTP in <span className={`font-semibold ${isDark ? 'text-slate-300' : 'text-gray-600'}`}>{seconds}s</span>
         </p>
       )}
     </div>
@@ -46,7 +46,7 @@ function ResendTimer({ onResend, loading }) {
 }
 
 // ─── 6-Box OTP Input ──────────────────────────────────────────────────────────
-function OtpBoxInput({ value, onChange }) {
+function OtpBoxInput({ value, onChange, isDark }) {
   const inputs = useRef([]);
   const digits = value.split("");
 
@@ -70,7 +70,6 @@ function OtpBoxInput({ value, onChange }) {
     e.preventDefault();
     const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
     onChange(pasted.padEnd(6, "").slice(0, 6));
-    // Focus last filled box
     const lastIdx = Math.min(pasted.length, 5);
     inputs.current[lastIdx]?.focus();
   };
@@ -91,9 +90,11 @@ function OtpBoxInput({ value, onChange }) {
           autoFocus={idx === 0}
           className={`w-11 h-14 text-center text-xl font-bold rounded-xl border-2 outline-none transition-all duration-200
             ${digits[idx]
-              ? "border-primary bg-primary-50 text-primary"
-              : "border-gray-200 dark:border-[#334155] bg-white dark:bg-[#0F172A] text-gray-700 dark:text-slate-300"}
-            focus:border-primary focus:ring-2 focus:ring-primary/20
+              ? "border-[#16A34A] bg-[#16A34A]/10 text-[#16A34A]"
+              : isDark
+                ? "border-[#334155] bg-[#0F172A] text-slate-300"
+                : "border-gray-200 bg-white text-gray-700"}
+            focus:border-[#16A34A] focus:ring-2 focus:ring-[#16A34A]/20
           `}
         />
       ))}
@@ -105,29 +106,30 @@ function OtpBoxInput({ value, onChange }) {
 export default function Login() {
   const navigate = useNavigate();
 
-  // OTP Flow state
   const [mobile, setMobile] = useState("");
   const [otpCode, setOtpCode] = useState("");
-  const [otpStep, setOtpStep] = useState(1); // 1 = enter mobile, 2 = enter OTP
+  const [otpStep, setOtpStep] = useState(1);
   const [otpLoading, setOtpLoading] = useState(false);
-  const [resendKey, setResendKey] = useState(0); // increment to reset countdown
+  const [resendKey, setResendKey] = useState(0);
 
   // Theme state
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(true);
 
   useEffect(() => {
-    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-      document.documentElement.classList.add('dark');
-      setIsDark(true);
-    } else {
+    const saved = localStorage.getItem('theme');
+    if (saved === 'light') {
       document.documentElement.classList.remove('dark');
       setIsDark(false);
+    } else {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+      setIsDark(true);
     }
   }, []);
 
   const toggleTheme = () => {
     const html = document.documentElement;
-    if (html.classList.contains('dark')) {
+    if (isDark) {
       html.classList.remove('dark');
       localStorage.setItem('theme', 'light');
       setIsDark(false);
@@ -138,29 +140,24 @@ export default function Login() {
     }
   };
 
-  // Shared
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // Auto-submit when all 6 digits entered
   useEffect(() => {
     if (otpCode.length === 6 && otpStep === 2) {
       handleVerifyOtp();
     }
   }, [otpCode]);
 
-  // ── Send OTP ────────────────────────────────────────────────────────────────
   const handleSendOtp = async (e) => {
     e?.preventDefault();
     setError("");
     setSuccess("");
-
     const cleaned = mobile.replace(/\D/g, "");
     if (cleaned.length !== 10) {
       setError("Please enter a valid 10-digit mobile number.");
       return;
     }
-
     setOtpLoading(true);
     try {
       await API.post("/auth/send-otp", { mobile: cleaned });
@@ -177,16 +174,13 @@ export default function Login() {
     }
   };
 
-  // ── Verify OTP ──────────────────────────────────────────────────────────────
   const handleVerifyOtp = async (e) => {
     e?.preventDefault();
     setError("");
-
     if (!otpCode || otpCode.replace(/\D/g, "").length < 6) {
       setError("Please enter the complete 6-digit OTP.");
       return;
     }
-
     setOtpLoading(true);
     try {
       const { data } = await API.post("/auth/verify-otp", {
@@ -199,133 +193,108 @@ export default function Login() {
     } catch (err) {
       const msg = err.response?.data?.error || err.response?.data?.message || "Invalid OTP. Please try again.";
       setError(msg);
-      // Clear OTP inputs on wrong code so user can re-type
       setOtpCode("");
     } finally {
       setOtpLoading(false);
     }
   };
 
-  // ── Resend OTP ──────────────────────────────────────────────────────────────
   const handleResend = () => {
     setOtpCode("");
     setError("");
     handleSendOtp();
   };
 
+  // ── Dynamic color tokens ───────────────────────────────────────────────────
+  const bg = isDark ? '#10141D' : '#F1F5F9';
+  const cardBg = isDark ? '#161B22' : '#FFFFFF';
+  const cardBorder = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)';
+  const cardShadow = isDark 
+    ? '0 32px 64px -16px rgba(0,0,0,0.6)' 
+    : '0 20px 50px -12px rgba(0,0,0,0.12)';
+  const inputBg = isDark ? 'rgba(11,13,19,0.6)' : '#F8FAFC';
+  const inputBorder = isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0';
+  const textPrimary = isDark ? '#FFFFFF' : '#0F172A';
+  const textSecondary = isDark ? '#94A3B8' : '#64748B';
+  const textMuted = isDark ? '#475569' : '#94A3B8';
+
   return (
-    <div className={`min-h-screen font-['Inter'] flex flex-col items-center justify-center p-4 antialiased selection:bg-[#22C55E]/10 selection:text-[#16A34A] transition-colors duration-500 relative overflow-hidden ${isDark ? 'bg-premium-dark text-white' : 'bg-slate-50 text-slate-900'}`}>
-      {/* Premium Admin-style radial glow */}
-      <div 
-        className={`absolute inset-0 pointer-events-none transition-opacity duration-1000 ${isDark ? 'opacity-50' : 'opacity-0'}`} 
-        style={{ background: 'radial-gradient(circle at center, #1E293B 0%, #10141D 100%)' }}
+    <div
+      className="min-h-screen font-['Inter'] flex flex-col items-center justify-center p-4 antialiased transition-colors duration-500 relative overflow-hidden"
+      style={{ backgroundColor: bg }}
+    >
+      {/* Radial glow — only in dark mode */}
+      <div
+        className="absolute inset-0 pointer-events-none transition-opacity duration-1000"
+        style={{
+          background: isDark
+            ? 'radial-gradient(ellipse at 50% 40%, rgba(30,41,59,0.6) 0%, transparent 70%)'
+            : 'none',
+          opacity: isDark ? 1 : 0,
+        }}
       />
-      
+
+      {/* Theme Toggle */}
       <div className="absolute top-8 right-8 z-50">
-         <button 
-           onClick={toggleTheme}
-           className={`w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md border transition-all shadow-2xl ${isDark ? 'bg-[#1E242E]/80 border-white/10 text-white hover:scale-110' : 'bg-white/80 border-slate-200 text-slate-900 hover:scale-110 hover:shadow-lg'}`}
-         >
-            {isDark ? <Sun className="w-5 h-5 text-yellow-400" /> : <Moon className="w-5 h-5 text-blue-400" />}
-         </button>
+        <button
+          onClick={toggleTheme}
+          className="w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md border transition-all duration-300 hover:scale-110 cursor-pointer"
+          style={{
+            backgroundColor: isDark ? 'rgba(30,36,46,0.8)' : 'rgba(255,255,255,0.9)',
+            borderColor: isDark ? 'rgba(255,255,255,0.1)' : '#E2E8F0',
+            boxShadow: isDark
+              ? '0 8px 32px rgba(0,0,0,0.3)'
+              : '0 4px 16px rgba(0,0,0,0.08)',
+          }}
+        >
+          {isDark ? <Sun className="w-5 h-5 text-yellow-400" /> : <Moon className="w-5 h-5 text-slate-600" />}
+        </button>
       </div>
 
       <div className="w-full max-w-[440px] flex flex-col items-center relative z-10">
-        
-        {/* Minimal Logo Section */}
+
+        {/* Logo */}
         <div className="mb-10 w-full flex flex-col items-center relative z-20">
           <img
             src="/logo.png"
             alt="Sanyog"
-            className={`h-14 w-auto object-contain drop-shadow-sm transition-all duration-300 ${!isDark ? 'brightness-90' : ''}`}
+            className="h-14 w-auto object-contain drop-shadow-sm transition-all duration-300"
+            style={{ filter: isDark ? 'none' : 'brightness(0.85)' }}
             onError={(e) => {
               e.target.style.display = 'none';
               e.target.nextSibling.style.display = 'flex';
             }}
           />
-          <div style={{ display: 'none' }} className="items-center justify-center w-14 h-14 bg-white dark:bg-[#0F172A] border border-slate-200 rounded-2xl shadow-sm">
-            <Shield className={`w-7 h-7 ${isDark ? 'text-white' : 'text-slate-800'}`} />
+          <div style={{ display: 'none' }} className="items-center justify-center w-14 h-14 rounded-2xl shadow-sm">
+            <Shield className="w-7 h-7" style={{ color: textPrimary }} />
           </div>
         </div>
 
-        {/* Premium Logic Card */}
-        <div 
-          className="w-full premium-card animate-fade-in overflow-hidden relative z-20 rounded-[2rem] transition-all duration-500"
+        {/* ─── Main Login Card ─── */}
+        <div
+          className="w-full overflow-hidden relative z-20 rounded-[2rem] transition-all duration-500"
+          style={{
+            backgroundColor: cardBg,
+            border: `1px solid ${cardBorder}`,
+            boxShadow: cardShadow,
+          }}
         >
-          
+
           {/* Step 1: Mobile Number */}
           {otpStep === 1 && (
             <form onSubmit={handleSendOtp} className="px-10 py-12">
               <div className="text-center mb-10">
-                <h2 className={`text-2xl font-black tracking-widest uppercase m-0 leading-none ${isDark ? 'text-white' : 'text-slate-900'}`}>Welcome Back</h2>
-                <p className={`text-[11px] mt-4 font-bold uppercase tracking-[0.2em] opacity-60 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Please authenticate to access the grid</p>
-              </div>
-
-              {/* Minimal Alerts */}
-              {error && (
-                <div className="flex items-start gap-2 bg-red-500/10 text-red-500 px-4 py-3 rounded-2xl mb-8 text-xs border border-red-500/20 font-bold uppercase tracking-wider">
-                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                  {error}
-                </div>
-              )}
-              {success && (
-                <div className="flex items-center gap-2 bg-green-500/10 text-green-600 px-4 py-3 rounded-2xl mb-8 text-xs border border-green-500/20 font-bold uppercase tracking-wider">
-                  <CheckCircle className="w-4 h-4 shrink-0" />
-                  {success}
-                </div>
-              )}
-
-              <div className="mb-8">
-                <label className={`block text-[10px] font-black uppercase tracking-widest mb-4 ml-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Mobile Access Key</label>
-                <div className="relative flex items-center group">
-                  <span className="absolute left-5 text-sm font-black text-[#15803D] select-none">+91</span>
-                  <input
-                    type="tel"
-                    maxLength={10}
-                    placeholder="10-digit mobile number"
-                    value={mobile}
-                    onChange={(e) => { setMobile(e.target.value.replace(/\D/g, "")); setError(""); }}
-                    className={`w-full pl-[60px] pr-4 h-16 border outline-none rounded-2xl text-base font-black transition-all duration-300 focus:border-[#16A34A]/50 placeholder:text-slate-400 ${isDark ? 'bg-[#0B0D13]/60 border-white/5 text-white focus:bg-[#0B0D13]' : 'bg-slate-50 border-slate-200 text-slate-900 focus:bg-white'}`}
-                    required
-                    autoFocus
-                  />
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={otpLoading || mobile.length !== 10}
-                className="w-full h-16 text-xs text-white font-black rounded-2xl bg-[#15803D] flex items-center justify-center gap-3 transition-all duration-300 hover:bg-[#166534] hover:shadow-[0_20px_40px_-10px_rgba(21,128,61,0.4)] disabled:opacity-30 disabled:pointer-events-none uppercase tracking-[0.2em]"
-              >
-                {otpLoading ? <><Loader2 className="w-5 h-5 animate-spin" /> SYNCHRONIZING...</> : <><RefreshCw className="w-4 h-4" /> REQUEST OTP</>}
-              </button>
-
-              <div className="mt-10 text-center pt-8 border-t border-slate-200 dark:border-white/5">
-                <p className={`text-[11px] font-bold uppercase tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
-                  New to Sanyog?{" "}
-                  <Link to="/register" className="text-[#15803D] font-black hover:text-emerald-500 transition-colors">
-                    CREATE ACCOUNT
-                  </Link>
-                </p>
-              </div>
-            </form>
-          )}
-
-          {/* Step 2: Verification */}
-          {otpStep === 2 && (
-            <form onSubmit={handleVerifyOtp} className="px-10 py-12">
-              <div className="text-center mb-10 relative">
-                <button
-                  type="button"
-                  onClick={() => { setOtpStep(1); setError(""); setOtpCode(""); }}
-                  className={`absolute left-0 top-1.5 transition-colors p-1 rounded-lg ${isDark ? 'text-slate-500 hover:text-white hover:bg-white/5' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-100'}`}
-                  aria-label="Back"
+                <h2
+                  className="text-2xl font-black tracking-widest uppercase m-0 leading-none"
+                  style={{ color: textPrimary }}
                 >
-                  <ArrowLeft className="w-5 h-5" />
-                </button>
-                <h2 className={`text-2xl font-black tracking-widest uppercase m-0 leading-none ${isDark ? 'text-white' : 'text-slate-900'}`}>Verify OTP</h2>
-                <p className={`text-[11px] mt-4 font-bold uppercase tracking-[0.2em] opacity-60 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                  Code sent to <span className="text-[#15803D]">+91 {mobile}</span>
+                  Welcome Back
+                </h2>
+                <p
+                  className="text-[11px] mt-4 font-bold uppercase tracking-[0.2em] opacity-60"
+                  style={{ color: textSecondary }}
+                >
+                  Please authenticate to access the grid
                 </p>
               </div>
 
@@ -344,26 +313,134 @@ export default function Login() {
               )}
 
               <div className="mb-8">
-                <OtpBoxInput value={otpCode} onChange={setOtpCode} key={resendKey} />
+                <label
+                  className="block text-[10px] font-black uppercase tracking-widest mb-4 ml-1"
+                  style={{ color: textSecondary }}
+                >
+                  Mobile Access Key
+                </label>
+                <div className="relative flex items-center group">
+                  <span className="absolute left-5 text-sm font-black text-[#16A34A] select-none">+91</span>
+                  <input
+                    type="tel"
+                    maxLength={10}
+                    placeholder="10-digit mobile number"
+                    value={mobile}
+                    onChange={(e) => { setMobile(e.target.value.replace(/\D/g, "")); setError(""); }}
+                    className="w-full pl-[60px] pr-4 h-16 outline-none rounded-2xl text-base font-black transition-all duration-300 focus:ring-2 focus:ring-[#16A34A]/30"
+                    style={{
+                      backgroundColor: inputBg,
+                      border: `1px solid ${inputBorder}`,
+                      color: textPrimary,
+                    }}
+                    required
+                    autoFocus
+                  />
+                </div>
+              </div>
+
+              {/* REQUEST OTP — Deep Forest Green */}
+              <button
+                type="submit"
+                disabled={otpLoading || mobile.length !== 10}
+                className="w-full h-16 text-xs text-white font-black rounded-2xl flex items-center justify-center gap-3 transition-all duration-300 disabled:opacity-50 disabled:pointer-events-none uppercase tracking-[0.2em]"
+                style={{
+                  backgroundColor: '#14532D',
+                  boxShadow: '0 8px 24px -4px rgba(20,83,45,0.4)',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#166534'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#14532D'; }}
+              >
+                {otpLoading ? <><Loader2 className="w-5 h-5 animate-spin" /> SYNCHRONIZING...</> : <><RefreshCw className="w-4 h-4" /> REQUEST OTP</>}
+              </button>
+
+              <div
+                className="mt-10 text-center pt-8"
+                style={{ borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0'}` }}
+              >
+                <p
+                  className="text-[11px] font-bold uppercase tracking-widest"
+                  style={{ color: textMuted }}
+                >
+                  New to Sanyog?{" "}
+                  <Link to="/register" className="text-[#16A34A] font-black hover:text-emerald-500 transition-colors">
+                    CREATE ACCOUNT
+                  </Link>
+                </p>
+              </div>
+            </form>
+          )}
+
+          {/* Step 2: Verification */}
+          {otpStep === 2 && (
+            <form onSubmit={handleVerifyOtp} className="px-10 py-12">
+              <div className="text-center mb-10 relative">
+                <button
+                  type="button"
+                  onClick={() => { setOtpStep(1); setError(""); setOtpCode(""); }}
+                  className="absolute left-0 top-1.5 transition-colors p-1 rounded-lg"
+                  style={{ color: textSecondary }}
+                  aria-label="Back"
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                </button>
+                <h2
+                  className="text-2xl font-black tracking-widest uppercase m-0 leading-none"
+                  style={{ color: textPrimary }}
+                >
+                  Verify OTP
+                </h2>
+                <p
+                  className="text-[11px] mt-4 font-bold uppercase tracking-[0.2em] opacity-60"
+                  style={{ color: textSecondary }}
+                >
+                  Code sent to <span className="text-[#16A34A]">+91 {mobile}</span>
+                </p>
+              </div>
+
+              {error && (
+                <div className="flex items-start gap-2 bg-red-500/10 text-red-500 px-4 py-3 rounded-2xl mb-8 text-xs border border-red-500/20 font-bold uppercase tracking-wider">
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                  {error}
+                </div>
+              )}
+              {success && (
+                <div className="flex items-center gap-2 bg-emerald-500/10 text-emerald-500 px-4 py-3 rounded-2xl mb-8 text-xs border border-emerald-500/20 font-bold uppercase tracking-wider">
+                  <CheckCircle className="w-4 h-4 shrink-0" />
+                  {success}
+                </div>
+              )}
+
+              <div className="mb-8">
+                <OtpBoxInput value={otpCode} onChange={setOtpCode} key={resendKey} isDark={isDark} />
               </div>
 
               <button
                 type="submit"
                 disabled={otpLoading || otpCode.length < 6}
-                className="w-full h-16 text-xs text-white font-black rounded-2xl bg-[#15803D] flex items-center justify-center gap-3 transition-all duration-300 hover:bg-[#166534] hover:shadow-[0_20px_40px_-10px_rgba(21,128,61,0.4)] disabled:opacity-30 disabled:pointer-events-none uppercase tracking-[0.2em]"
+                className="w-full h-16 text-xs text-white font-black rounded-2xl flex items-center justify-center gap-3 transition-all duration-300 disabled:opacity-50 disabled:pointer-events-none uppercase tracking-[0.2em]"
+                style={{
+                  backgroundColor: '#14532D',
+                  boxShadow: '0 8px 24px -4px rgba(20,83,45,0.4)',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#166534'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#14532D'; }}
               >
                 {otpLoading ? <><Loader2 className="w-5 h-5 animate-spin" /> VERIFYING...</> : <><CheckCircle className="w-4 h-4" /> VERIFY & SIGN IN</>}
               </button>
 
               <div className="mt-8 transition-opacity text-center">
-                <ResendTimer key={resendKey} onResend={handleResend} loading={otpLoading} />
+                <ResendTimer key={resendKey} onResend={handleResend} loading={otpLoading} isDark={isDark} />
               </div>
             </form>
           )}
         </div>
 
         <div className="mt-10 mb-4 text-center z-10 w-full relative">
-          <p className={`${isDark ? 'text-slate-600' : 'text-slate-400'} text-[11px] font-bold uppercase tracking-widest`}>
+          <p
+            className="text-[11px] font-bold uppercase tracking-widest"
+            style={{ color: textMuted }}
+          >
             © {new Date().getFullYear()} Sanyog Conformity Solutions
           </p>
         </div>
