@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Sanyog Conformity Solutions",
+    "name": "BSwift by Sanyog",
     "slug": "sanyog-conformity-solutions",
     "version": "1.0.0",
     "scheme": "sanyog",
@@ -33,6 +33,11 @@
     },
     "plugins": [
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "48ee77d4-664b-4361-ba43-0c40a1a80135"
+      }
+    }
   }
 }

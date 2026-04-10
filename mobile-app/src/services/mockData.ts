@@ -19,7 +19,7 @@ export const mockCategories: ServiceCategory[] = [
     icon: 'globe',
     description: 'Global compliance for export markets — Saudi, EU, Africa, US & more',
     serviceCount: 24,
-    gradient: palette.gradientBlue,
+    gradient: palette.gradientGreen,
   },
   {
     id: 'domestic',

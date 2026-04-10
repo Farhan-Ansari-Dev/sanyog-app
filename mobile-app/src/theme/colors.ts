@@ -4,26 +4,26 @@
  */
 
 export const palette = {
-  // Brand
-  brandBlue: '#3B82F6',
-  brandBlueDark: '#2563EB',
-  brandBlueLight: '#60A5FA',
+  // Brand (Transitioned to Emerald/Green)
+  brandGreen: '#10B981',
+  brandGreenDark: '#059669',
+  brandGreenLight: '#34D399',
   brandGold: '#F59E0B',
   brandGoldLight: '#FBBF24',
 
   // Neutrals (Dark Mode)
-  darkBg: '#080C14',
-  darkSurface: '#0F1523',
-  darkCard: '#161E30',
-  darkCardHover: '#1C2640',
+  darkBg: '#06090F',
+  darkSurface: '#101625',
+  darkCard: '#1A2235',
+  darkCardHover: '#222B45',
   darkBorder: '#1E293B',
   darkBorderSubtle: '#1A2236',
 
   // Neutrals (Light Mode)
-  lightBg: '#F1F5F9',
+  lightBg: '#F8FAFC',
   lightSurface: '#FFFFFF',
   lightCard: '#FFFFFF',
-  lightCardHover: '#F8FAFC',
+  lightCardHover: '#F1F5F9',
   lightBorder: '#E2E8F0',
   lightBorderSubtle: '#CBD5E1',
 
@@ -51,9 +51,9 @@ export const palette = {
   pendingBg: 'rgba(139,92,246,0.12)',
 
   // Gradients
-  gradientBlue: ['#3B82F6', '#1D4ED8'] as [string, string],
+  gradientGreen: ['#10B981', '#059669'] as [string, string],
   gradientGold: ['#F59E0B', '#D97706'] as [string, string],
-  gradientDark: ['#0F1523', '#080C14'] as [string, string],
+  gradientDark: ['#101625', '#06090F'] as [string, string],
   gradientPurple: ['#8B5CF6', '#6D28D9'] as [string, string],
   gradientEmerald: ['#10B981', '#059669'] as [string, string],
 
@@ -113,9 +113,9 @@ export const darkTheme: ThemeColors = {
   textSecondary: palette.white70,
   textMuted: palette.white50,
   textInverse: palette.black,
-  primary: palette.brandBlue,
-  primaryDark: palette.brandBlueDark,
-  primaryLight: palette.brandBlueLight,
+  primary: palette.brandGreen,
+  primaryDark: palette.brandGreenDark,
+  primaryLight: palette.brandGreenLight,
   accent: palette.brandGold,
   accentLight: palette.brandGoldLight,
   success: palette.success,
@@ -131,7 +131,7 @@ export const darkTheme: ThemeColors = {
   statusBar: 'light-content',
   tabBarBg: palette.darkSurface,
   tabBarBorder: palette.darkBorder,
-  tabBarActive: palette.brandBlue,
+  tabBarActive: palette.brandGreen,
   tabBarInactive: palette.white50,
   inputBg: palette.darkCard,
   placeholder: palette.white50,
@@ -150,9 +150,9 @@ export const lightTheme: ThemeColors = {
   textSecondary: palette.black70,
   textMuted: palette.black50,
   textInverse: palette.white,
-  primary: palette.brandBlue,
-  primaryDark: palette.brandBlueDark,
-  primaryLight: palette.brandBlueLight,
+  primary: palette.brandGreen,
+  primaryDark: palette.brandGreenDark,
+  primaryLight: palette.brandGreenLight,
   accent: palette.brandGold,
   accentLight: palette.brandGoldLight,
   success: palette.success,
@@ -168,7 +168,7 @@ export const lightTheme: ThemeColors = {
   statusBar: 'dark-content',
   tabBarBg: palette.lightSurface,
   tabBarBorder: palette.lightBorder,
-  tabBarActive: palette.brandBlue,
+  tabBarActive: palette.brandGreen,
   tabBarInactive: palette.black50,
   inputBg: palette.lightBg,
   placeholder: palette.black50,

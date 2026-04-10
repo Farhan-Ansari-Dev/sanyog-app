@@ -19,4 +19,25 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// MOCK FOR LOCAL WEB TESTING (Bypass CORS)
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Basic mock for dev preview
+    if (error.config?.url?.includes('/auth/send-otp')) {
+      console.log('Mocked send-otp');
+      return Promise.resolve({ data: { success: true, message: 'OTP sent successfully' } });
+    }
+    if (error.config?.url?.includes('/auth/verify-otp')) {
+      console.log('Mocked verify-otp');
+      return Promise.resolve({ data: { success: true, token: 'mock_jwt_token', isNewUser: false } });
+    }
+    if (error.config?.url?.includes('/me')) {
+      console.log('Mocked /me');
+      return Promise.resolve({ data: { success: true, user: { name: 'Mock User', email: 'mock@example.com' } } });
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default api;

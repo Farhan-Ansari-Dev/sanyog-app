@@ -14,8 +14,8 @@ import { spacing, typography, borderRadius, palette } from '../../theme';
 import type { ApplicationStatus } from '../../types';
 
 const statusColors: Record<string, string> = {
-  draft: palette.brandBlue,
-  submitted: palette.brandBlue,
+  draft: palette.brandGreen,
+  submitted: palette.brandGreen,
   under_review: palette.brandGold,
   documents_required: palette.brandGold,
   document_verification: '#8B5CF6',

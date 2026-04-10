@@ -167,7 +167,7 @@ export default function HomeScreen({ navigation }: any) {
             ★ NEW CERTIFICATION — Big Hero CTA Card
            ═══════════════════════════════════════════════════ */}
         <Pressable
-          onPress={() => navigation.navigate('ServicesList')}
+          onPress={() => navigation.navigate('RoadmapWizard')}
           style={({ pressed }) => ({
             marginHorizontal: spacing.lg,
             marginBottom: spacing.xl,
@@ -176,7 +176,7 @@ export default function HomeScreen({ navigation }: any) {
             opacity: pressed ? 0.92 : 1,
             transform: [{ scale: pressed ? 0.985 : 1 }],
             elevation: 8,
-            shadowColor: '#3B82F6',
+            shadowColor: '#10B981',
             shadowOffset: { width: 0, height: 6 },
             shadowOpacity: 0.35,
             shadowRadius: 12,
@@ -184,7 +184,7 @@ export default function HomeScreen({ navigation }: any) {
         >
           <View
             style={{
-              backgroundColor: '#1E3A8A',
+              backgroundColor: '#064E3B',
               borderRadius: borderRadius.xl,
               padding: spacing.xl,
               overflow: 'hidden',
@@ -199,7 +199,7 @@ export default function HomeScreen({ navigation }: any) {
                 width: 120,
                 height: 120,
                 borderRadius: 60,
-                backgroundColor: 'rgba(59,130,246,0.25)',
+                backgroundColor: 'rgba(16,185,129,0.25)',
               }}
             />
             <View
@@ -210,7 +210,7 @@ export default function HomeScreen({ navigation }: any) {
                 width: 100,
                 height: 100,
                 borderRadius: 50,
-                backgroundColor: 'rgba(59,130,246,0.15)',
+                backgroundColor: 'rgba(52,211,153,0.15)',
               }}
             />
             <View
@@ -221,7 +221,7 @@ export default function HomeScreen({ navigation }: any) {
                 width: 50,
                 height: 50,
                 borderRadius: 25,
-                backgroundColor: 'rgba(96,165,250,0.12)',
+                backgroundColor: 'rgba(110,231,183,0.12)',
               }}
             />
 
@@ -251,7 +251,7 @@ export default function HomeScreen({ navigation }: any) {
               >
                 <Ionicons name="flash" size={12} color="#34D399" />
                 <Text style={{ color: '#34D399', fontSize: 11, fontWeight: '700', marginLeft: 4 }}>
-                  Quick Apply
+                  AI Powered
                 </Text>
               </View>
             </View>
@@ -266,7 +266,7 @@ export default function HomeScreen({ navigation }: any) {
                 marginBottom: spacing.sm,
               }}
             >
-              New Certification
+              Smart AI Roadmap
             </Text>
             <Text
               style={{
@@ -276,7 +276,7 @@ export default function HomeScreen({ navigation }: any) {
                 marginBottom: spacing.xl,
               }}
             >
-              Start a new certification application for BIS, CE, SASO, USFDA and 60+ more services.
+              Get your complete certification roadmap in 60 seconds. No consultant. No confusion.
             </Text>
 
             {/* Bottom row: CTA + Stats */}
@@ -292,17 +292,17 @@ export default function HomeScreen({ navigation }: any) {
                 }}
               >
                 <Text style={{ color: '#FFFFFF', fontSize: 15, fontWeight: '700', marginRight: 8 }}>
-                  Browse Services
+                  Generate Now
                 </Text>
                 <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
               </View>
 
               <View style={{ alignItems: 'flex-end' }}>
                 <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, fontWeight: '600' }}>
-                  Available
+                  Time
                 </Text>
                 <Text style={{ color: '#FFFFFF', fontSize: 22, fontWeight: '900' }}>
-                  60+
+                  60s
                 </Text>
               </View>
             </View>

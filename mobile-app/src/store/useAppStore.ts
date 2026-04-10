@@ -78,7 +78,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       const { groups, flatServices } = res.data;
       
       const mappedCategories = groups.map((g: any, index: number) => {
-        const fallbacks = [palette.gradientBlue, palette.gradientPurple, palette.gradientEmerald, palette.gradientGold];
+        const fallbacks = [palette.gradientGreen, palette.gradientPurple, palette.gradientEmerald, palette.gradientGold];
         return {
           id: g.groupName.toLowerCase().replace(/\s+/g, '-'),
           name: g.groupName,

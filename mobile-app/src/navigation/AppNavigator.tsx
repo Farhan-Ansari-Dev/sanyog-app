@@ -26,6 +26,7 @@ import NotificationsScreen from '../screens/notifications/NotificationsScreen';
 import ProfileScreen from '../screens/profile/ProfileScreen';
 import AboutScreen from '../screens/profile/AboutScreen';
 import ContactExpertScreen from '../screens/profile/ContactExpertScreen';
+import RoadmapWizardScreen from '../screens/services/RoadmapWizardScreen';
 
 // Types
 import type {
@@ -54,6 +55,7 @@ type MainStackParamList = {
   About: undefined;
   ContactExpert: undefined;
   Settings: undefined;
+  RoadmapWizard: undefined;
 };
 
 const MainStack = createNativeStackNavigator<MainStackParamList>();
@@ -231,6 +233,7 @@ export function MainTabNavigator() {
       <MainStack.Screen name="UploadDocs" component={UploadDocsScreen} options={{ title: 'Upload Documents' }} />
       <MainStack.Screen name="About" component={AboutScreen} options={{ title: 'About Sanyog' }} />
       <MainStack.Screen name="ContactExpert" component={ContactExpertScreen} options={{ title: 'Contact Expert' }} />
+      <MainStack.Screen name="RoadmapWizard" component={RoadmapWizardScreen} options={{ title: 'AI Roadmap' }} />
     </MainStack.Navigator>
   );
 }

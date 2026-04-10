@@ -39,16 +39,16 @@ const slides: Slide[] = [
   {
     id: '1',
     icon: 'shield-checkmark',
-    iconBg: '#3B82F6',
+    iconBg: '#10B981',
     title: 'Global Compliance\nSimplified',
-    subtitle: 'SANYOG CONFORMITY',
+    subtitle: 'BSWIFT BY SANYOG',
     description:
       'Navigate complex certification requirements across 50+ countries with our expert guidance. From BIS to SASO, we handle it all.',
   },
   {
     id: '2',
     icon: 'document-text',
-    iconBg: '#8B5CF6',
+    iconBg: '#34D399',
     title: 'Apply & Track\nin Real-Time',
     subtitle: 'SEAMLESS WORKFLOW',
     description:
@@ -57,7 +57,7 @@ const slides: Slide[] = [
   {
     id: '3',
     icon: 'rocket',
-    iconBg: '#10B981',
+    iconBg: '#059669',
     title: 'Expert Support\nat Every Step',
     subtitle: 'TRUSTED BY 500+ BUSINESSES',
     description:

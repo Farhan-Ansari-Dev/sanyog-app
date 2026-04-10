@@ -17,7 +17,7 @@ const typeConfig: Record<NotifType['type'], { icon: keyof typeof Ionicons.glyphM
   error: { icon: 'close-circle', colorKey: 'error' },
 };
 
-export default function NotificationsScreen({}: Props) {
+export default function NotificationsScreen({}: any) {
   const t = useTheme();
   const store = useAppStore();
 

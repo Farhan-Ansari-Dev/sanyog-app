@@ -50,13 +50,13 @@ export default function CertDetailScreen({ navigation, route }: any) {
               width: 56,
               height: 56,
               borderRadius: borderRadius.lg,
-              backgroundColor: palette.brandBlue + '15',
+              backgroundColor: palette.brandGreen + '15',
               justifyContent: 'center',
               alignItems: 'center',
               marginBottom: spacing.lg,
             }}
           >
-            <Ionicons name="ribbon" size={28} color={palette.brandBlue} />
+            <Ionicons name="ribbon" size={28} color={palette.brandGreen} />
           </View>
           <Text
             style={{

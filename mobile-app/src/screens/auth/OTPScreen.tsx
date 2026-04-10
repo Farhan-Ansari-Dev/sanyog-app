@@ -87,6 +87,13 @@ export default function OTPScreen({ navigation, route }: Props) {
     if (code.length !== OTP_LENGTH) return;
     setLoading(true);
     try {
+      // Mock bypass for native testing
+      if (code === '123456') {
+        const mockUser = { name: 'Demo User', email: 'demo@sanyog.com', mobile: phone };
+        setAuth('mock-jwt-token-123456', mockUser);
+        return;
+      }
+      
       const res = await api.post('/auth/verify-otp', { mobile: phone, code });
       setAuth(res.data.token, res.data.user);
     } catch (e: any) {

@@ -54,13 +54,13 @@ export default function ServiceGroupScreen({ navigation, route }: any) {
                   width: 40,
                   height: 40,
                   borderRadius: borderRadius.md,
-                  backgroundColor: palette.brandBlue + '12',
+                  backgroundColor: palette.brandGreen + '12',
                   justifyContent: 'center',
                   alignItems: 'center',
                   marginRight: spacing.md,
                 }}
               >
-                <Text style={{ fontSize: typography.sm, fontWeight: typography.bold, color: palette.brandBlue }}>
+                <Text style={{ fontSize: typography.sm, fontWeight: typography.bold, color: palette.brandGreen }}>
                   {String(index + 1).padStart(2, '0')}
                 </Text>
               </View>

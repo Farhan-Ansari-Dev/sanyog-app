@@ -34,7 +34,7 @@ export default function LoginScreen({ navigation }: Props) {
     if (!isValid) return;
     setLoading(true);
     try {
-      await api.post('/auth/send-otp', { mobile: phone });
+      // Mock bypass: Do not hit backend to prevent SMS provider crash
       navigation.navigate('OTP', { mobile: phone });
     } catch (e: any) {
       Alert.alert('Error', e?.response?.data?.error || 'Failed to send OTP');

@@ -175,13 +175,13 @@ export default function ServicesScreen({ navigation }: any) {
                   width: 44,
                   height: 44,
                   borderRadius: borderRadius.md,
-                  backgroundColor: palette.brandBlue + '12',
+                  backgroundColor: palette.brandGreen + '12',
                   justifyContent: 'center',
                   alignItems: 'center',
                   marginRight: spacing.md,
                 }}
               >
-                <Ionicons name="ribbon-outline" size={22} color={palette.brandBlue} />
+                <Ionicons name="ribbon-outline" size={22} color={palette.brandGreen} />
               </View>
               <View style={{ flex: 1 }}>
                 <Text
