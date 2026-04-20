@@ -5,6 +5,7 @@
 import React from 'react';
 import { View, Text, LogBox } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
+import Toast from 'react-native-toast-message';
 import { useAppStore } from './src/store/useAppStore';
 import { AuthNavigator, MainTabNavigator } from './src/navigation/AppNavigator';
 
@@ -56,6 +57,7 @@ export default function App() {
   return (
     <ErrorBoundary>
       <AppContent />
+      <Toast />
     </ErrorBoundary>
   );
 }

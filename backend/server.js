@@ -4,6 +4,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const logger = require('./utils/logger');
 
 const authRoutes = require('./routes/auth');
 const applicationRoutes = require('./routes/applications');
@@ -19,6 +22,20 @@ const { seedAdminFromEnv } = require('./services/adminSeed');
 
 const app = express();
 
+// ============================================
+// ⭐ SECURITY HARDENING (HELMET & RATE LIMIT)
+// ============================================
+app.use(helmet());
+
+// Global Rate Limiter: Maximum 300 requests per 15 minutes per IP
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 300,
+  message: { success: false, error: 'Too many requests from this IP, please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use(globalLimiter);
 
 // ============================================
 // ⭐ CRITICAL FIX — TRUST PROXY (Cloudflare + Nginx)
@@ -87,6 +104,7 @@ app.get('/health', (req, res) => {
 // ============================================
 
 app.use('/auth', authRoutes);
+app.use('/notifications', require('./routes/notifications'));
 app.use('/applications', applicationRoutes);
 app.use('/contact', contactRoutes);
 
@@ -98,6 +116,7 @@ app.use('/admin/services', adminServicesRoutes);
 app.use('/admin/users', adminUsersRoutes);
 
 app.use('/catalog', catalogRoutes);
+app.use('/news', require('./routes/news'));
 
 
 // ============================================
@@ -118,22 +137,69 @@ if (!process.env.JWT_SECRET) {
 
 
 // ============================================
+// GLOBAL ERROR HANDLER
+// ============================================
+
+app.use((err, req, res, next) => {
+  logger.error(`[Error] ${err.message}`, { stack: err.stack, method: req.method, path: req.path });
+
+  let statusCode = err.status || err.statusCode || 500;
+  let message = err.message || 'Internal Server Error';
+
+  // Handle Mongoose Validation Errors
+  if (err.name === 'ValidationError') {
+    statusCode = 400;
+    message = Object.values(err.errors).map(val => val.message).join(', ');
+  }
+
+  // Handle MongoDB Duplicate Key
+  if (err.code === 11000) {
+    statusCode = 400;
+    message = 'Duplicate field value entered.';
+  }
+
+  // Handle Zod Validation Errors
+  if (err.name === 'ZodError') {
+    statusCode = 400;
+    message = err.errors.map(e => e.message).join(' | ');
+  }
+
+  // Handle JWT Errors
+  if (err.name === 'JsonWebTokenError') {
+    statusCode = 401;
+    message = 'Invalid token. Please log in again.';
+  }
+  if (err.name === 'TokenExpiredError') {
+    statusCode = 401;
+    message = 'Your session has expired. Please log in again.';
+  }
+
+  res.status(statusCode).json({
+    success: false,
+    data: null,
+    error: message,
+    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+  });
+});
+
+
+// ============================================
 // DATABASE + SERVER START
 // ============================================
 
 mongoose
   .connect(mongoUri)
   .then(() => {
-    console.log('✅ MongoDB connected');
+    logger.info('✅ MongoDB connected');
     return seedAdminFromEnv();
   })
   .then(() => {
     const port = process.env.PORT || 5000;
     app.listen(port, () =>
-      console.log(`🚀 Server running on port ${port}`)
+      logger.info(`🚀 Server running on port ${port}`)
     );
   })
   .catch((err) => {
-    console.error('❌ Mongo connection error', err);
+    logger.error('❌ Mongo connection error', { error: err });
     process.exit(1);
   });

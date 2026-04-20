@@ -72,20 +72,21 @@ export default function Login() {
 
       <div className="w-full max-w-[440px] flex flex-col items-center relative z-10">
         
-        {/* Minimal Logo Section */}
         <div className="mb-10 w-full flex flex-col items-center relative z-20">
+          <div className="w-16 h-16 bg-white dark:bg-[#0F172A] rounded-2xl shadow-xl flex items-center justify-center border border-slate-100 dark:border-slate-800 transform -rotate-6 mb-4">
+             <div className="relative w-10 h-10">
+                <div className="absolute inset-0 border-4 border-emerald-500 rounded-lg"></div>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-emerald-500 rounded-full"></div>
+                <div className="absolute top-2 left-2 w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
+                <div className="absolute bottom-2 right-2 w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
+             </div>
+          </div>
           <img
             src="/logo.png"
             alt="Sanyog"
-            className="h-14 w-auto object-contain drop-shadow-sm transition-all duration-300"
-            onError={(e) => {
-              e.target.style.display = 'none';
-              e.target.nextSibling.style.display = 'flex';
-            }}
+            className="h-8 w-auto object-contain opacity-50"
+            onError={(e) => { e.target.style.display = 'none'; }}
           />
-          <div style={{ display: 'none' }} className="items-center justify-center w-14 h-14 bg-white dark:bg-[#0F172A] border border-slate-200 rounded-2xl shadow-sm">
-            <Shield className="w-7 h-7 text-slate-800" />
-          </div>
         </div>
 
         {/* The Premium Light Card */}
@@ -95,8 +96,8 @@ export default function Login() {
         >
           <form onSubmit={handleSubmit} className="px-8 py-10 sm:px-10">
             <div className="text-center mb-8">
-              <h2 className="text-[26px] font-bold text-[#0F172A] dark:text-white tracking-tight m-0">Welcome Admin</h2>
-              <p className="text-[14px] text-[#6B7280] dark:text-[#94A3B8] mt-2 font-medium">Please sign in to manage the portal.</p>
+              <h2 className="text-2xl font-black tracking-tight m-0 dark:text-white uppercase"><span className="text-emerald-500">DICE</span> ADMIN</h2>
+              <p className="text-[10px] text-[#6B7280] dark:text-[#94A3B8] mt-2 font-black uppercase tracking-[0.2em]">Digital Identity & Certification Ecosystem</p>
             </div>
 
             {/* Minimal Alerts */}

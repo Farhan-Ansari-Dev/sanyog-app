@@ -7,6 +7,8 @@ const ServiceSchema = new mongoose.Schema(
     slug: { type: String, required: true, unique: true },
     description: { type: String, default: '' },
     imageUrl: { type: String, default: '' },
+    isFeatured: { type: Boolean, default: false },
+    priority: { type: Number, default: 0 },
     isActive: { type: Boolean, default: true },
   },
   { timestamps: true }

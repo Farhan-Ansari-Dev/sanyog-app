@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const ApplicationSchema = new mongoose.Schema(
   {
-    userMobile:    { type: String, required: true, index: true },
+    userEmail:    { type: String, required: true, index: true },
     certification: { type: String, required: true },
 
     serviceGroup:  { type: String },
@@ -28,5 +28,10 @@ const ApplicationSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// High Performance Compound Aggregation Indexes
+ApplicationSchema.index({ status: 1, deletedAt: 1, createdAt: -1 });
+ApplicationSchema.index({ serviceGroup: 1, createdAt: -1 });
+ApplicationSchema.index({ userEmail: 1, status: 1, deletedAt: 1 });
 
 module.exports = mongoose.model('Application', ApplicationSchema);

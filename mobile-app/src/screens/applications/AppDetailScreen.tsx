@@ -141,6 +141,34 @@ export default function AppDetailScreen({ navigation, route }: any) {
           </View>
         )}
 
+        {/* Client Action Items (Consultancy Tasks) */}
+        {app.clientTasks && app.clientTasks.length > 0 && (
+          <>
+            <SectionHeader title="Your Action Items" />
+            <GlassCard style={{ marginBottom: spacing.lg, paddingBottom: spacing.sm }}>
+              {app.clientTasks.map((task: any, i: number) => (
+                <View key={i} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: spacing.sm }}>
+                  <Ionicons 
+                    name={task.pending ? "ellipse-outline" : "checkmark-circle"} 
+                    size={20} 
+                    color={task.pending ? t.warning : t.success} 
+                    style={{ marginRight: spacing.sm }} 
+                  />
+                  <Text style={{ 
+                    flex: 1, 
+                    fontSize: typography.sm, 
+                    color: t.text, 
+                    textDecorationLine: task.pending ? 'none' : 'line-through',
+                    opacity: task.pending ? 1 : 0.6 
+                  }}>
+                    {task.task}
+                  </Text>
+                </View>
+              ))}
+            </GlassCard>
+          </>
+        )}
+
         {/* Timeline */}
         <SectionHeader title="Status Timeline" />
         <GlassCard>

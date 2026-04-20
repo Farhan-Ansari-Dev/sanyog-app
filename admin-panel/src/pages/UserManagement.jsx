@@ -162,7 +162,7 @@ export default function UserManagement() {
                     }`}
                 >
                     <UserCircle2 className="w-4 h-4" />
-                    Mobile Clients
+                    Web/App Clients
                 </button>
                 <button 
                     onClick={() => setActiveTab("staff")}
@@ -188,7 +188,7 @@ export default function UserManagement() {
                         <Search className="w-4 h-4 text-[#94A3B8] absolute left-3.5 top-1/2 -translate-y-1/2" />
                         <input
                             className="w-full pl-10 pr-4 h-10 bg-white dark:bg-[#0F172A] border border-[#E2E8F0] dark:border-[#334155] text-[14px] text-[#0F172A] dark:text-white rounded-xl outline-none focus:border-[#22C55E] transition-all"
-                            placeholder={activeTab === "clients" ? "Search clients by phone or email..." : "Search staff by name or email..."}
+                            placeholder={activeTab === "clients" ? "Search clients by email or mobile..." : "Search staff by name or email..."}
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                         />
@@ -213,8 +213,8 @@ export default function UserManagement() {
                             <table className="w-full text-left border-collapse">
                                 <thead>
                                     <tr className="bg-white dark:bg-[#0F172A] border-b border-[#E2E8F0]">
-                                        <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] uppercase tracking-wider">Mobile Number</th>
                                         <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] uppercase tracking-wider">Email Address</th>
+                                        <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] uppercase tracking-wider">Mobile Number</th>
                                         <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] uppercase tracking-wider">Applications</th>
                                         <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] uppercase tracking-wider text-right">Joined</th>
                                         <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] uppercase tracking-wider text-right">Actions</th>
@@ -223,8 +223,8 @@ export default function UserManagement() {
                                 <tbody className="divide-y divide-[#F1F5F9] dark:divide-[#1E293B]">
                                     {filteredUsers.map((u) => (
                                         <tr key={u._id} className="hover:bg-slate-50 dark:hover:bg-[#1E293B]/50 transition-colors">
-                                            <td className="px-6 py-4 whitespace-nowrap font-bold text-[#0F172A] dark:text-[#F8FAFC]">{u.mobile}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-[14px] text-[#475569] dark:text-[#94A3B8]">{u.email || <span className="text-slate-400 dark:text-slate-600 italic">None</span>}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap font-bold text-[#0F172A] dark:text-[#F8FAFC]">{u.email}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-[14px] text-[#475569] dark:text-[#94A3B8]">{u.mobile || <span className="text-slate-400 dark:text-slate-600 italic">N/A</span>}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <span className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2.5 py-1 rounded-md text-xs font-bold border border-slate-200 dark:border-slate-700">{u.applicationCount || 0}</span>
                                             </td>
@@ -390,23 +390,24 @@ export default function UserManagement() {
                         <form onSubmit={handleCreateClient} className="p-6">
                             <div className="space-y-4">
                                 <div>
-                                    <label className="block text-[13px] font-semibold text-[#334155] dark:text-[#CBD5E1] mb-1.5">Mobile Number (Login ID)</label>
-                                    <input 
-                                        type="tel" 
-                                        required 
-                                        className="w-full h-11 px-4 bg-[#F8FAFC] dark:bg-[#1E293B] border border-[#E2E8F0] dark:border-[#334155] text-[14px] text-[#0F172A] dark:text-[#F8FAFC] rounded-xl outline-none focus:border-[#22C55E]"
-                                        value={clientForm.mobile}
-                                        onChange={e => setClientForm({...clientForm, mobile: e.target.value})}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-[13px] font-semibold text-[#334155] dark:text-[#CBD5E1] mb-1.5">Email (Optional)</label>
+                                    <label className="block text-[13px] font-semibold text-[#334155] dark:text-[#CBD5E1] mb-1.5">Email Address (Login ID)</label>
                                     <input 
                                         type="email" 
+                                        required
                                         className="w-full h-11 px-4 bg-[#F8FAFC] dark:bg-[#1E293B] border border-[#E2E8F0] dark:border-[#334155] text-[14px] text-[#0F172A] dark:text-[#F8FAFC] rounded-xl outline-none focus:border-[#22C55E]"
                                         value={clientForm.email}
                                         onChange={e => setClientForm({...clientForm, email: e.target.value})}
                                         placeholder="client@company.com"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-[13px] font-semibold text-[#334155] dark:text-[#CBD5E1] mb-1.5">Mobile Number (Optional)</label>
+                                    <input 
+                                        type="tel" 
+                                        className="w-full h-11 px-4 bg-[#F8FAFC] dark:bg-[#1E293B] border border-[#E2E8F0] dark:border-[#334155] text-[14px] text-[#0F172A] dark:text-[#F8FAFC] rounded-xl outline-none focus:border-[#22C55E]"
+                                        value={clientForm.mobile}
+                                        onChange={e => setClientForm({...clientForm, mobile: e.target.value})}
+                                        placeholder="+91"
                                     />
                                 </div>
                             </div>

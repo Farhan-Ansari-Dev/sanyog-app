@@ -2,44 +2,74 @@
  * UploadDocsScreen – Document upload interface
  */
 import React, { useState } from 'react';
-import { View, Text, SafeAreaView, StatusBar, ScrollView, Pressable } from 'react-native';
+import { View, Text, SafeAreaView, StatusBar, ScrollView, Pressable, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../hooks/useTheme';
 import GlassCard from '../../components/common/GlassCard';
 import PrimaryButton from '../../components/common/PrimaryButton';
 import { spacing, typography, borderRadius } from '../../theme';
 
-interface MockFile {
-  id: string;
-  name: string;
-  size: string;
-}
+import * as DocumentPicker from 'expo-document-picker';
+import axios from 'axios';
+import api from '../../services/api';
 
-export default function UploadDocsScreen({ navigation }: any) {
+export default function UploadDocsScreen({ navigation, route }: any) {
   const t = useTheme();
-  const [files, setFiles] = useState<MockFile[]>([]);
+  const { appId } = route.params;
+  const [files, setFiles] = useState<any[]>([]);
   const [uploading, setUploading] = useState(false);
 
-  const pickDocument = () => {
-    // Mock file picker
-    const mockFile: MockFile = {
-      id: `file-${Date.now()}`,
-      name: `Document_${files.length + 1}.pdf`,
-      size: `${(Math.random() * 5 + 0.5).toFixed(1)} MB`,
-    };
-    setFiles((prev) => [...prev, mockFile]);
+  const pickDocument = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: ['application/pdf', 'image/jpeg', 'image/png'],
+        multiple: true,
+      });
+
+      if (!result.canceled) {
+        setFiles((prev) => [...prev, ...result.assets]);
+      }
+    } catch (err) {
+      console.warn('Picker error:', err);
+    }
   };
 
   const removeFile = (id: string) => {
-    setFiles((prev) => prev.filter((f) => f.id !== id));
+    setFiles((prev) => prev.filter((f) => (f.uri || f.id) !== id));
   };
 
   const handleUpload = async () => {
     if (files.length === 0) return;
     setUploading(true);
-    await new Promise((r) => setTimeout(r, 2000));
-    setUploading(false);
-    navigation.goBack();
+
+    try {
+      const formData = new FormData();
+      files.forEach((file) => {
+        // Prepare file for FormData in React Native
+        const fileName = file.name || 'document.pdf';
+        const fileUri = Platform.OS === 'ios' ? file.uri.replace('file://', '') : file.uri;
+        
+        formData.append('files', {
+          uri: fileUri,
+          name: fileName,
+          type: file.mimeType || 'application/pdf',
+        } as any);
+      });
+
+      await api.post(`/applications/${appId}/upload`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      alert('Documents uploaded successfully!');
+      navigation.goBack();
+    } catch (e: any) {
+      console.error('Upload error:', e);
+      alert('Upload failed: ' + (e.response?.data?.error || e.message));
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
@@ -115,7 +145,7 @@ export default function UploadDocsScreen({ navigation }: any) {
               Selected Files ({files.length})
             </Text>
             {files.map((file) => (
-              <GlassCard key={file.id} style={{ marginBottom: spacing.sm }}>
+              <GlassCard key={file.uri} style={{ marginBottom: spacing.sm }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <View
                     style={{
@@ -134,9 +164,11 @@ export default function UploadDocsScreen({ navigation }: any) {
                     <Text style={{ fontSize: typography.sm, color: t.text, fontWeight: typography.medium }}>
                       {file.name}
                     </Text>
-                    <Text style={{ fontSize: typography.xs, color: t.textMuted, marginTop: 2 }}>{file.size}</Text>
+                    <Text style={{ fontSize: typography.xs, color: t.textMuted, marginTop: 2 }}>
+                      {(file.size / 1024 / 1024).toFixed(2)} MB
+                    </Text>
                   </View>
-                  <Pressable onPress={() => removeFile(file.id)} hitSlop={8}>
+                  <Pressable onPress={() => removeFile(file.uri)} hitSlop={8}>
                     <Ionicons name="close-circle" size={22} color={t.error} />
                   </Pressable>
                 </View>

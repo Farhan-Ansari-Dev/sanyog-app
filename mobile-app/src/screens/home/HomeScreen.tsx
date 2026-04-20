@@ -30,6 +30,7 @@ export default function HomeScreen({ navigation }: any) {
     store.loadCatalog();
     store.loadApplications();
     store.loadNotifications();
+    store.loadNews();
   }, []);
 
   const recentApps = store.applications.slice(0, 3);
@@ -38,14 +39,17 @@ export default function HomeScreen({ navigation }: any) {
   const statCards = [
     {
       label: 'Active',
-      value: store.applications.filter((a) => a.status !== 'approved' && a.status !== 'rejected').length,
+      value: store.applications.filter((a) => {
+        const s = (a.status || "").toLowerCase();
+        return !s.includes("approved") && !s.includes("rejected");
+      }).length,
       icon: 'time-outline' as const,
       color: '#3B82F6',
       bg: '#3B82F6' + '15',
     },
     {
       label: 'Approved',
-      value: store.applications.filter((a) => a.status === 'approved').length,
+      value: store.applications.filter((a) => (a.status || "").toLowerCase().includes("approved")).length,
       icon: 'checkmark-circle-outline' as const,
       color: '#10B981',
       bg: '#10B981' + '15',
@@ -164,7 +168,96 @@ export default function HomeScreen({ navigation }: any) {
         </View>
 
         {/* ═══════════════════════════════════════════════════
-            ★ NEW CERTIFICATION — Big Hero CTA Card
+            ★ COMPLIANCE DASHBOARD OVERVIEW
+           ═══════════════════════════════════════════════════ */}
+        <View style={{ marginHorizontal: spacing.lg, marginBottom: spacing.xl }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: spacing.md }}>
+            <GlassCard style={{ flex: 1, marginRight: spacing.sm, backgroundColor: store.theme === 'dark' ? '#064E3B' : '#E7F9F3', borderColor: '#10B981', paddingTop: spacing.xl, borderLeftWidth: 6 }}>
+               <Ionicons name="shield-checkmark" size={28} color="#10B981" style={{ marginBottom: spacing.sm }} />
+               <Text style={{ fontSize: 32, fontWeight: '900', color: store.theme === 'dark' ? '#fff' : '#065F46' }}>
+                 {store.applications.filter((a) => (a.status || "").toLowerCase().includes("approved")).length}
+               </Text>
+               <Text style={{ fontSize: 13, color: store.theme === 'dark' ? '#A7F3D0' : '#065F46', fontWeight: '700', marginTop: 4, letterSpacing: 0.5 }}>
+                 Active Certificates
+               </Text>
+            </GlassCard>
+
+            <View style={{ flex: 1, marginLeft: spacing.sm, justifyContent: 'space-between' }}>
+              <GlassCard style={{ flex: 1, marginBottom: spacing.sm, padding: spacing.md }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <View>
+                    <Text style={{ fontSize: 20, fontWeight: '800', color: t.text }}>
+                      {store.applications.filter((a) => {
+                        const s = (a.status || "").toLowerCase();
+                        return !s.includes("approved") && !s.includes("rejected");
+                      }).length}
+                    </Text>
+                    <Text style={{ fontSize: 12, color: t.textMuted, fontWeight: '500' }}>In Progress</Text>
+                  </View>
+                  <Ionicons name="sync" size={20} color="#3B82F6" />
+                </View>
+              </GlassCard>
+
+              <GlassCard style={{ flex: 1, marginTop: spacing.sm, padding: spacing.md, backgroundColor: '#FEF2F2', borderColor: '#FCA5A5' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <View>
+                    <Text style={{ fontSize: 20, fontWeight: '800', color: '#EF4444' }}>
+                      {store.applications.filter((a) => {
+                        if (!a.validUntil || a.status !== 'approved') return false;
+                        const daysLeft = (new Date(a.validUntil).getTime() - Date.now()) / (1000 * 3600 * 24);
+                        return daysLeft < 60; //Expiring in 60 days
+                      }).length}
+                    </Text>
+                    <Text style={{ fontSize: 12, color: '#EF4444', fontWeight: '500' }}>Renewals Due</Text>
+                  </View>
+                  <Ionicons name="warning" size={20} color="#EF4444" />
+                </View>
+              </GlassCard>
+            </View>
+          </View>
+        </View>
+
+        {/* ═══════════════════════════════════════════════════
+            ★ REGULATORY NEWS & ALERTS (Crawler Context)
+           ═══════════════════════════════════════════════════ */}
+        <SectionHeader title="Regulatory Updates" />
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: spacing.xl }}>
+          <View style={{ paddingHorizontal: spacing.lg, flexDirection: 'row' }}>
+            {store.news.length > 0 ? (
+              store.news.map((item: any) => (
+                <GlassCard key={item.id} style={{ width: width * 0.75, marginRight: spacing.md, backgroundColor: '#F8FAFC' }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: spacing.xs }}>
+                    <View style={{ 
+                      paddingHorizontal: 8, 
+                      paddingVertical: 4, 
+                      borderRadius: 4, 
+                      backgroundColor: item.category === 'BIS' ? '#DBEAFE' : item.category === 'EPR' ? '#D1FAE5' : '#FEF3C7' 
+                    }}>
+                      <Text style={{ fontSize: 10, fontWeight: '700', color: item.category === 'BIS' ? '#1E40AF' : item.category === 'EPR' ? '#065F46' : '#92400E' }}>
+                        {item.category}
+                      </Text>
+                    </View>
+                    <Text style={{ fontSize: 11, color: t.textMuted, marginLeft: 8 }}>
+                      {new Date(item.date).toLocaleDateString()}
+                    </Text>
+                  </View>
+                  <Text style={{ fontSize: 15, fontWeight: '700', color: t.text, marginBottom: 4 }}>
+                    {item.title}
+                  </Text>
+                  <Text style={{ fontSize: 13, color: t.textMuted }} numberOfLines={2}>
+                    {item.content}
+                  </Text>
+                </GlassCard>
+              ))
+            ) : (
+              <GlassCard style={{ width: width * 0.75, marginRight: spacing.md, backgroundColor: '#F8FAFC' }}>
+                <Text style={{ fontSize: 13, color: t.textMuted }}>Fetching latest updates...</Text>
+              </GlassCard>
+            )}
+          </View>
+        </ScrollView>
+        {/* ═══════════════════════════════════════════════════
+            ★ SMART AI ROADMAP — Big Hero CTA Card
            ═══════════════════════════════════════════════════ */}
         <Pressable
           onPress={() => navigation.navigate('RoadmapWizard')}
@@ -202,30 +295,7 @@ export default function HomeScreen({ navigation }: any) {
                 backgroundColor: 'rgba(16,185,129,0.25)',
               }}
             />
-            <View
-              style={{
-                position: 'absolute',
-                bottom: -40,
-                left: -20,
-                width: 100,
-                height: 100,
-                borderRadius: 50,
-                backgroundColor: 'rgba(52,211,153,0.15)',
-              }}
-            />
-            <View
-              style={{
-                position: 'absolute',
-                top: 20,
-                right: 60,
-                width: 50,
-                height: 50,
-                borderRadius: 25,
-                backgroundColor: 'rgba(110,231,183,0.12)',
-              }}
-            />
-
-            {/* Top row: Icon + Badge */}
+            
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.lg }}>
               <View
                 style={{
@@ -237,7 +307,7 @@ export default function HomeScreen({ navigation }: any) {
                   alignItems: 'center',
                 }}
               >
-                <Ionicons name="add-circle" size={28} color="#FFFFFF" />
+                <Ionicons name="sparkles" size={28} color="#FFFFFF" />
               </View>
               <View
                 style={{

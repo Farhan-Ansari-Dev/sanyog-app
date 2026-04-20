@@ -5,27 +5,15 @@ const jwt = require('jsonwebtoken');
 const { z } = require('zod');
 
 const User = require('../models/User');
-const { createOtpProvider, normalizeIndianMobile } = require('../services/otpProvider');
-
-// ─── Init OTP Provider (Fast2SMS / mock / twilio) ──────────────────────────
-const otpProvider = createOtpProvider();
-console.log(`[Auth] OTP provider loaded: ${otpProvider.mode}`);
+const emailService = require('../services/emailService');
 
 // ─── Rate Limiters ──────────────────────────────────────────────────────────
 const sendOtpLimiter = rateLimit({
   windowMs: 60 * 1000,          // 1 minute
-  limit: 3,                      // max 3 OTP requests per minute per IP
+  limit: 5,                      // max 5 OTP requests per minute per IP
   standardHeaders: 'draft-7',
   legacyHeaders: false,
-  message: { error: 'Too many OTP requests. Please wait 1 minute and try again.' },
-});
-
-const verifyOtpLimiter = rateLimit({
-  windowMs: 10 * 60 * 1000,     // 10 minutes
-  limit: 10,                     // max 10 verify attempts per 10 min
-  standardHeaders: 'draft-7',
-  legacyHeaders: false,
-  message: { error: 'Too many verification attempts. Please wait and try again.' },
+  message: { error: 'Too many requests. Please wait 1 minute.' },
 });
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -33,280 +21,219 @@ function generateOtp() {
   return String(Math.floor(100000 + Math.random() * 900000));
 }
 
-// ─── POST /auth/send-otp ──────────────────────────────────────────────────────
+// ─── POST /auth/send-otp (Email OTP) ──────────────────────────────────────────
 router.post('/send-otp', sendOtpLimiter, async (req, res) => {
-  // Validate input
   const schema = z.object({
-    mobile: z.string().min(8).max(15),
+    email: z.string().email(),
+    /* 
+    mobile: z.string().optional(), // Mobile login disabled for now
+    */
   });
   const parsed = schema.safeParse(req.body);
   if (!parsed.success) {
-    return res.status(400).json({ error: 'Please provide a valid mobile number.' });
+    return res.status(400).json({ error: 'Please provide a valid email address.' });
   }
 
-  const mobile = normalizeIndianMobile(parsed.data.mobile);
+  const email = parsed.data.email.toLowerCase();
 
   try {
-    // Check resend cooldown (30 seconds between requests per mobile)
-    const existingUser = await User.findOne({ mobile });
-    if (existingUser?.otpLastRequestedAt) {
-      const cooldownMs = 30 * 1000; // 30 seconds
-      const elapsed = Date.now() - new Date(existingUser.otpLastRequestedAt).getTime();
-      if (elapsed < cooldownMs) {
-        const waitSec = Math.ceil((cooldownMs - elapsed) / 1000);
-        return res.status(429).json({
-          error: `Please wait ${waitSec} second${waitSec !== 1 ? 's' : ''} before requesting a new OTP.`,
-          waitSeconds: waitSec,
-        });
-      }
-    }
-
-    // Generate OTP
     const otp = generateOtp();
     const otpHash = await bcrypt.hash(otp, 10);
-    const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
 
-    // Save OTP hash to DB (upsert — creates user if first time)
-    await User.findOneAndUpdate(
-      { mobile },
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ error: 'Account not found. Please register first.' });
+    }
+
+    await User.updateOne(
+      { email },
       {
-        $setOnInsert: { mobile },
         $set: {
           otpHash,
           otpExpiresAt,
           otpLastRequestedAt: new Date(),
         },
-        $inc: { otpRequestCount: 1 },
-      },
-      { upsert: true, new: true }
+      }
     );
 
-    // Send OTP via provider
-    if (otpProvider.mode === 'fast2sms') {
-      await otpProvider.sendOtp(mobile, otp);
-      console.log(`[OTP:fast2sms] Sent to ${mobile}`);
-    } else if (otpProvider.mode === 'twilio_verify') {
-      await otpProvider.sendOtp(mobile);
-    } else {
-      // Mock — log to console
-      await otpProvider.sendOtp(mobile, otp);
-    }
-
+    // REAL EMAIL SENDING
+    await emailService.sendOtpEmail(email, otp);
+    
     return res.json({
       ok: true,
-      provider: otpProvider.mode,
-      message: 'OTP sent successfully.',
-      // Only expose expiry in dev mode for debugging
-      ...(process.env.NODE_ENV !== 'production' && otpProvider.mode === 'mock'
-        ? { _devOtp: otp }
-        : {}),
+      message: `Verification code sent to ${email}`,
+      // For development/mock login:
+      ...(process.env.NODE_ENV !== 'production' && (email === 'admin@sanyog.com' || email.includes('test')) ? { _devOtp: otp } : {})
     });
   } catch (err) {
-    console.error('[send-otp] Error:', err.message || err);
-
-    // Friendly errors for known Fast2SMS failures
-    if (err.message?.includes('Fast2SMS')) {
-      return res.status(502).json({
-        error: 'SMS service temporarily unavailable. Please try again in a moment.',
-      });
-    }
-
-    return res.status(500).json({ error: 'Failed to send OTP. Please try again.' });
+    console.error('[send-otp] Error:', err);
+    return res.status(500).json({ error: 'Failed to send OTP.' });
   }
 });
 
 // ─── POST /auth/verify-otp ────────────────────────────────────────────────────
-router.post('/verify-otp', verifyOtpLimiter, async (req, res) => {
-  // Validate input
+router.post('/verify-otp', async (req, res) => {
   const schema = z.object({
-    mobile: z.string().min(8).max(15),
-    code: z.string().min(4).max(10),
+    email: z.string().email(),
+    code: z.string().min(6),
   });
   const parsed = schema.safeParse(req.body);
-  if (!parsed.success) {
-    return res.status(400).json({ error: 'Invalid mobile number or OTP.' });
-  }
+  if (!parsed.success) return res.status(400).json({ error: 'Invalid input' });
 
-  const mobile = normalizeIndianMobile(parsed.data.mobile);
-  const code = String(parsed.data.code).trim();
+  const { email, code } = parsed.data;
+  const lowerEmail = email.toLowerCase();
 
   try {
-    // 🔥 MASTER BYPASS 🔥
-    if (mobile === normalizeIndianMobile('7357539473') && code === '123456') {
-      let user = await User.findOne({ mobile });
-      if (!user) {
-        user = await User.create({ mobile, isVerified: true });
-      } else {
-        await User.updateOne({ mobile }, { $set: { isVerified: true }, $unset: { otpHash: 1, otpExpiresAt: 1 } });
-      }
-      
-      const token = jwt.sign(
-        { mobile },
-        process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
-      );
-      console.log(`[Auth] Master Bypass Login ✅ mobile=${mobile}`);
-      
-      return res.json({
-        ok: true,
-        token,
-        mobile,
-        user,
-        message: 'Master login successful.',
-      });
-    }
-
-    // Twilio manages its own OTP storage
-    if (otpProvider.mode === 'twilio_verify') {
-      const verified = await otpProvider.verifyOtp(mobile, code);
-      if (!verified) {
-        return res.status(401).json({ error: 'Invalid or expired OTP.' });
-      }
-
-      await User.findOneAndUpdate(
-        { mobile },
-        { $set: { isVerified: true }, $unset: { otpHash: 1, otpExpiresAt: 1 } },
-        { upsert: true }
-      );
-
-      const token = jwt.sign({ mobile }, process.env.JWT_SECRET, {
-        expiresIn: process.env.JWT_EXPIRES_IN || '7d',
-      });
-      return res.json({ ok: true, token, mobile });
-    }
-
-    // Fast2SMS / Mock: verify against bcrypt hash stored in DB
-    const user = await User.findOne({ mobile });
-
-    if (!user) {
-      return res.status(400).json({ error: 'OTP not requested for this number. Please request OTP first.' });
-    }
-
-    if (!user.otpHash || !user.otpExpiresAt) {
-      return res.status(400).json({ error: 'No pending OTP found. Please request a new OTP.' });
-    }
-
-    if (user.otpExpiresAt.getTime() < Date.now()) {
-      // Clear expired OTP
-      await User.updateOne({ mobile }, { $unset: { otpHash: 1, otpExpiresAt: 1 } });
-      return res.status(400).json({ error: 'OTP has expired. Please request a new one.' });
+    const user = await User.findOne({ email: lowerEmail });
+    if (!user || !user.otpHash || user.otpExpiresAt < Date.now()) {
+      return res.status(400).json({ error: 'Verification code expired. Please request a new one.' });
     }
 
     const isValid = await bcrypt.compare(code, user.otpHash);
-    if (!isValid) {
-      return res.status(401).json({ error: 'Invalid OTP. Please check and try again.' });
-    }
+    if (!isValid) return res.status(401).json({ error: 'Invalid OTP' });
 
-    // OTP valid — mark user verified, clear OTP fields
-    await User.findOneAndUpdate(
-      { mobile },
-      {
-        $set: { isVerified: true },
-        $unset: { otpHash: 1, otpExpiresAt: 1 },
-      }
-    );
+    user.isVerified = true;
+    user.otpHash = undefined;
+    user.otpExpiresAt = undefined;
+    await user.save();
 
-    // Issue JWT
-    const token = jwt.sign(
-      { mobile },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
-    );
-
-    console.log(`[OTP:${otpProvider.mode}] Verified ✅ mobile=${mobile}`);
-
-    return res.json({
-      ok: true,
-      token,
-      mobile,
-      user,
-      message: 'Login successful.',
-    });
+    const token = jwt.sign({ email: lowerEmail, userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    return res.json({ ok: true, token, user });
   } catch (err) {
-    console.error('[verify-otp] Error:', err.message || err);
-    return res.status(500).json({ error: 'Verification failed. Please try again.' });
+    return res.status(500).json({ error: 'Verification failed' });
   }
 });
 
-// ─── POST /auth/resend-otp (alias of send-otp with its own limiter) ─────────
-router.post('/resend-otp', sendOtpLimiter, async (req, res) => {
-  // Simply reuse the same logic — forward to send-otp handler
-  return router.handle({ ...req, url: '/send-otp', path: '/send-otp' }, res, () => {});
+// ─── POST /auth/login-password ───────────────────────────────────────────────
+router.post('/login-password', async (req, res) => {
+  const schema = z.object({
+    email: z.string().email(),
+    password: z.string().min(6),
+  });
+  const parsed = schema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: 'Invalid input' });
+
+  const { email, password } = parsed.data;
+  const lowerEmail = email.toLowerCase();
+
+  try {
+    const user = await User.findOne({ email: lowerEmail });
+    if (!user || !user.passwordHash) {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.passwordHash);
+    if (!isMatch) {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+
+    const token = jwt.sign({ email: lowerEmail, userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    res.json({ ok: true, token, user });
+  } catch (err) {
+    res.status(500).json({ error: 'Login failed' });
+  }
 });
 
-// ─── POST /auth/register ──────────────────────────────────────────────────────
+// ─── AUTH MIDDLEWARE ──────────────────────────────────────────────────────────
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (!token) return res.status(401).json({ error: 'Unauthorized' });
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) return res.status(403).json({ error: 'Forbidden' });
+    req.user = user;
+    next();
+  });
+};
+
+// ─── GET /auth/me (Get Current Profile) ──────────────────────────────────────
+router.get('/me', authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId).select('-passwordHash -otpHash');
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch profile' });
+  }
+});
+
+// ─── PUT /auth/me (Update Profile) ───────────────────────────────────────────
+router.put('/me', authenticateToken, async (req, res) => {
+  const { name, company, country, mobile, avatar } = req.body;
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.user.userId,
+      { $set: { name, company, country, mobile, avatar } },
+      { new: true }
+    ).select('-passwordHash -otpHash');
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update profile' });
+  }
+});
+
+// ─── PUT /auth/me/settings (Update UI Settings) ──────────────────────────────
+router.put('/me/settings', authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.user.userId,
+      { $set: { settings: req.body } },
+      { new: true }
+    ).select('-passwordHash -otpHash');
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update settings' });
+  }
+});
+
+// ─── POST /auth/register (Email Signup) ───────────────────────────────────────
 router.post('/register', async (req, res) => {
   const schema = z.object({
-    name:     z.string().min(2).max(100),
-    email:    z.string().email(),
-    password: z.string().min(8).max(128),
-    mobile:   z.string().regex(/^\d{10}$/, 'Mobile must be 10 digits'),
-    company:  z.string().min(1).max(200),
-    country:  z.string().min(1).max(100),
+    name: z.string().min(2),
+    email: z.string().email(),
+    password: z.string().min(6),
+    company: z.string().optional(),
+    mobile: z.string().optional(),
+    country: z.string().optional(),
   });
 
   const parsed = schema.safeParse(req.body);
-  if (!parsed.success) {
-    const msg = parsed.error.errors[0]?.message || 'Invalid input.';
-    return res.status(400).json({ message: msg });
-  }
+  if (!parsed.success) return res.status(400).json({ error: 'Invalid data. Password must be at least 6 characters.' });
 
-  const { name, email, password, mobile, company, country } = parsed.data;
-  const normalizedMobile = normalizeIndianMobile(mobile);
+  const { name, email, password, company, mobile, country } = parsed.data;
+  const lowerEmail = email.toLowerCase();
 
   try {
-    // Check duplicate mobile
-    const existingMobile = await User.findOne({ mobile: normalizedMobile });
-    if (existingMobile && existingMobile.passwordHash) {
-      return res.status(409).json({ message: 'Mobile number is already registered. Please sign in.' });
+    const existing = await User.findOne({ email: lowerEmail });
+    if (existing && existing.passwordHash) {
+      return res.status(400).json({ error: 'User already exists with this email.' });
     }
 
-    // Check duplicate email
-    const existingEmail = await User.findOne({ email: email.toLowerCase() });
-    if (existingEmail) {
-      return res.status(409).json({ message: 'Email is already registered. Please sign in.' });
-    }
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(password, salt);
 
-    // Hash password
-    const passwordHash = await bcrypt.hash(password, 10);
-
-    // Create or update user (mobile might exist from OTP attempts)
     const user = await User.findOneAndUpdate(
-      { mobile: normalizedMobile },
-      {
-        $set: {
-          name,
-          email: email.toLowerCase(),
-          passwordHash,
-          company,
-          country,
-          isVerified: true,
-        },
-      },
+      { email: lowerEmail },
+      { $set: { name, company, mobile, country, passwordHash, isVerified: true } },
       { upsert: true, new: true }
     );
 
-    // Issue JWT
-    const token = jwt.sign(
-      { mobile: normalizedMobile, userId: user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
-    );
-
-    console.log(`[register] New user registered: ${email} / ${normalizedMobile}`);
-
-    return res.status(201).json({
-      ok: true,
-      token,
-      mobile: normalizedMobile,
-      name,
-      message: 'Account created successfully.',
+    // TRIGGER WELCOME NOTIFICATION
+    const Notification = require('../models/Notification');
+    await Notification.create({
+      userId: user._id,
+      title: "Welcome to Sanyog",
+      desc: `Your account for ${name} has been activated successfully.`,
+      type: 'success'
     });
+
+    const token = jwt.sign({ email: lowerEmail, userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    return res.status(201).json({ ok: true, token, user });
   } catch (err) {
-    console.error('[register] Error:', err.message);
-    return res.status(500).json({ message: 'Registration failed. Please try again.' });
+    return res.status(500).json({ error: 'Signup failed' });
   }
 });
 
 module.exports = router;
-

@@ -1,32 +1,48 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
   darkMode: 'class',
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
-      fontFamily: { sans: ['Inter', 'sans-serif'] },
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+      },
       colors: {
+        lightBg: '#F8FAFC',
+        lightCard: '#FFFFFF',
+        lightBorder: '#E2E8F0',
+        darkBg: '#1E293B',
+        darkCard: '#263445',
+        darkBorder: '#334155',
         primary: {
-          DEFAULT: '#1B3FA0',   // Sanyog brand royal blue
-          light:   '#3b82f6',
-          dark:    '#142d73',
-          50:      '#eef2ff',
-          100:     '#e0e7ff',
+          light: '#22C55E',
+          DEFAULT: '#16A34A',
+          dark: '#15803D',
         },
-        brand: {
-          green:       '#22A547',  // Sanyog brand green
-          'green-dark':'#187a35',
-          'green-50':  '#f0fdf4',
-          blue:        '#1B3FA0',
-        },
+        textMainLight: '#0F172A',
+        textSubLight: '#475569',
+        textMainDark: '#E2E8F0',
+        textSubDark: '#94A3B8',
+        success: '#16A34A',
+        error: '#EF4444',
+        warning: '#F59E0B',
+      },
+      borderRadius: {
+        'xl': '12px',
       },
       animation: {
-        'fade-in': 'fadeIn 0.25s ease-out',
-        'slide-in': 'slideIn 0.25s ease-out',
+        'fade-in': 'fadeIn 0.3s ease-in-out',
+        'slide-in': 'slideIn 0.3s ease-out',
       },
       keyframes: {
-        fadeIn: { '0%': { opacity: 0, transform: 'translateY(8px)' }, '100%': { opacity: 1, transform: 'translateY(0)' } },
-        slideIn: { '0%': { opacity: 0, transform: 'translateX(-8px)' }, '100%': { opacity: 1, transform: 'translateX(0)' } },
+        fadeIn: {
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        slideIn: {
+          '0%': { opacity: '0', transform: 'translateX(-10px)' },
+          '100%': { opacity: '1', transform: 'translateX(0)' },
+        },
       },
     },
   },

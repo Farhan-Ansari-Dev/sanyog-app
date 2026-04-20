@@ -64,8 +64,20 @@ const statusConfig: Record<string, { label: string; color: string; bg: string; i
 };
 
 export default function StatusBadge({ status, size = 'md' }: Props) {
-  const config = statusConfig[status] || {
-    label: status.replace(/_/g, ' '),
+  const t = useTheme();
+  
+  // Intelligent mapping for admin statuses
+  const normalizedStatus = (status || "").toLowerCase();
+  let key = status;
+  
+  if (normalizedStatus.includes('approved')) key = 'approved';
+  else if (normalizedStatus.includes('rejected')) key = 'rejected';
+  else if (normalizedStatus.includes('documents received')) key = 'submitted';
+  else if (normalizedStatus.includes('under review')) key = 'under_review';
+  else if (normalizedStatus.includes('query raised')) key = 'documents_required';
+
+  const config = statusConfig[key] || {
+    label: status.replace(/_/g, ' ').replace(/\//g, ' '),
     color: '#6B7280',
     bg: '#6B7280' + '15',
     icon: 'ellipse',

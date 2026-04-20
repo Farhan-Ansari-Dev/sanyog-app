@@ -44,7 +44,7 @@ if (getRNMinorVersion() >= 75) {
   }
 }
 
-rootProject.name = 'Sanyog Conformity Solutions'
+rootProject.name = 'BSwift by Sanyog'
 
 dependencyResolutionManagement {
   versionCatalogs {

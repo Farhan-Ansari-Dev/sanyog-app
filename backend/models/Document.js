@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const DocumentSchema = new mongoose.Schema(
   {
     applicationId: { type: mongoose.Schema.Types.ObjectId, ref: 'Application', required: true, index: true },
-    uploadedByMobile: { type: String, required: true, index: true },
+    uploadedByEmail: { type: String, required: true, index: true },
 
     originalName: { type: String, required: true },
     mimeType: { type: String, required: true },
@@ -15,5 +15,7 @@ const DocumentSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+DocumentSchema.index({ applicationId: 1, createdAt: -1 });
 
 module.exports = mongoose.model('Document', DocumentSchema);

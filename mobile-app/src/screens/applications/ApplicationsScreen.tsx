@@ -9,6 +9,7 @@ import { useAppStore } from '../../store/useAppStore';
 import GlassCard from '../../components/common/GlassCard';
 import SearchBar from '../../components/common/SearchBar';
 import StatusBadge from '../../components/common/StatusBadge';
+import Skeleton from '../../components/Skeleton';
 import { spacing, typography, borderRadius } from '../../theme';
 
 export default function ApplicationsScreen({ navigation }: any) {
@@ -108,7 +109,26 @@ export default function ApplicationsScreen({ navigation }: any) {
         </View>
 
         {/* Application Cards */}
-        {filtered.length === 0 ? (
+        {store.isLoading ? (
+          <View>
+             {[1, 2, 3].map(i => (
+               <View key={i} style={{ marginBottom: spacing.md, backgroundColor: t.card, borderRadius: borderRadius.lg, padding: spacing.md, borderWidth: 1, borderColor: t.borderSubtle }}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: spacing.md }}>
+                    <View style={{ flex: 1, gap: 8 }}>
+                       <Skeleton style={{ height: 20, width: '70%' }} />
+                       <Skeleton style={{ height: 14, width: '40%' }} />
+                    </View>
+                    <Skeleton style={{ height: 24, width: 80, borderRadius: 12 }} />
+                  </View>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', borderTopWidth: 1, borderTopColor: t.borderSubtle, paddingTop: spacing.md }}>
+                     <Skeleton style={{ height: 14, width: 80 }} />
+                     <Skeleton style={{ height: 14, width: 60 }} />
+                     <Skeleton style={{ height: 14, width: 20 }} />
+                  </View>
+               </View>
+             ))}
+          </View>
+        ) : filtered.length === 0 ? (
           <View style={{ alignItems: 'center', paddingVertical: spacing['3xl'] }}>
             <Ionicons name="document-text-outline" size={48} color={t.textMuted} />
             <Text style={{ color: t.textMuted, fontSize: typography.base, marginTop: spacing.md, fontWeight: typography.semiBold }}>

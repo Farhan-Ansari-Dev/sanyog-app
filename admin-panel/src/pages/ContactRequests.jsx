@@ -123,10 +123,10 @@ export default function ContactRequests() {
             <table className="w-full text-left border-collapse min-w-[700px]">
               <thead>
                 <tr className="bg-[#F8FAFC] dark:bg-[#080808] border-b border-[#E2E8F0] dark:border-[#333333]">
-                  <th className="px-6 py-4 text-[11px] font-bold text-[#64748B] dark:text-[#94A3B8] uppercase tracking-widest w-1/4">Origin Endpoint</th>
-                  <th className="px-6 py-4 text-[11px] font-bold text-[#64748B] dark:text-[#94A3B8] uppercase tracking-widest w-1/3">Inquiry Trace</th>
-                  <th className="px-6 py-4 text-[11px] font-bold text-[#64748B] dark:text-[#94A3B8] uppercase tracking-widest">Timestamp</th>
-                  <th className="px-6 py-4 text-[11px] font-bold text-[#64748B] dark:text-[#94A3B8] uppercase tracking-widest text-right">Workflow Matrix</th>
+                  <th className="px-6 py-4 text-[11px] font-bold text-[#64748B] dark:text-[#94A3B8] uppercase tracking-widest w-1/4">Client Details</th>
+                  <th className="px-6 py-4 text-[11px] font-bold text-[#64748B] dark:text-[#94A3B8] uppercase tracking-widest w-1/3">Message</th>
+                  <th className="px-6 py-4 text-[11px] font-bold text-[#64748B] dark:text-[#94A3B8] uppercase tracking-widest">Date</th>
+                  <th className="px-6 py-4 text-[11px] font-bold text-[#64748B] dark:text-[#94A3B8] uppercase tracking-widest text-right">Status / Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#F1F5F9] dark:divide-[#222222] bg-white dark:bg-[#111111]">
@@ -139,14 +139,17 @@ export default function ContactRequests() {
                           <div className={`p-2.5 rounded-xl border ${isNew ? 'bg-red-50 border-red-100 text-red-500 dark:bg-red-900/10 dark:border-red-900/20' : 'bg-slate-50 border-slate-100 dark:bg-[#222222] dark:border-[#333333] text-slate-400 dark:text-slate-500'}`}>
                             <Phone className="w-4 h-4" />
                           </div>
-                          <span className="text-[14px] font-bold text-[#0F172A] dark:text-white tracking-wide">{r.userMobile}</span>
+                          <div className="flex flex-col">
+                            <span className="text-[14px] font-bold text-[#0F172A] dark:text-white tracking-wide">{r.userMobile || r.userEmail || "Unknown"}</span>
+                            {r.userMobile && r.userEmail && <span className="text-[10px] text-[#64748B] font-medium">{r.userEmail}</span>}
+                          </div>
                         </div>
                       </td>
                       <td className="px-6 py-5">
                         {r.message ? (
                           <div className="text-[13px] font-medium text-[#475569] dark:text-[#CBD5E1] line-clamp-2" title={r.message}>{r.message}</div>
                         ) : (
-                          <div className="text-[13px] text-[#94A3B8] dark:text-[#64748B] italic">Payload completely empty</div>
+                          <div className="text-[13px] text-[#94A3B8] dark:text-[#64748B] italic">No specific message provided</div>
                         )}
                       </td>
                       <td className="px-6 py-5 whitespace-nowrap">

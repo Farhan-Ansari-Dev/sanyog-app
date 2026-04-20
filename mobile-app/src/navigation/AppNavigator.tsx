@@ -11,6 +11,7 @@ import { useAppStore } from '../store/useAppStore';
 import { typography, spacing, borderRadius } from '../theme';
 
 // Import screens
+import SplashScreen from '../screens/auth/AnimatedSplashScreen';
 import OnboardingScreen from '../screens/auth/OnboardingScreen';
 import LoginScreen from '../screens/auth/LoginScreen';
 import OTPScreen from '../screens/auth/OTPScreen';
@@ -40,11 +41,12 @@ const AuthStack = createNativeStackNavigator<AuthStackParamList>();
 type MainStackParamList = {
   // Tabs (home screens for each tab)
   HomeMain: undefined;
-  ServicesList: undefined;
   AppsList: undefined;
-  NotifList: undefined;
   ProfileMain: undefined;
+  SupportMain: undefined;
   // Sub-screens
+  ServicesList: undefined;
+  NotifList: undefined;
   CertDetail: { certId: string };
   ServiceGroup: { categoryId: string; categoryName: string };
   ApplyStep1: { certId: string; certName: string };
@@ -66,11 +68,10 @@ function CustomTabBar({ navigation, currentTab }: { navigation: any; currentTab:
   const unreadCount = useAppStore((s) => s.unreadCount);
 
   const tabs = [
-    { key: 'HomeMain', label: 'Home', icon: 'home', iconFocused: 'home' },
-    { key: 'ServicesList', label: 'Services', icon: 'grid-outline', iconFocused: 'grid' },
-    { key: 'AppsList', label: 'Track', icon: 'documents-outline', iconFocused: 'documents' },
-    { key: 'NotifList', label: 'Alerts', icon: 'notifications-outline', iconFocused: 'notifications', badge: unreadCount },
+    { key: 'HomeMain', label: 'Home', icon: 'home-outline', iconFocused: 'home' },
+    { key: 'AppsList', label: 'Applications', icon: 'document-text-outline', iconFocused: 'document-text' },
     { key: 'ProfileMain', label: 'Profile', icon: 'person-outline', iconFocused: 'person' },
+    { key: 'SupportMain', label: 'Support', icon: 'help-buoy-outline', iconFocused: 'help-buoy' },
   ];
 
   return (
@@ -179,6 +180,7 @@ export function AuthNavigator() {
   const opts = useScreenOptions();
   return (
     <AuthStack.Navigator screenOptions={{ ...opts, headerShown: false }}>
+      <AuthStack.Screen name="Splash" component={SplashScreen} />
       <AuthStack.Screen name="Onboarding" component={OnboardingScreen} />
       <AuthStack.Screen name="Login" component={LoginScreen} />
       <AuthStack.Screen name="OTP" component={OTPScreen} />
@@ -209,13 +211,13 @@ export function MainTabNavigator() {
         options={{ headerShown: false }}
       />
       <MainStack.Screen
-        name="NotifList"
-        component={withTabBar(NotificationsScreen, 'NotifList')}
+        name="ProfileMain"
+        component={withTabBar(ProfileScreen, 'ProfileMain')}
         options={{ headerShown: false }}
       />
       <MainStack.Screen
-        name="ProfileMain"
-        component={withTabBar(ProfileScreen, 'ProfileMain')}
+        name="SupportMain"
+        component={withTabBar(ContactExpertScreen, 'SupportMain')}
         options={{ headerShown: false }}
       />
 
@@ -232,7 +234,8 @@ export function MainTabNavigator() {
       <MainStack.Screen name="AppDetail" component={AppDetailScreen} options={{ title: 'Application Details' }} />
       <MainStack.Screen name="UploadDocs" component={UploadDocsScreen} options={{ title: 'Upload Documents' }} />
       <MainStack.Screen name="About" component={AboutScreen} options={{ title: 'About Sanyog' }} />
-      <MainStack.Screen name="ContactExpert" component={ContactExpertScreen} options={{ title: 'Contact Expert' }} />
+      <MainStack.Screen name="ServicesList" component={ServicesScreen} options={{ title: 'Services' }} />
+      <MainStack.Screen name="NotifList" component={NotificationsScreen} options={{ title: 'Notifications' }} />
       <MainStack.Screen name="RoadmapWizard" component={RoadmapWizardScreen} options={{ title: 'AI Roadmap' }} />
     </MainStack.Navigator>
   );

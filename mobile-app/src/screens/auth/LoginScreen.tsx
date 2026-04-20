@@ -26,16 +26,16 @@ type Props = NativeStackScreenProps<AuthStackParamList, 'Login'>;
 
 export default function LoginScreen({ navigation }: Props) {
   const t = useTheme();
-  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
-  const isValid = phone.replace(/\D/g, '').length === 10;
+  const isValid = email.includes('@') && email.includes('.');
 
   const handleSend = async () => {
     if (!isValid) return;
     setLoading(true);
     try {
-      // Mock bypass: Do not hit backend to prevent SMS provider crash
-      navigation.navigate('OTP', { mobile: phone });
+      await api.post('/auth/send-otp', { email });
+      navigation.navigate('OTP', { email });
     } catch (e: any) {
       Alert.alert('Error', e?.response?.data?.error || 'Failed to send OTP');
     } finally {
@@ -81,7 +81,7 @@ export default function LoginScreen({ navigation }: Props) {
                 letterSpacing: -0.5,
               }}
             >
-              Welcome Back
+              Partner Login
             </Text>
             <Text
               style={{
@@ -90,11 +90,11 @@ export default function LoginScreen({ navigation }: Props) {
                 marginTop: spacing.sm,
               }}
             >
-              Sign in to manage your certifications
+              Sign in with your Email ID
             </Text>
           </View>
 
-          {/* Phone Input */}
+          {/* Email Input */}
           <Text
             style={{
               fontSize: 11,
@@ -105,7 +105,7 @@ export default function LoginScreen({ navigation }: Props) {
               marginBottom: spacing.sm,
             }}
           >
-            Mobile Number
+            Email Address
           </Text>
           <View
             style={{
@@ -114,7 +114,7 @@ export default function LoginScreen({ navigation }: Props) {
               backgroundColor: t.inputBg,
               borderRadius: borderRadius.lg,
               borderWidth: 1.5,
-              borderColor: phone.length > 0 ? t.primary + '60' : t.border,
+              borderColor: email.length > 0 ? t.primary + '60' : t.border,
               paddingHorizontal: spacing.base,
               marginBottom: spacing.xl,
               elevation: 1,
@@ -124,31 +124,14 @@ export default function LoginScreen({ navigation }: Props) {
               shadowRadius: 2,
             }}
           >
-            <Text
-              style={{
-                fontSize: 16,
-                fontWeight: '700',
-                color: t.textSecondary,
-                marginRight: spacing.sm,
-              }}
-            >
-              +91
-            </Text>
-            <View
-              style={{
-                width: 1,
-                height: 24,
-                backgroundColor: t.border,
-                marginRight: spacing.sm,
-              }}
-            />
+            <Ionicons name="mail-outline" size={20} color={t.textMuted} style={{ marginRight: spacing.sm }} />
             <TextInput
-              value={phone}
-              onChangeText={setPhone}
-              placeholder="Enter 10-digit number"
+              value={email}
+              onChangeText={setEmail}
+              placeholder="name@company.com"
               placeholderTextColor={t.placeholder}
-              keyboardType="phone-pad"
-              maxLength={10}
+              keyboardType="email-address"
+              autoCapitalize="none"
               style={{
                 flex: 1,
                 fontSize: 16,
@@ -162,9 +145,16 @@ export default function LoginScreen({ navigation }: Props) {
             )}
           </View>
 
+          {/* Mobile Login Option (Commented for later) */}
+          {/* 
+          <Pressable style={{ marginBottom: spacing.lg }}>
+            <Text style={{ color: t.primary, fontWeight: '600' }}>Login with Mobile Number</Text>
+          </Pressable> 
+          */}
+
           {/* Send OTP */}
           <PrimaryButton
-            title="Send OTP"
+            title="Get OTP on Email"
             onPress={handleSend}
             loading={loading}
             disabled={!isValid}
@@ -172,7 +162,6 @@ export default function LoginScreen({ navigation }: Props) {
             size="lg"
           />
 
-          {/* Footer Note */}
           <Text
             style={{
               fontSize: 12,
@@ -182,8 +171,8 @@ export default function LoginScreen({ navigation }: Props) {
               lineHeight: 18,
             }}
           >
-            In development mode, OTP is printed in backend logs.{'\n'}
-            For demo, use any 10-digit number.
+            Email OTP is currently mandatory.{'\n'}
+            Mobile registration option will be added later.
           </Text>
         </ScrollView>
       </KeyboardAvoidingView>

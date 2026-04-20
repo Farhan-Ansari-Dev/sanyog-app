@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Download, ChevronDown, ChevronRight, Inbox, Search, RefreshCw, Loader2, Save, FileText, Plus, Trash2, X, FolderTree } from "lucide-react";
 import api from "../services/api";
+import Skeleton from "../components/Skeleton";
 
 const STATUS_OPTIONS = [
   "Documents Received",
@@ -61,6 +62,11 @@ export default function Applications() {
   const [saveMsg, setSaveMsg] = useState("");
 
   const [downloadingDoc, setDownloadingDoc] = useState("");
+
+  // Bulk Processing & Export State
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [bulkStatus, setBulkStatus] = useState("");
+  const [bulkProcessing, setBulkProcessing] = useState(false);
 
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [createForm, setCreateForm] = useState({
@@ -182,20 +188,86 @@ export default function Applications() {
     );
   });
 
+  // Bulk Operations & CSV Export
+  const toggleSelect = (id) => {
+    if (selectedIds.includes(id)) {
+      setSelectedIds(selectedIds.filter(x => x !== id));
+    } else {
+      setSelectedIds([...selectedIds, id]);
+    }
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === filtered.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(filtered.map(a => a._id));
+    }
+  };
+
+  const handleBulkUpdate = async () => {
+    if (!bulkStatus || !selectedIds.length) return;
+    setBulkProcessing(true);
+    try {
+      await api.patch('/admin/applications/bulk/update', {
+        applicationIds: selectedIds,
+        status: bulkStatus
+      });
+      setSelectedIds([]);
+      setBulkStatus("");
+      await load();
+    } catch (e) {
+      alert(e?.response?.data?.error || "Bulk update failed");
+    } finally {
+      setBulkProcessing(false);
+    }
+  };
+
+  const handleExportCsv = () => {
+    if (!filtered.length) return;
+    const headers = ["ID", "Company", "Applicant", "Service", "Mobile", "Status", "Date"];
+    const rows = filtered.map(a => [
+      a._id,
+      `"${(a.companyName || '').replace(/"/g, '""')}"`,
+      `"${(a.applicantName || '').replace(/"/g, '""')}"`,
+      `"${(a.serviceName || '').replace(/"/g, '""')}"`,
+      a.userMobile,
+      `"${(a.status || '').replace(/"/g, '""')}"`,
+      new Date(a.createdAt).toISOString().split('T')[0]
+    ]);
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `DICE_Applications_${new Date().getTime()}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="animate-fade-in pb-12">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-[#0F172A] dark:text-white tracking-tight">Applications</h1>
-          <p className="text-[15px] text-[#64748B] dark:text-[#94A3B8] mt-1">Manage all client certification applications sequentially.</p>
+          <p className="text-[15px] text-[#64748B] dark:text-[#94A3B8] mt-1">Manage and track all certification applications.</p>
         </div>
-        <button 
-          onClick={() => setShowCreateModal(true)}
-          className="h-11 px-5 bg-[#22C55E] hover:bg-[#16A34A] text-white text-[14px] font-semibold rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 w-full sm:w-auto"
-        >
-          <Plus className="w-5 h-5" />
-          Add Application
-        </button>
+        <div className="flex w-full sm:w-auto gap-3">
+          <button 
+            onClick={handleExportCsv}
+            className="h-11 px-5 border border-[#E2E8F0] dark:border-[#333333] hover:bg-slate-50 dark:hover:bg-[#1A1A1A] text-[#0F172A] dark:text-white text-[14px] font-semibold rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 flex-1 sm:flex-none"
+          >
+            <Download className="w-5 h-5" />
+            Export
+          </button>
+          <button 
+            onClick={() => setShowCreateModal(true)}
+            className="h-11 px-5 bg-[#22C55E] hover:bg-[#16A34A] text-white text-[14px] font-semibold rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 flex-1 sm:flex-none"
+          >
+            <Plus className="w-5 h-5" />
+            Add Application
+          </button>
+        </div>
       </div>
 
       {error && (
@@ -257,12 +329,55 @@ export default function Applications() {
         </div>
       </div>
 
+      {/* Bulk Processing Actions */}
+      {selectedIds.length > 0 && (
+        <div className="bg-[#1E293B] dark:bg-[#0F172A] p-3 rounded-2xl shadow-lg border border-[#334155] dark:border-blue-900/50 mb-6 flex flex-col md:flex-row gap-4 items-center animate-fade-in-up text-white sticky top-20 z-40">
+          <div className="px-3 py-1 bg-white/10 rounded-lg text-sm font-bold shadow-inner">
+            {selectedIds.length} Selected
+          </div>
+          <div className="flex-1 w-full md:w-auto relative">
+             <select
+               className="w-full h-10 px-4 bg-slate-900/50 border border-[#334155] text-[14px] text-white rounded-xl outline-none focus:border-blue-500 appearance-none"
+               value={bulkStatus}
+               onChange={e => setBulkStatus(e.target.value)}
+             >
+               <option value="">Choose new status...</option>
+               {STATUS_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
+             </select>
+          </div>
+          <div className="flex w-full md:w-auto gap-2">
+            <button 
+              onClick={() => setSelectedIds([])}
+              className="px-4 py-2 text-[13px] font-semibold text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg"
+            >
+              Cancel
+            </button>
+            <button 
+              onClick={handleBulkUpdate}
+              disabled={!bulkStatus || bulkProcessing}
+              className="flex-1 md:flex-none h-10 px-6 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-bold rounded-xl text-[14px] flex items-center gap-2 transition"
+            >
+              {bulkProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              Apply Bulk Change
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Main Content Area */}
       <div className="bg-white dark:bg-[#111111] border border-[#E2E8F0] dark:border-[#333333] rounded-2xl shadow-sm overflow-hidden transition-colors">
         {loading ? (
-          <div className="w-full h-64 flex flex-col items-center justify-center">
-            <Loader2 className="w-8 h-8 animate-spin text-[#22C55E] mb-4" />
-            <p className="text-[#64748B] dark:text-[#94A3B8] font-medium text-[15px]">Loading applications...</p>
+          <div className="w-full">
+            <div className="bg-[#F8FAFC] dark:bg-[#080808] border-b border-[#E2E8F0] dark:border-[#333333] h-12 flex items-center px-6" />
+            {[1, 2, 3, 4, 5].map(i => (
+              <div key={i} className="flex h-[72px] px-6 items-center gap-4 border-b border-[#F1F5F9] dark:border-[#222222]">
+                <Skeleton className="w-[200px] h-10" />
+                <Skeleton className="w-[150px] h-10" />
+                <Skeleton className="w-[100px] h-8" />
+                <div className="flex-1" />
+                <Skeleton className="w-[80px] h-8" />
+              </div>
+            ))}
           </div>
         ) : !filtered.length ? (
           <div className="flex flex-col items-center justify-center p-16 text-center h-full">
@@ -275,6 +390,14 @@ export default function Applications() {
             <table className="w-full text-left border-collapse min-w-[800px]">
               <thead>
                 <tr className="bg-[#F8FAFC] dark:bg-[#080808] border-b border-[#E2E8F0] dark:border-[#333333]">
+                  <th className="px-6 py-4 w-12">
+                    <input 
+                      type="checkbox" 
+                      className="w-4 h-4 rounded border-slate-300" 
+                      checked={filtered.length > 0 && selectedIds.length === filtered.length}
+                      onChange={toggleSelectAll}
+                    />
+                  </th>
                   <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider">Company & Service</th>
                   <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider">Applicant</th>
                   <th className="px-6 py-4 text-[12px] font-bold text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider">Status</th>
@@ -292,8 +415,16 @@ export default function Applications() {
                           onClick={() => toggleExpand(a)}
                           className={`cursor-pointer transition-colors ${
                             isExpanded ? 'bg-slate-50 dark:bg-[#1A1A1A]' : 'hover:bg-slate-50 dark:hover:bg-[#1A1A1A]'
-                          }`}
+                          } ${selectedIds.includes(a._id) ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''}`}
                         >
+                          <td className="px-6 py-5" onClick={(e) => e.stopPropagation()}>
+                            <input 
+                              type="checkbox" 
+                              className="w-4 h-4 rounded border-slate-300 pointer-events-auto"
+                              checked={selectedIds.includes(a._id)}
+                              onChange={() => toggleSelect(a._id)}
+                            />
+                          </td>
                           <td className="px-6 py-5 whitespace-nowrap">
                             <div className="flex items-center gap-3">
                               <button className={`w-6 h-6 rounded-md flex items-center justify-center transition-colors ${isExpanded ? 'bg-[#22C55E] text-white' : 'bg-slate-100 text-[#64748B] dark:bg-[#222222] dark:text-[#94A3B8]'}`}>
@@ -322,7 +453,7 @@ export default function Applications() {
                         {/* Expanding Configuration Row */}
                         {isExpanded && (
                           <tr className="bg-[#F8FAFC] dark:bg-[#0A0A0A] border-b border-[#E2E8F0] dark:border-[#333333]">
-                            <td colSpan={4} className="border-l-4 border-[#22C55E] p-0">
+                            <td colSpan={5} className="border-l-4 border-[#22C55E] p-0">
                               <div className="p-6 lg:p-8 animate-fade-in grid grid-cols-1 lg:grid-cols-2 gap-8">
                                 
                                 {/* Left Column: Details & Documents */}
@@ -376,12 +507,12 @@ export default function Applications() {
                                 <div>
                                   <div className="bg-white dark:bg-[#111111] border border-slate-200 dark:border-[#333333] rounded-xl p-5 shadow-sm">
                                     <h4 className="text-[12px] font-bold text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider mb-4 border-b border-slate-100 dark:border-[#333333] pb-3 flex items-center gap-2">
-                                      <RefreshCw className="w-4 h-4" /> Workflow State Control
+                                      <RefreshCw className="w-4 h-4" /> Application Status Control
                                     </h4>
                                     
                                     <div className="space-y-4">
                                       <div>
-                                        <label className="block text-[13px] font-semibold text-[#334155] dark:text-[#E2E8F0] mb-1.5">Application Milestone</label>
+                                        <label className="block text-[13px] font-semibold text-[#334155] dark:text-[#E2E8F0] mb-1.5">Application Status</label>
                                         <select
                                           className="w-full h-10 px-3 bg-[#F8FAFC] dark:bg-[#1A1A1A] border border-[#E2E8F0] dark:border-[#333333] text-[13px] font-semibold text-[#0F172A] dark:text-white rounded-lg outline-none focus:border-[#22C55E]"
                                           value={editStatus}
@@ -393,7 +524,7 @@ export default function Applications() {
                                       
                                       <div>
                                         <label className="block text-[13px] font-semibold text-[#334155] dark:text-[#E2E8F0] mb-1.5 flex justify-between">
-                                          Administrative Remarks
+                                          Admin Notes
                                         </label>
                                         <textarea
                                           className="w-full p-3 bg-[#F8FAFC] dark:bg-[#1A1A1A] border border-[#E2E8F0] dark:border-[#333333] text-[13px] text-[#0F172A] dark:text-white rounded-lg outline-none focus:border-[#22C55E] min-h-[100px] resize-none"
@@ -402,7 +533,7 @@ export default function Applications() {
                                           onChange={e => setEditRemarks(e.target.value)}
                                         ></textarea>
                                         <p className="text-[11px] text-[#94A3B8] mt-1.5 flex items-center gap-1.5">
-                                          <div className="w-1.5 h-1.5 rounded-full bg-blue-400"></div> These remarks dynamically echo to the client portal.
+                                          <div className="w-1.5 h-1.5 rounded-full bg-blue-400"></div> These notes are visible to the client.
                                         </p>
                                       </div>
 

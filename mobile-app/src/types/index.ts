@@ -4,9 +4,10 @@
 
 // ─── Navigation ───────────────────────────────────────────
 export type AuthStackParamList = {
+  Splash: undefined;
   Onboarding: undefined;
   Login: undefined;
-  OTP: { mobile: string };
+  OTP: { email: string };
 };
 
 export type HomeStackParamList = {
@@ -96,6 +97,8 @@ export interface Application {
   email: string;
   status: ApplicationStatus;
   statusHistory: StatusHistoryEntry[];
+  clientTasks?: { id: string; task: string; pending: boolean }[];
+  validUntil?: string;
   documents: DocumentEntry[];
   remarks: string;
   createdAt: string;
@@ -106,6 +109,7 @@ export type ApplicationStatus =
   | 'draft'
   | 'submitted'
   | 'under_review'
+  | 'testing'
   | 'documents_required'
   | 'approved'
   | 'rejected';

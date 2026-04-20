@@ -88,20 +88,21 @@ router.delete('/staff/:id', adminAuth, requireRole('admin'), async (req, res) =>
 router.get('/clients', adminAuth, async (req, res) => {
   try {
     const users = await User.find().sort({ createdAt: -1 }).limit(500);
-    // Attach application count
+    // Attach application count by email
     const appCounts = await Application.aggregate([
-      { $group: { _id: '$mobile', count: { $sum: 1 }, lastDate: { $max: '$createdAt' } } }
+      { $group: { _id: '$userEmail', count: { $sum: 1 }, lastDate: { $max: '$createdAt' } } }
     ]);
     const countMap = {};
-    appCounts.forEach(a => { countMap[a._id] = { count: a.count, lastDate: a.lastDate }; });
+    appCounts.forEach(a => { if (a._id) countMap[a._id] = { count: a.count, lastDate: a.lastDate }; });
 
     const result = users.map(u => ({
       _id: u._id,
+      email: u.email,
       mobile: u.mobile,
       isVerified: u.isVerified,
       createdAt: u.createdAt,
-      applications: countMap[u.mobile]?.count || 0,
-      lastActivity: countMap[u.mobile]?.lastDate || u.createdAt,
+      applicationCount: countMap[u.email]?.count || 0,
+      lastActivity: countMap[u.email]?.lastDate || u.createdAt,
     }));
 
     return res.json(result);
@@ -113,15 +114,15 @@ router.get('/clients', adminAuth, async (req, res) => {
 // POST /admin/users/clients — add a client manually
 router.post('/clients', adminAuth, requireRole('admin'), async (req, res) => {
   try {
-    const { mobile, email } = req.body;
-    if (!mobile) return res.status(400).json({ error: 'Mobile number is required' });
+    const { email, mobile } = req.body;
+    if (!email) return res.status(400).json({ error: 'Email is required' });
     
-    const exists = await User.findOne({ mobile });
-    if (exists) return res.status(409).json({ error: 'Client with this mobile already exists' });
+    const exists = await User.findOne({ email: email.toLowerCase() });
+    if (exists) return res.status(409).json({ error: 'Client with this email already exists' });
 
     const client = await User.create({ 
-      mobile, 
-      email: email || '',
+      email: email.toLowerCase(),
+      mobile: mobile || '',
       isVerified: true 
     });
     return res.status(201).json({ ok: true, _id: client._id });

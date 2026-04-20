@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useTheme } from "../context/ThemeContext";
 import {
   Shield, Phone, Lock, Eye, EyeOff, Loader2,
   ArrowRight, AlertCircle, CheckCircle, RefreshCw, ArrowLeft,
-  Sun, Moon
+  Sun, Moon, Mail, Key
 } from "lucide-react";
 import API from "../services/api";
 
@@ -106,45 +107,23 @@ function OtpBoxInput({ value, onChange, isDark }) {
 export default function Login() {
   const navigate = useNavigate();
 
-  const [mobile, setMobile] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  
+  const [loginMethod, setLoginMethod] = useState("otp"); // "otp" or "password"
   const [otpCode, setOtpCode] = useState("");
   const [otpStep, setOtpStep] = useState(1);
-  const [otpLoading, setOtpLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [resendKey, setResendKey] = useState(0);
 
-  // Theme state
-  const [isDark, setIsDark] = useState(true);
-
-  useEffect(() => {
-    const saved = localStorage.getItem('theme');
-    if (saved === 'light') {
-      document.documentElement.classList.remove('dark');
-      setIsDark(false);
-    } else {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-      setIsDark(true);
-    }
-  }, []);
-
-  const toggleTheme = () => {
-    const html = document.documentElement;
-    if (isDark) {
-      html.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-      setIsDark(false);
-    } else {
-      html.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-      setIsDark(true);
-    }
-  };
+  const { isDark, toggleTheme } = useTheme();
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
   useEffect(() => {
-    if (otpCode.length === 6 && otpStep === 2) {
+    if (otpCode.length === 6 && otpStep === 2 && loginMethod === "otp") {
       handleVerifyOtp();
     }
   }, [otpCode]);
@@ -153,24 +132,23 @@ export default function Login() {
     e?.preventDefault();
     setError("");
     setSuccess("");
-    const cleaned = mobile.replace(/\D/g, "");
-    if (cleaned.length !== 10) {
-      setError("Please enter a valid 10-digit mobile number.");
+    if (!email.includes("@") || !email.includes(".")) {
+      setError("Please enter a valid email address.");
       return;
     }
-    setOtpLoading(true);
+    setLoading(true);
     try {
-      await API.post("/auth/send-otp", { mobile: cleaned });
+      await API.post("/auth/send-otp", { email });
       setOtpStep(2);
       setOtpCode("");
       setResendKey((k) => k + 1);
-      setSuccess("OTP sent! Check your WhatsApp messages.");
+      setSuccess("OTP sent! Please check your email inbox.");
       setTimeout(() => setSuccess(""), 4000);
     } catch (err) {
-      const msg = err.response?.data?.error || err.response?.data?.message || "Failed to send OTP. Please try again.";
+      const msg = err.response?.data?.error || err.response?.data?.message || "Failed to send OTP.";
       setError(msg);
     } finally {
-      setOtpLoading(false);
+      setLoading(false);
     }
   };
 
@@ -178,24 +156,48 @@ export default function Login() {
     e?.preventDefault();
     setError("");
     if (!otpCode || otpCode.replace(/\D/g, "").length < 6) {
-      setError("Please enter the complete 6-digit OTP.");
+      setError("Please enter the 6-digit OTP.");
       return;
     }
-    setOtpLoading(true);
+    setLoading(true);
     try {
       const { data } = await API.post("/auth/verify-otp", {
-        mobile: mobile.replace(/\D/g, ""),
+        email: email.toLowerCase(),
         code: otpCode,
       });
       localStorage.setItem("token", data.token);
       setSuccess("Login successful! Redirecting...");
       setTimeout(() => navigate("/dashboard"), 800);
     } catch (err) {
-      const msg = err.response?.data?.error || err.response?.data?.message || "Invalid OTP. Please try again.";
+      const msg = err.response?.data?.error || err.response?.data?.message || "Invalid OTP.";
       setError(msg);
       setOtpCode("");
     } finally {
-      setOtpLoading(false);
+      setLoading(false);
+    }
+  };
+
+  const handlePasswordLogin = async (e) => {
+    e?.preventDefault();
+    setError("");
+    if (!email || !password) {
+      setError("Email and password are required.");
+      return;
+    }
+    setLoading(true);
+    try {
+      const { data } = await API.post("/auth/login-password", {
+        email: email.toLowerCase(),
+        password: password,
+      });
+      localStorage.setItem("token", data.token);
+      setSuccess("Login successful! Redirecting...");
+      setTimeout(() => navigate("/dashboard"), 800);
+    } catch (err) {
+      const msg = err.response?.data?.error || err.response?.data?.message || "Invalid email or password.";
+      setError(msg);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -214,27 +216,26 @@ export default function Login() {
     : '0 20px 50px -12px rgba(0,0,0,0.12)';
   const inputBg = isDark ? 'rgba(11,13,19,0.6)' : '#F8FAFC';
   const inputBorder = isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0';
-  const textPrimary = isDark ? '#FFFFFF' : '#0F172A';
-  const textSecondary = isDark ? '#94A3B8' : '#64748B';
-  const textMuted = isDark ? '#475569' : '#94A3B8';
+  const textPrimary = isDark ? '#F8FAFC' : '#0F172A';
+  const textSecondary = isDark ? '#CBD5E1' : '#64748B';
+  const textMuted = isDark ? '#64748B' : '#94A3B8';
 
   return (
     <div
       className="min-h-screen font-['Inter'] flex flex-col items-center justify-center p-4 antialiased transition-colors duration-500 relative overflow-hidden"
       style={{ backgroundColor: bg }}
     >
-      {/* Radial glow — only in dark mode */}
+      {/* Radial glow */}
       <div
         className="absolute inset-0 pointer-events-none transition-opacity duration-1000"
         style={{
           background: isDark
-            ? 'radial-gradient(ellipse at 50% 40%, rgba(30,41,59,0.6) 0%, transparent 70%)'
+            ? 'radial-gradient(ellipse at 50% 30%, rgba(22,163,74,0.15) 0%, transparent 70%)'
             : 'none',
-          opacity: isDark ? 1 : 0,
+          opacity: isDark ? 0.8 : 0,
         }}
       />
 
-      {/* Theme Toggle */}
       <div className="absolute top-8 right-8 z-50">
         <button
           onClick={toggleTheme}
@@ -242,9 +243,7 @@ export default function Login() {
           style={{
             backgroundColor: isDark ? 'rgba(30,36,46,0.8)' : 'rgba(255,255,255,0.9)',
             borderColor: isDark ? 'rgba(255,255,255,0.1)' : '#E2E8F0',
-            boxShadow: isDark
-              ? '0 8px 32px rgba(0,0,0,0.3)'
-              : '0 4px 16px rgba(0,0,0,0.08)',
+            boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.3)' : '0 4px 16px rgba(0,0,0,0.08)',
           }}
         >
           {isDark ? <Sun className="w-5 h-5 text-yellow-400" /> : <Moon className="w-5 h-5 text-slate-600" />}
@@ -252,199 +251,147 @@ export default function Login() {
       </div>
 
       <div className="w-full max-w-[440px] flex flex-col items-center relative z-10">
-
-        {/* Logo */}
         <div className="mb-10 w-full flex flex-col items-center relative z-20">
-          <img
-            src="/logo.png"
-            alt="Sanyog"
-            className="h-14 w-auto object-contain drop-shadow-sm transition-all duration-300"
-            style={{ filter: isDark ? 'none' : 'brightness(0.85)' }}
-            onError={(e) => {
-              e.target.style.display = 'none';
-              e.target.nextSibling.style.display = 'flex';
-            }}
-          />
-          <div style={{ display: 'none' }} className="items-center justify-center w-14 h-14 rounded-2xl shadow-sm">
-            <Shield className="w-7 h-7" style={{ color: textPrimary }} />
+          <div className="w-16 h-16 bg-white dark:bg-[#0F172A] rounded-2xl shadow-xl flex items-center justify-center border border-slate-100 dark:border-slate-800 transform rotate-6 mb-4">
+             <div className="relative w-10 h-10">
+                <div className="absolute inset-0 border-4 border-emerald-500 rounded-lg"></div>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-emerald-500 rounded-full"></div>
+                <div className="absolute top-2 right-2 w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
+                <div className="absolute bottom-2 left-2 w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
+             </div>
           </div>
+          <img
+            src="/logo.png" alt="Sanyog"
+            className="h-8 w-auto object-contain opacity-50"
+            style={{ filter: isDark ? 'none' : 'brightness(0.85)' }}
+            onError={(e) => { e.target.style.display = 'none'; }}
+          />
         </div>
 
-        {/* ─── Main Login Card ─── */}
         <div
           className="w-full overflow-hidden relative z-20 rounded-[2rem] transition-all duration-500"
-          style={{
-            backgroundColor: cardBg,
-            border: `1px solid ${cardBorder}`,
-            boxShadow: cardShadow,
-          }}
+          style={{ backgroundColor: cardBg, border: `1px solid ${cardBorder}`, boxShadow: cardShadow }}
         >
+          {/* Method Switcher */}
+          <div className="flex p-1 bg-gray-100 dark:bg-[#0B0D13] mx-10 mt-8 rounded-2xl border dark:border-[#2A2D3E]">
+             <button onClick={() => { setLoginMethod("otp"); setOtpStep(1); setError(""); }}
+               className={`flex-1 py-3 rounded-[14px] text-[10px] font-black uppercase tracking-widest transition-all ${loginMethod === 'otp' ? 'bg-white dark:bg-[#1E242E] shadow-xl text-[#16A34A]' : 'text-gray-400 hover:text-gray-600'}`}>
+                OTP Code
+             </button>
+             <button onClick={() => { setLoginMethod("password"); setError(""); }}
+               className={`flex-1 py-3 rounded-[14px] text-[10px] font-black uppercase tracking-widest transition-all ${loginMethod === 'password' ? 'bg-white dark:bg-[#1E242E] shadow-xl text-[#16A34A]' : 'text-gray-400 hover:text-gray-600'}`}>
+                Password
+             </button>
+          </div>
 
-          {/* Step 1: Mobile Number */}
-          {otpStep === 1 && (
-            <form onSubmit={handleSendOtp} className="px-10 py-12">
-              <div className="text-center mb-10">
-                <h2
-                  className="text-2xl font-black tracking-widest uppercase m-0 leading-none"
-                  style={{ color: textPrimary }}
-                >
-                  Welcome Back
-                </h2>
-                <p
-                  className="text-[11px] mt-4 font-bold uppercase tracking-[0.2em] opacity-60"
-                  style={{ color: textSecondary }}
-                >
-                  Please authenticate to access the grid
-                </p>
+          <div className="px-10 py-8">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-black tracking-tighter uppercase m-0 leading-none" style={{ color: textPrimary }}>
+                DICE <span className="text-emerald-500">PORTAL</span>
+              </h2>
+              <p className="text-[9px] mt-4 font-black uppercase tracking-[0.3em] opacity-40" style={{ color: textSecondary }}>
+                Digital Identity & Certification Ecosystem
+              </p>
+            </div>
+
+            {error && (
+              <div className="flex items-start gap-2 bg-red-500/10 text-red-500 px-4 py-3 rounded-2xl mb-8 text-xs border border-red-500/20 font-bold uppercase tracking-wider">
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" /> {error}
               </div>
-
-              {/* Alerts */}
-              {error && (
-                <div className="flex items-start gap-2 bg-red-500/10 text-red-500 px-4 py-3 rounded-2xl mb-8 text-xs border border-red-500/20 font-bold uppercase tracking-wider">
-                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                  {error}
-                </div>
-              )}
-              {success && (
-                <div className="flex items-center gap-2 bg-emerald-500/10 text-emerald-500 px-4 py-3 rounded-2xl mb-8 text-xs border border-emerald-500/20 font-bold uppercase tracking-wider">
-                  <CheckCircle className="w-4 h-4 shrink-0" />
-                  {success}
-                </div>
-              )}
-
-              <div className="mb-8">
-                <label
-                  className="block text-[10px] font-black uppercase tracking-widest mb-4 ml-1"
-                  style={{ color: textSecondary }}
-                >
-                  Mobile Access Key
-                </label>
-                <div className="relative flex items-center group">
-                  <span className="absolute left-5 text-sm font-black text-[#16A34A] select-none">+91</span>
-                  <input
-                    type="tel"
-                    maxLength={10}
-                    placeholder="10-digit mobile number"
-                    value={mobile}
-                    onChange={(e) => { setMobile(e.target.value.replace(/\D/g, "")); setError(""); }}
-                    className="w-full pl-[60px] pr-4 h-16 outline-none rounded-2xl text-base font-black transition-all duration-300 focus:ring-2 focus:ring-[#16A34A]/30"
-                    style={{
-                      backgroundColor: inputBg,
-                      border: `1px solid ${inputBorder}`,
-                      color: textPrimary,
-                    }}
-                    required
-                    autoFocus
-                  />
-                </div>
+            )}
+            {success && (
+              <div className="flex items-center gap-2 bg-emerald-500/10 text-emerald-500 px-4 py-3 rounded-2xl mb-8 text-xs border border-emerald-500/20 font-bold uppercase tracking-wider">
+                <CheckCircle className="w-4 h-4 shrink-0" /> {success}
               </div>
+            )}
 
-              {/* REQUEST OTP — Deep Forest Green */}
-              <button
-                type="submit"
-                disabled={otpLoading || mobile.length !== 10}
-                className="w-full h-16 text-xs text-white font-black rounded-2xl flex items-center justify-center gap-3 transition-all duration-300 disabled:opacity-50 disabled:pointer-events-none uppercase tracking-[0.2em]"
-                style={{
-                  backgroundColor: '#14532D',
-                  boxShadow: '0 8px 24px -4px rgba(20,83,45,0.4)',
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#166534'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#14532D'; }}
-              >
-                {otpLoading ? <><Loader2 className="w-5 h-5 animate-spin" /> SYNCHRONIZING...</> : <><RefreshCw className="w-4 h-4" /> REQUEST OTP</>}
-              </button>
+            {/* OTP FLOW */}
+            {loginMethod === 'otp' && (
+              <>
+                {otpStep === 1 ? (
+                  <form onSubmit={handleSendOtp} className="space-y-8">
+                    <div>
+                      <label className="block text-[10px] font-black uppercase tracking-widest mb-4 ml-1" style={{ color: textSecondary }}>Your Email</label>
+                      <div className="relative group">
+                        <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-[#16A34A]" />
+                        <input type="email" placeholder="name@company.com" value={email}
+                          onChange={(e) => { setEmail(e.target.value); setError(""); }}
+                          className="w-full pl-[60px] pr-4 h-16 outline-none rounded-2xl text-base font-black transition-all duration-300 focus:ring-2 focus:ring-[#16A34A]/30"
+                          style={{ backgroundColor: inputBg, border: `1px solid ${inputBorder}`, color: textPrimary }} required autoFocus />
+                      </div>
+                    </div>
+                    <button type="submit" disabled={loading || !email.includes('@')}
+                      className="w-full h-16 text-xs text-white font-black rounded-2xl flex items-center justify-center gap-3 transition-all duration-300 disabled:opacity-50 uppercase tracking-[0.2em]"
+                      style={{ backgroundColor: '#14532D', boxShadow: '0 8px 24px -4px rgba(20,83,45,0.4)' }}>
+                      {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+                      {loading ? "SYNCHRONIZING..." : "SEND EMAIL OTP"}
+                    </button>
+                  </form>
+                ) : (
+                  <form onSubmit={handleVerifyOtp} className="space-y-8">
+                     <div className="mb-8">
+                        <OtpBoxInput value={otpCode} onChange={setOtpCode} key={resendKey} isDark={isDark} />
+                     </div>
+                     <button type="submit" disabled={loading || otpCode.length < 6}
+                        className="w-full h-16 text-xs text-white font-black rounded-2xl flex items-center justify-center gap-3 transition-all duration-300 disabled:opacity-50 uppercase tracking-[0.2em]"
+                        style={{ backgroundColor: '#14532D', boxShadow: '0 8px 24px -4px rgba(20,83,45,0.4)' }}>
+                        {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                        {loading ? "VERIFYING..." : "VERIFY & SIGN IN"}
+                     </button>
+                     <div className="mt-8 text-center text-xs">
+                        <ResendTimer key={resendKey} onResend={handleResend} loading={loading} isDark={isDark} />
+                        <button type="button" onClick={() => setOtpStep(1)} className="mt-3 text-[#16A34A] font-black uppercase tracking-widest hover:underline block mx-auto">Change Email</button>
+                     </div>
+                  </form>
+                )}
+              </>
+            )}
 
-              <div
-                className="mt-10 text-center pt-8"
-                style={{ borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0'}` }}
-              >
-                <p
-                  className="text-[11px] font-bold uppercase tracking-widest"
-                  style={{ color: textMuted }}
-                >
-                  New to Sanyog?{" "}
-                  <Link to="/register" className="text-[#16A34A] font-black hover:text-emerald-500 transition-colors">
-                    CREATE ACCOUNT
-                  </Link>
-                </p>
-              </div>
-            </form>
-          )}
-
-          {/* Step 2: Verification */}
-          {otpStep === 2 && (
-            <form onSubmit={handleVerifyOtp} className="px-10 py-12">
-              <div className="text-center mb-10 relative">
-                <button
-                  type="button"
-                  onClick={() => { setOtpStep(1); setError(""); setOtpCode(""); }}
-                  className="absolute left-0 top-1.5 transition-colors p-1 rounded-lg"
-                  style={{ color: textSecondary }}
-                  aria-label="Back"
-                >
-                  <ArrowLeft className="w-5 h-5" />
-                </button>
-                <h2
-                  className="text-2xl font-black tracking-widest uppercase m-0 leading-none"
-                  style={{ color: textPrimary }}
-                >
-                  Verify OTP
-                </h2>
-                <p
-                  className="text-[11px] mt-4 font-bold uppercase tracking-[0.2em] opacity-60"
-                  style={{ color: textSecondary }}
-                >
-                  Code sent to <span className="text-[#16A34A]">+91 {mobile}</span>
-                </p>
-              </div>
-
-              {error && (
-                <div className="flex items-start gap-2 bg-red-500/10 text-red-500 px-4 py-3 rounded-2xl mb-8 text-xs border border-red-500/20 font-bold uppercase tracking-wider">
-                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                  {error}
-                </div>
-              )}
-              {success && (
-                <div className="flex items-center gap-2 bg-emerald-500/10 text-emerald-500 px-4 py-3 rounded-2xl mb-8 text-xs border border-emerald-500/20 font-bold uppercase tracking-wider">
-                  <CheckCircle className="w-4 h-4 shrink-0" />
-                  {success}
-                </div>
-              )}
-
-              <div className="mb-8">
-                <OtpBoxInput value={otpCode} onChange={setOtpCode} key={resendKey} isDark={isDark} />
-              </div>
-
-              <button
-                type="submit"
-                disabled={otpLoading || otpCode.length < 6}
-                className="w-full h-16 text-xs text-white font-black rounded-2xl flex items-center justify-center gap-3 transition-all duration-300 disabled:opacity-50 disabled:pointer-events-none uppercase tracking-[0.2em]"
-                style={{
-                  backgroundColor: '#14532D',
-                  boxShadow: '0 8px 24px -4px rgba(20,83,45,0.4)',
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#166534'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#14532D'; }}
-              >
-                {otpLoading ? <><Loader2 className="w-5 h-5 animate-spin" /> VERIFYING...</> : <><CheckCircle className="w-4 h-4" /> VERIFY & SIGN IN</>}
-              </button>
-
-              <div className="mt-8 transition-opacity text-center">
-                <ResendTimer key={resendKey} onResend={handleResend} loading={otpLoading} isDark={isDark} />
-              </div>
-            </form>
-          )}
+            {/* PASSWORD FLOW */}
+            {loginMethod === 'password' && (
+              <form onSubmit={handlePasswordLogin} className="space-y-6">
+                  <div>
+                    <label className="block text-[10px] font-black uppercase tracking-widest mb-4 ml-1" style={{ color: textSecondary }}>Your Email</label>
+                    <div className="relative">
+                       <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-[#16A34A]" />
+                       <input type="email" placeholder="name@company.com" value={email}
+                         onChange={(e) => { setEmail(e.target.value); setError(""); }}
+                         className="w-full pl-[60px] pr-4 h-16 outline-none rounded-2xl text-base font-black transition-all focus:ring-2 focus:ring-[#16A34A]/30"
+                         style={{ backgroundColor: inputBg, border: `1px solid ${inputBorder}`, color: textPrimary }} required />
+                    </div>
+                 </div>
+                  <div>
+                    <label className="block text-[10px] font-black uppercase tracking-widest mb-4 ml-1" style={{ color: textSecondary }}>Password</label>
+                    <div className="relative">
+                       <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-[#16A34A]" />
+                       <input type={showPassword ? "text" : "password"} placeholder="••••••••" value={password}
+                         onChange={(e) => { setPassword(e.target.value); setError(""); }}
+                         className="w-full pl-[60px] pr-14 h-16 outline-none rounded-2xl text-base font-black transition-all focus:ring-2 focus:ring-[#16A34A]/30"
+                         style={{ backgroundColor: inputBg, border: `1px solid ${inputBorder}`, color: textPrimary }} required />
+                       <button type="button" onClick={() => setShowPassword(!showPassword)}
+                         className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer">
+                          {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                       </button>
+                    </div>
+                 </div>
+                 <button type="submit" disabled={loading}
+                    className="w-full h-16 text-xs text-white font-black rounded-2xl flex items-center justify-center gap-3 transition-all duration-300 disabled:opacity-50 uppercase tracking-[0.2em]"
+                    style={{ backgroundColor: '#14532D', boxShadow: '0 8px 24px -4px rgba(20,83,45,0.4)' }}>
+                    {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Key className="w-4 h-4" />}
+                    {loading ? "AUTHENTICATING..." : "SIGN IN"}
+                 </button>
+              </form>
+            )}
+            
+            <div className="mt-10 text-center pt-8" style={{ borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0'}` }}>
+              <p className="text-[11px] font-bold uppercase tracking-widest" style={{ color: textMuted }}>
+                New Partner?{" "}
+                <Link to="/register" className="text-[#16A34A] font-black hover:text-emerald-500 transition-colors">REGISTER NOW</Link>
+              </p>
+            </div>
+          </div>
         </div>
-
-        <div className="mt-10 mb-4 text-center z-10 w-full relative">
-          <p
-            className="text-[11px] font-bold uppercase tracking-widest"
-            style={{ color: textMuted }}
-          >
-            © {new Date().getFullYear()} Sanyog Conformity Solutions
-          </p>
-        </div>
-
+        <p className="mt-10 text-[11px] font-bold uppercase tracking-widest text-center" style={{ color: textMuted }}>© {new Date().getFullYear()} Sanyog Conformity Solutions</p>
       </div>
     </div>
   );

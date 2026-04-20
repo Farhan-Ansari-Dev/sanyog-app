@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useTheme } from "../context/ThemeContext";
 import { Shield, User, Mail, Lock, Phone, Building2, Globe, Eye, EyeOff, Loader2, Check, AlertCircle, ArrowRight, ArrowLeft, Sun, Moon } from "lucide-react";
 import API from "../services/api";
 
@@ -10,36 +11,12 @@ const countries = [
 
 export default function Register() {
   const navigate = useNavigate();
+  const { isDark, toggleTheme } = useTheme();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  const [isDark, setIsDark] = useState(true);
-
-  useEffect(() => {
-    const saved = localStorage.getItem('theme');
-    if (saved === 'light') {
-      document.documentElement.classList.remove('dark');
-      setIsDark(false);
-    } else {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-      setIsDark(true);
-    }
-  }, []);
-
-  const toggleTheme = () => {
-    if (isDark) {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-      setIsDark(false);
-    } else {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-      setIsDark(true);
-    }
-  };
 
   const [form, setForm] = useState({
     name: "", email: "", password: "", confirmPassword: "",
@@ -80,14 +57,19 @@ export default function Register() {
     setLoading(true);
     setError("");
     try {
+      // Backend now prioritizes email. mobile is optional or handled later.
       const { data } = await API.post("/auth/register", {
-        name: form.name, email: form.email, password: form.password,
-        mobile: form.mobile, company: form.company, country: form.country,
+        name: form.name, 
+        email: form.email.toLowerCase(), 
+        password: form.password,
+        company: form.company,
+        country: form.country,
+        mobile: form.mobile,
       });
       localStorage.setItem("token", data.token);
       navigate("/dashboard");
     } catch (err) {
-      setError(err.response?.data?.message || "Registration failed. Please try again.");
+      setError(err.response?.data?.message || err.response?.data?.error || "Registration failed.");
     } finally {
       setLoading(false);
     }

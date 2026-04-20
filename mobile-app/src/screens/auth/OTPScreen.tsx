@@ -31,12 +31,15 @@ const OTP_LENGTH = 6;
 export default function OTPScreen({ navigation, route }: Props) {
   const t = useTheme();
   const setAuth = useAppStore((s: any) => s.setAuth);
-  const phone = route.params?.mobile || '9876543210';
-  const maskedPhone = phone.slice(0, 2) + '****' + phone.slice(-4);
+  const email = route.params?.email || 'user@example.com';
+  
+  // Mask email: u***r@example.com
+  const [name, domain] = email.split('@');
+  const maskedEmail = name[0] + '****' + name[name.length - 1] + '@' + domain;
 
   const [otp, setOtp] = useState<string[]>(new Array(OTP_LENGTH).fill(''));
   const [loading, setLoading] = useState(false);
-  const [countdown, setCountdown] = useState(30);
+  const [countdown, setCountdown] = useState(60);
   const [focusedIndex, setFocusedIndex] = useState(0);
   const inputRefs = useRef<Array<TextInput | null>>([]);
 
@@ -87,14 +90,14 @@ export default function OTPScreen({ navigation, route }: Props) {
     if (code.length !== OTP_LENGTH) return;
     setLoading(true);
     try {
-      // Mock bypass for native testing
+      // Mock bypass 
       if (code === '123456') {
-        const mockUser = { name: 'Demo User', email: 'demo@sanyog.com', mobile: phone };
-        setAuth('mock-jwt-token-123456', mockUser);
+        const res = await api.post('/auth/verify-otp', { email, code });
+        setAuth(res.data.token, res.data.user);
         return;
       }
       
-      const res = await api.post('/auth/verify-otp', { mobile: phone, code });
+      const res = await api.post('/auth/verify-otp', { email, code });
       setAuth(res.data.token, res.data.user);
     } catch (e: any) {
       Alert.alert('Error', e?.response?.data?.error || 'Invalid OTP');
@@ -103,10 +106,15 @@ export default function OTPScreen({ navigation, route }: Props) {
     }
   };
 
-  const handleResend = () => {
-    setCountdown(30);
-    setOtp(new Array(OTP_LENGTH).fill(''));
-    setTimeout(() => inputRefs.current[0]?.focus(), 200);
+  const handleResend = async () => {
+    try {
+      await api.post('/auth/send-otp', { email });
+      setCountdown(60);
+      setOtp(new Array(OTP_LENGTH).fill(''));
+      setTimeout(() => inputRefs.current[0]?.focus(), 200);
+    } catch (e) {
+      Alert.alert('Error', 'Failed to resend OTP');
+    }
   };
 
   const isFilled = otp.every((d) => d !== '');
@@ -152,7 +160,7 @@ export default function OTPScreen({ navigation, route }: Props) {
                 marginBottom: spacing.xl,
               }}
             >
-              <Ionicons name="chatbox-ellipses" size={32} color="#10B981" />
+              <Ionicons name="mail-open-outline" size={32} color="#10B981" />
             </View>
             <Text
               style={{
@@ -162,7 +170,7 @@ export default function OTPScreen({ navigation, route }: Props) {
                 letterSpacing: -0.5,
               }}
             >
-              Verify OTP
+              Verify Email
             </Text>
             <Text
               style={{
@@ -173,7 +181,7 @@ export default function OTPScreen({ navigation, route }: Props) {
               }}
             >
               We sent a 6-digit code to{'\n'}
-              <Text style={{ fontWeight: '700', color: t.textSecondary }}>+91 {maskedPhone}</Text>
+              <Text style={{ fontWeight: '700', color: t.textSecondary }}>{maskedEmail}</Text>
             </Text>
           </View>
 

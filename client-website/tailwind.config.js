@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
   darkMode: 'class',
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
@@ -8,17 +8,27 @@ module.exports = {
         sans: ['Inter', 'sans-serif'],
       },
       colors: {
+        lightBg: '#F8FAFC',
+        lightCard: '#FFFFFF',
+        lightBorder: '#E2E8F0',
+        darkBg: '#1E293B',
+        darkCard: '#263445',
+        darkBorder: '#334155',
         primary: {
-          DEFAULT: '#16A34A', // Sanyog Green 600
-          light: '#22C55E',   // Green 500
-          50: '#F0FDF4',
-          100: '#DCFCE7',
-          200: '#BBF7D0',
-          600: '#16A34A',
-          700: '#15803D',
-          800: '#166534',
-          900: '#14532D',
+          light: '#22C55E',
+          DEFAULT: '#16A34A',
+          dark: '#15803D',
         },
+        textMainLight: '#0F172A',
+        textSubLight: '#475569',
+        textMainDark: '#E2E8F0',
+        textSubDark: '#94A3B8',
+        success: '#16A34A',
+        error: '#EF4444',
+        warning: '#F59E0B',
+      },
+      borderRadius: {
+        'xl': '12px',
       },
       animation: {
         'fade-in': 'fadeIn 0.3s ease-in-out',

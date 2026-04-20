@@ -4,7 +4,7 @@ const { SERVICE_CATALOG } = require('../services/serviceCatalog');
 
 router.get('/services', async (req, res) => {
   try {
-    let services = await Service.find({ isActive: true }).sort({ createdAt: 1 });
+    let services = await Service.find({ isActive: true }).sort({ priority: -1, createdAt: 1 });
     
     // Auto-seed if empty
     if (services.length === 0) {
