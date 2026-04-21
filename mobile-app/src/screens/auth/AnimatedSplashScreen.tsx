@@ -11,55 +11,62 @@ export default function AnimatedSplashScreen({ navigation }: any) {
   
   // Animation values
   const rotateY = useRef(new Animated.Value(0)).current;
-  const scale = useRef(new Animated.Value(0.3)).current;
+  const scale = useRef(new Animated.Value(0)).current;
   const fadeText = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(20)).current;
+  const glowAnim = useRef(new Animated.Value(0.2)).current;
 
   useEffect(() => {
-    // Sequence of animations
+    // 1. Independent Pulsing Glow
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(glowAnim, { toValue: 1, duration: 1500, useNativeDriver: true }),
+        Animated.timing(glowAnim, { toValue: 0.2, duration: 1500, useNativeDriver: true })
+      ])
+    ).start();
+
+    // 2. Synchronized Hero Sequence
     Animated.sequence([
-      // 1. Zoom and rotate cube
+      // Stage A: Elastic Zoom & Spin
       Animated.parallel([
         Animated.spring(scale, {
           toValue: 1,
-          friction: 4,
+          tension: 25,
+          friction: 6,
           useNativeDriver: true,
         }),
-        Animated.loop(
-          Animated.timing(rotateY, {
-            toValue: 1,
-            duration: 1500,
-            useNativeDriver: true,
-          }),
-          { iterations: 2 }
-        )
+        Animated.spring(rotateY, {
+          toValue: 1,
+          tension: 20,
+          friction: 7,
+          useNativeDriver: true,
+        })
       ]),
-      // 2. Fade in text
+      // Stage B: Glide Typography up seamlessly
       Animated.parallel([
         Animated.timing(fadeText, {
           toValue: 1,
-          duration: 800,
+          duration: 600,
           useNativeDriver: true,
         }),
-        Animated.timing(translateY, {
+        Animated.spring(translateY, {
           toValue: 0,
-          duration: 800,
+          tension: 40,
+          friction: 8,
           useNativeDriver: true,
         })
-      ])
-    ]).start();
-
-    // Navigate to Onboarding after 3.5 seconds
-    const timer = setTimeout(() => {
+      ]),
+      // Stage C: Brief pause to admire, then navigate exactly when finished
+      Animated.delay(1200)
+    ]).start(() => {
       navigation.replace('Onboarding');
-    }, 3500);
+    });
 
-    return () => clearTimeout(timer);
   }, []);
 
   const spin = rotateY.interpolate({
     inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
+    outputRange: ['540deg', '0deg'], // Spans 1.5 physically satisfying rotations backwards into resting place
   });
 
   return (
@@ -67,7 +74,7 @@ export default function AnimatedSplashScreen({ navigation }: any) {
       <StatusBar barStyle="light-content" backgroundColor="#0A0E1A" />
       
       {/* Decorative background glow */}
-      <View style={styles.glow} />
+      <Animated.View style={[styles.glow, { opacity: glowAnim, transform: [{ scale: glowAnim.interpolate({ inputRange: [0.2, 1], outputRange: [0.8, 1.2] }) }] }]} />
 
       {/* Animated Certification Block */}
       <Animated.View 
