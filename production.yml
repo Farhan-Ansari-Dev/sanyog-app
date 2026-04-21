@@ -1,0 +1,67 @@
+name: DICE Sanyog - Production Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code Repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js Environment
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    # 1. BUILD WEBSITES (Isolating Node_Modules)
+    - name: Build Web Client 
+      working-directory: ./client-website
+      run: |
+        npm ci
+        npm run build
+
+    - name: Build Admin Panel
+      working-directory: ./admin-panel
+      run: |
+        npm ci
+        npm run build
+
+    # 2. SYNC TO EC2 SECURELY VIA SSH
+    - name: Deploy to AWS EC2 Native Node
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_PRIVATE_KEY }}
+        script: |
+          cd /var/www/sanyog-app
+          
+          # Pull latest branch safely
+          git stash
+          git pull origin main
+
+          # Update Backend Dependencies
+          cd backend
+          npm ci --production
+          
+          # Execute Zero-Downtime Daemon Restart
+          pm2 reload ecosystem.config.js --update-env
+
+          # Compile and Sweep static files to Nginx bounds
+          echo "Syncing UI builds..."
+          cd ../client-website
+          npm ci
+          npm run build
+          sudo rsync -av --delete dist/ /var/www/portal/dist/
+
+          cd ../admin-panel
+          npm ci
+          npm run build
+          sudo rsync -av --delete dist/ /var/www/admin/dist/
+          
+          echo "Live Deployment Finalized."
