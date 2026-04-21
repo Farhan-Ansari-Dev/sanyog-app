@@ -18,6 +18,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../hooks/useTheme';
 import PrimaryButton from '../../components/common/PrimaryButton';
 import api from '../../services/api';
+import { useAppStore } from '../../store/useAppStore';
 import { spacing, typography, borderRadius } from '../../theme';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { AuthStackParamList } from '../../types';
@@ -27,10 +28,25 @@ type Props = NativeStackScreenProps<AuthStackParamList, 'Login'>;
 export default function LoginScreen({ navigation }: Props) {
   const t = useTheme();
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const isValid = email.includes('@') && email.includes('.');
+  const store = useAppStore();
 
-  const handleSend = async () => {
+  const handleLogin = async () => {
+    if (!isValid || password.length < 6) return;
+    setLoading(true);
+    try {
+      const res = await api.post('/auth/login-password', { email, password });
+      store.setAuth(res.data.token, res.data.user);
+    } catch (e: any) {
+      Alert.alert('Error', e?.response?.data?.error || 'Invalid email or password');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSendOTP = async () => {
     if (!isValid) return;
     setLoading(true);
     try {
@@ -145,22 +161,88 @@ export default function LoginScreen({ navigation }: Props) {
             )}
           </View>
 
-          {/* Mobile Login Option (Commented for later) */}
-          {/* 
-          <Pressable style={{ marginBottom: spacing.lg }}>
-            <Text style={{ color: t.primary, fontWeight: '600' }}>Login with Mobile Number</Text>
-          </Pressable> 
-          */}
+          {/* Password Input */}
+          <Text
+            style={{
+              fontSize: 11,
+              fontWeight: '800',
+              color: t.textMuted,
+              letterSpacing: 1.5,
+              textTransform: 'uppercase',
+              marginBottom: spacing.sm,
+            }}
+          >
+            Password
+          </Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              backgroundColor: t.inputBg,
+              borderRadius: borderRadius.lg,
+              borderWidth: 1.5,
+              borderColor: password.length > 5 ? t.primary + '60' : t.border,
+              paddingHorizontal: spacing.base,
+              marginBottom: spacing.xl,
+              elevation: 1,
+              shadowColor: t.shadow,
+              shadowOffset: { width: 0, height: 1 },
+              shadowOpacity: 0.05,
+              shadowRadius: 2,
+            }}
+          >
+            <Ionicons name="lock-closed-outline" size={20} color={t.textMuted} style={{ marginRight: spacing.sm }} />
+            <TextInput
+              value={password}
+              onChangeText={setPassword}
+              placeholder="Enter your password"
+              placeholderTextColor={t.placeholder}
+              secureTextEntry
+              style={{
+                flex: 1,
+                fontSize: 16,
+                color: t.text,
+                fontWeight: '500',
+                paddingVertical: Platform.OS === 'ios' ? 16 : 14,
+              }}
+            />
+            {password.length > 5 && (
+              <Ionicons name="checkmark-circle" size={22} color="#10B981" />
+            )}
+          </View>
 
-          {/* Send OTP */}
+          {/* Action Buttons */}
           <PrimaryButton
-            title="Get OTP on Email"
-            onPress={handleSend}
+            title="Sign In"
+            onPress={handleLogin}
             loading={loading}
-            disabled={!isValid}
-            icon="paper-plane-outline"
+            disabled={!isValid || password.length < 6}
+            icon="log-in-outline"
             size="lg"
           />
+
+          <View style={{ alignItems: 'center', marginVertical: spacing.lg }}>
+            <Text style={{ color: t.textMuted, fontSize: 13, fontWeight: '600' }}>OR</Text>
+          </View>
+
+          <Pressable 
+            onPress={handleSendOTP} 
+            disabled={!isValid || loading}
+            style={({ pressed }) => ({
+              backgroundColor: t.card,
+              paddingVertical: 14,
+              borderRadius: borderRadius.lg,
+              borderWidth: 1,
+              borderColor: t.primary + '40',
+              alignItems: 'center',
+              opacity: pressed || !isValid ? 0.6 : 1,
+              flexDirection: 'row',
+              justifyContent: 'center'
+            })}
+          >
+             <Ionicons name="paper-plane-outline" size={18} color={t.primary} style={{ marginRight: 8 }} />
+             <Text style={{ color: t.primary, fontWeight: '700', fontSize: 15 }}>Log in with OTP</Text>
+          </Pressable>
 
           <View style={{ alignItems: 'center', marginTop: spacing.xl }}>
             <Text style={{ color: t.textMuted, marginBottom: spacing.xs }}>New Partner?</Text>
