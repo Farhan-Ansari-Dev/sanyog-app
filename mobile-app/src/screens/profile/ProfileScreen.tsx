@@ -46,24 +46,6 @@ export default function ProfileScreen({ navigation }: any) {
     },
   ];
 
-  return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: t.bg }}>
-      <StatusBar barStyle={t.statusBar} backgroundColor={t.bg} />
-      <ScrollView
-        contentContainerStyle={{ paddingHorizontal: spacing.lg, paddingBottom: spacing['3xl'] }}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Header */}
-        <View style={{ marginTop: spacing.lg, marginBottom: spacing.xl }}>
-          <Text
-            style={{
-              fontSize: typography['3xl'],
-              fontWeight: typography.black,
-              color: t.text,
-              letterSpacing: typography.tighter,
-            }}
-          >
-            Profile
   const handleUploadPhoto = async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
@@ -84,6 +66,27 @@ export default function ProfileScreen({ navigation }: any) {
       Toast.show({ type: 'error', text1: 'Upload Failed', text2: err.message });
     }
   };
+
+  return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: t.bg }}>
+      <StatusBar barStyle={t.statusBar} backgroundColor={t.bg} />
+      <ScrollView
+        contentContainerStyle={{ paddingHorizontal: spacing.lg, paddingBottom: spacing['3xl'] }}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Header */}
+        <View style={{ marginTop: spacing.lg, marginBottom: spacing.xl }}>
+          <Text
+            style={{
+              fontSize: typography['3xl'],
+              fontWeight: typography.black,
+              color: t.text,
+              letterSpacing: typography.tighter,
+            }}
+          >
+            Profile
+          </Text>
+        </View>
 
         {/* User Card */}
         <GlassCard variant="elevated" style={{ marginBottom: spacing.xl }}>
