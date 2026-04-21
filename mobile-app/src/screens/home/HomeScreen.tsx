@@ -16,6 +16,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../hooks/useTheme';
 import { useAppStore } from '../../store/useAppStore';
+import { Image } from 'react-native';
 import GlassCard from '../../components/common/GlassCard';
 import SectionHeader from '../../components/common/SectionHeader';
 import StatusBadge from '../../components/common/StatusBadge';
@@ -112,21 +113,24 @@ export default function HomeScreen({ navigation }: any) {
             marginBottom: spacing.xl,
           }}
         >
-          <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 13, color: t.textMuted, fontWeight: '500' }}>
-              Welcome back,
-            </Text>
-            <Text
-              style={{
-                fontSize: 26,
-                fontWeight: '900',
-                color: t.text,
-                letterSpacing: -0.5,
-                marginTop: 2,
-              }}
-            >
-              {store.user?.name?.split(' ')[0] || 'User'} 👋
-            </Text>
+          <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+            <Pressable onPress={() => navigation.navigate('ProfileMain')} style={{ marginRight: spacing.sm }}>
+              {store.user?.avatar ? (
+                <Image source={{ uri: store.user.avatar }} style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: t.borderSubtle }} />
+              ) : (
+                <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: t.primary + '20', justifyContent: 'center', alignItems: 'center' }}>
+                  <Ionicons name="person" size={20} color={t.primary} />
+                </View>
+              )}
+            </Pressable>
+            <View>
+              <Text style={{ fontSize: 13, color: t.textMuted, fontWeight: '500' }}>
+                Welcome back,
+              </Text>
+              <Text style={{ fontSize: 24, fontWeight: '900', color: t.text, letterSpacing: -0.5, marginTop: 2 }}>
+                {store.user?.name?.split(' ')[0] || 'User'}
+              </Text>
+            </View>
           </View>
 
           <Pressable
@@ -225,7 +229,7 @@ export default function HomeScreen({ navigation }: any) {
           <View style={{ paddingHorizontal: spacing.lg, flexDirection: 'row' }}>
             {store.news.length > 0 ? (
               store.news.map((item: any) => (
-                <GlassCard key={item.id} style={{ width: width * 0.75, marginRight: spacing.md, backgroundColor: '#F8FAFC' }}>
+                <GlassCard key={item.id} style={{ width: width * 0.75, marginRight: spacing.md, backgroundColor: t.card }}>
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: spacing.xs }}>
                     <View style={{ 
                       paddingHorizontal: 8, 
@@ -250,7 +254,7 @@ export default function HomeScreen({ navigation }: any) {
                 </GlassCard>
               ))
             ) : (
-              <GlassCard style={{ width: width * 0.75, marginRight: spacing.md, backgroundColor: '#F8FAFC' }}>
+              <GlassCard style={{ width: width * 0.75, marginRight: spacing.md, backgroundColor: t.card }}>
                 <Text style={{ fontSize: 13, color: t.textMuted }}>Fetching latest updates...</Text>
               </GlassCard>
             )}

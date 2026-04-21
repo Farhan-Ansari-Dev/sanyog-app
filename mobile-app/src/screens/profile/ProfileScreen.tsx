@@ -2,8 +2,12 @@
  * ProfileScreen – User profile, settings, and account management
  */
 import React from 'react';
-import { View, Text, ScrollView, SafeAreaView, StatusBar, Pressable, Switch } from 'react-native';
+import { View, Text, ScrollView, SafeAreaView, StatusBar, Pressable, Switch, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as DocumentPicker from 'expo-document-picker';
+import * as FileSystem from 'expo-file-system';
+import Toast from 'react-native-toast-message';
+import api from '../../services/api';
 import { useTheme } from '../../hooks/useTheme';
 import { useAppStore } from '../../store/useAppStore';
 import GlassCard from '../../components/common/GlassCard';
@@ -60,13 +64,32 @@ export default function ProfileScreen({ navigation }: any) {
             }}
           >
             Profile
-          </Text>
-        </View>
+  const handleUploadPhoto = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: 'image/*',
+        copyToCacheDirectory: true
+      });
+      if (!result.canceled && result.assets && result.assets[0]) {
+        const fileUri = result.assets[0].uri;
+        const base64 = await FileSystem.readAsStringAsync(fileUri, { encoding: FileSystem.EncodingType.Base64 });
+        const mimeType = result.assets[0].mimeType || 'image/jpeg';
+        const avatarUri = `data:${mimeType};base64,${base64}`;
+
+        const res = await api.put('/auth/me', { avatar: avatarUri });
+        store.setAuth(store.token!, res.data);
+        Toast.show({ type: 'success', text1: 'Profile Avatar Updated' });
+      }
+    } catch (err: any) {
+      Toast.show({ type: 'error', text1: 'Upload Failed', text2: err.message });
+    }
+  };
 
         {/* User Card */}
         <GlassCard variant="elevated" style={{ marginBottom: spacing.xl }}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <View
+            <Pressable
+              onPress={handleUploadPhoto}
               style={{
                 width: 60,
                 height: 60,
@@ -75,18 +98,26 @@ export default function ProfileScreen({ navigation }: any) {
                 justifyContent: 'center',
                 alignItems: 'center',
                 marginRight: spacing.base,
+                overflow: 'hidden',
               }}
             >
-              <Text
-                style={{
-                  fontSize: typography['2xl'],
-                  fontWeight: typography.black,
-                  color: t.primary,
-                }}
-              >
-                {user?.name?.charAt(0) || 'U'}
-              </Text>
-            </View>
+              {user?.avatar ? (
+                <Image source={{ uri: user.avatar }} style={{ width: '100%', height: '100%' }} />
+              ) : (
+                <Text
+                  style={{
+                    fontSize: typography['2xl'],
+                    fontWeight: typography.black,
+                    color: t.primary,
+                  }}
+                >
+                  {user?.name?.charAt(0) || 'U'}
+                </Text>
+              )}
+              <View style={{ position: 'absolute', bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', width: '100%', alignItems: 'center', paddingVertical: 2 }}>
+                <Ionicons name="camera" size={12} color="#FFF" />
+              </View>
+            </Pressable>
             <View style={{ flex: 1 }}>
               <Text
                 style={{
@@ -121,6 +152,7 @@ export default function ProfileScreen({ navigation }: any) {
                 alignItems: 'center',
                 borderWidth: 1,
                 borderColor: t.borderSubtle,
+                marginLeft: i > 0 ? spacing.sm : 0
               }}
             >
               <Ionicons name={stat.icon} size={20} color={t.primary} style={{ marginBottom: spacing.xs }} />
