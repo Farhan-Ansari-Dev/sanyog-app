@@ -9,6 +9,7 @@ import { useTheme } from '../../hooks/useTheme';
 import { useAppStore } from '../../store/useAppStore';
 import PrimaryButton from '../../components/common/PrimaryButton';
 import GlassCard from '../../components/common/GlassCard';
+import api from '../../services/api';
 import { spacing, typography, borderRadius, palette } from '../../theme';
 import type { ServicesStackParamList, ApplicationFormData, Application } from '../../types';
 
@@ -26,6 +27,7 @@ const emptyForm: ApplicationFormData = {
 
 export default function ApplyScreen({ navigation, route }: any) {
   const t = useTheme();
+  const store = useAppStore();
   const addApplication = useAppStore((s) => s.addApplication);
   const { certId, certName } = route.params;
   const [step, setStep] = useState(1);
@@ -70,28 +72,26 @@ export default function ApplyScreen({ navigation, route }: any) {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      await new Promise((r) => setTimeout(r, 1500));
-      const newApp: Application = {
-        id: `app-${Date.now()}`,
-        certId,
-        certName,
-        categoryName: 'Pending',
-        companyName: form.companyName,
-        applicantName: form.applicantName,
-        email: form.email,
-        status: 'submitted',
-        statusHistory: [
-          { status: 'submitted', date: new Date().toISOString(), note: 'Application submitted successfully' },
-        ],
-        documents: [],
-        remarks: '',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      addApplication(newApp);
+      const formData = new FormData();
+      formData.append('serviceName', certName);
+      formData.append('serviceId', certId);
+      formData.append('companyName', form.companyName);
+      formData.append('applicantName', form.applicantName);
+      formData.append('email', form.email);
+      formData.append('city', form.city);
+      formData.append('productDescription', form.productDescription);
+
+      // Map to exact API structure natively
+      await api.post('/applications', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      // Automatically reload global store to fetch identically updated server limits
+      await store.loadApplications();
       navigation.popToTop();
-    } catch {
-      // handle error
+    } catch (e: any) {
+      console.error(e.response?.data || e);
+      // Optional fallback
     } finally {
       setLoading(false);
     }

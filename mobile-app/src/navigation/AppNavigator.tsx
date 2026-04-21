@@ -29,6 +29,7 @@ import ProfileScreen from '../screens/profile/ProfileScreen';
 import AboutScreen from '../screens/profile/AboutScreen';
 import ContactExpertScreen from '../screens/profile/ContactExpertScreen';
 import RoadmapWizardScreen from '../screens/services/RoadmapWizardScreen';
+import PlaceholderScreen from '../screens/common/PlaceholderScreen';
 
 // Types
 import type {
@@ -59,6 +60,7 @@ type MainStackParamList = {
   ContactExpert: undefined;
   Settings: undefined;
   RoadmapWizard: undefined;
+  Placeholder: { title: string };
 };
 
 const MainStack = createNativeStackNavigator<MainStackParamList>();
@@ -238,6 +240,7 @@ export function MainTabNavigator() {
       <MainStack.Screen name="About" component={AboutScreen} options={{ title: 'About Sanyog' }} />
       <MainStack.Screen name="NotifList" component={NotificationsScreen} options={{ title: 'Notifications' }} />
       <MainStack.Screen name="RoadmapWizard" component={RoadmapWizardScreen} options={{ title: 'AI Roadmap' }} />
+      <MainStack.Screen name="Placeholder" component={PlaceholderScreen} options={{ headerShown: false }} />
     </MainStack.Navigator>
   );
 }

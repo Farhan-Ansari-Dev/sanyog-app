@@ -24,24 +24,24 @@ export default function ProfileScreen({ navigation }: any) {
     {
       section: 'Account',
       items: [
-        { icon: 'person-outline', label: 'Edit Profile', onPress: () => {} },
-        { icon: 'document-text-outline', label: 'My Documents', onPress: () => {} },
-        { icon: 'card-outline', label: 'Billing & Invoices', onPress: () => {} },
+        { icon: 'person-outline', label: 'Edit Profile', onPress: () => navigation.navigate('Placeholder', { title: 'Edit Profile' }) },
+        { icon: 'document-text-outline', label: 'My Documents', onPress: () => navigation.navigate('AppsList') },
+        { icon: 'card-outline', label: 'Billing & Invoices', onPress: () => navigation.navigate('Placeholder', { title: 'Billing & Invoices' }) },
       ],
     },
     {
       section: 'Support',
       items: [
         { icon: 'chatbubble-ellipses-outline', label: 'Contact Expert', onPress: () => navigation.navigate('ContactExpert') },
-        { icon: 'help-circle-outline', label: 'Help & FAQ', onPress: () => {} },
+        { icon: 'help-circle-outline', label: 'Help & FAQ', onPress: () => navigation.navigate('Placeholder', { title: 'Help & FAQ' }) },
         { icon: 'information-circle-outline', label: 'About Sanyog', onPress: () => navigation.navigate('About') },
       ],
     },
     {
       section: 'Legal',
       items: [
-        { icon: 'shield-outline', label: 'Privacy Policy', onPress: () => {} },
-        { icon: 'document-outline', label: 'Terms of Service', onPress: () => {} },
+        { icon: 'shield-outline', label: 'Privacy Policy', onPress: () => navigation.navigate('Placeholder', { title: 'Privacy Policy' }) },
+        { icon: 'document-outline', label: 'Terms of Service', onPress: () => navigation.navigate('Placeholder', { title: 'Terms of Service' }) },
       ],
     },
   ];
