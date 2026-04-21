@@ -1,0 +1,1 @@
+ssh -i "C:\Users\Admin\Desktop\Key\sanyog-key.pem" -o StrictHostKeyChecking=no ec2-user@ec2-98-83-43-29.compute-1.amazonaws.com "sudo tar -xzf ~/backend.tar.gz -C ~/sanyog-app/ && sudo tar -xzf ~/admin.tar.gz -C /var/www/admin-panel/ && sudo tar -xzf ~/portal.tar.gz -C /var/www/portal/ && cd ~/sanyog-app/backend && npm install && pm2 restart sanyog-backend"

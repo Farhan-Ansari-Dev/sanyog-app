@@ -14,6 +14,7 @@ import { typography, spacing, borderRadius } from '../theme';
 import SplashScreen from '../screens/auth/AnimatedSplashScreen';
 import OnboardingScreen from '../screens/auth/OnboardingScreen';
 import LoginScreen from '../screens/auth/LoginScreen';
+import RegisterScreen from '../screens/auth/RegisterScreen';
 import OTPScreen from '../screens/auth/OTPScreen';
 import HomeScreen from '../screens/home/HomeScreen';
 import ServicesScreen from '../screens/services/ServicesScreen';
@@ -183,6 +184,7 @@ export function AuthNavigator() {
       <AuthStack.Screen name="Splash" component={SplashScreen} />
       <AuthStack.Screen name="Onboarding" component={OnboardingScreen} />
       <AuthStack.Screen name="Login" component={LoginScreen} />
+      <AuthStack.Screen name="Register" component={RegisterScreen} />
       <AuthStack.Screen name="OTP" component={OTPScreen} />
     </AuthStack.Navigator>
   );

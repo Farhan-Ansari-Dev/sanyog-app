@@ -162,18 +162,13 @@ export default function LoginScreen({ navigation }: Props) {
             size="lg"
           />
 
-          <Text
-            style={{
-              fontSize: 12,
-              color: t.textMuted,
-              textAlign: 'center',
-              marginTop: spacing.xl,
-              lineHeight: 18,
-            }}
-          >
-            Email OTP is currently mandatory.{'\n'}
-            Mobile registration option will be added later.
-          </Text>
+          <View style={{ alignItems: 'center', marginTop: spacing.xl }}>
+            <Text style={{ color: t.textMuted, marginBottom: spacing.xs }}>New Partner?</Text>
+            <Pressable onPress={() => navigation.navigate('Register')}>
+              <Text style={{ color: t.primary, fontWeight: '700', fontSize: 16 }}>Create an Account</Text>
+            </Pressable>
+          </View>
+
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

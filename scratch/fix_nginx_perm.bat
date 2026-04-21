@@ -1,0 +1,3 @@
+ssh -i "C:\Users\Admin\Desktop\Key\sanyog-key.pem" -o StrictHostKeyChecking=no ec2-user@ec2-98-83-43-29.compute-1.amazonaws.com "sudo chown -R ec2-user:ec2-user /var/www/portal && sudo chmod -R 755 /var/www/portal"
+ssh -i "C:\Users\Admin\Desktop\Key\sanyog-key.pem" -o StrictHostKeyChecking=no ec2-user@ec2-98-83-43-29.compute-1.amazonaws.com "sudo sed -i '/http {/a \    include /etc/nginx/mime.types;' /etc/nginx/nginx.conf"
+ssh -i "C:\Users\Admin\Desktop\Key\sanyog-key.pem" -o StrictHostKeyChecking=no ec2-user@ec2-98-83-43-29.compute-1.amazonaws.com "sudo nginx -t && sudo systemctl reload nginx"

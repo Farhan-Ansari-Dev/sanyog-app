@@ -3,7 +3,7 @@ import { useAppStore } from '../store/useAppStore';
 import Toast from 'react-native-toast-message';
 
 // Standardized environment execution
-const API_URL = 'http://localhost:5000' || 'https://api.sanyogconformity.com'; 
+const API_URL = 'https://api.sanyogconformity.com';
 
 const api = axios.create({
   baseURL: API_URL,

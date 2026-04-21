@@ -7,6 +7,7 @@ export type AuthStackParamList = {
   Splash: undefined;
   Onboarding: undefined;
   Login: undefined;
+  Register: undefined;
   OTP: { email: string };
 };
 

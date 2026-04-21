@@ -2,8 +2,8 @@
  * Sanyog Conformity – Mobile App Entry Point
  * Premium enterprise-grade certification management app
  */
-import React from 'react';
-import { View, Text, LogBox } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, LogBox, PermissionsAndroid, Platform } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import { useAppStore } from './src/store/useAppStore';
@@ -45,6 +45,18 @@ class ErrorBoundary extends React.Component<
 
 function AppContent() {
   const isAuthenticated = useAppStore((s) => s.isAuthenticated);
+
+  useEffect(() => {
+    if (Platform.OS === 'android') {
+      PermissionsAndroid.requestMultiple([
+        PermissionsAndroid.PERMISSIONS.CAMERA,
+        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
+      ]).catch(console.warn);
+    }
+  }, []);
 
   return (
     <NavigationContainer>
