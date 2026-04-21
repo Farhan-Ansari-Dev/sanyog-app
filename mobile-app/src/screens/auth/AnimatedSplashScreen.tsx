@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, Animated, StyleSheet, StatusBar, Dimensions } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../hooks/useTheme';
 import { spacing, typography } from '../../theme';
 
@@ -68,7 +69,7 @@ export default function AnimatedSplashScreen({ navigation }: any) {
       {/* Decorative background glow */}
       <View style={styles.glow} />
 
-      {/* Animated Cube (Dice) */}
+      {/* Animated Certification Block */}
       <Animated.View 
         style={[
           styles.cubeContainer,
@@ -82,22 +83,7 @@ export default function AnimatedSplashScreen({ navigation }: any) {
         ]}
       >
         <View style={styles.diceFace}>
-           {/* 5 Dots pattern for "DICE" feel */}
-           <View style={styles.dotsRow}>
-              <View style={styles.dot} />
-              <View style={[styles.dot, { opacity: 0 }]} />
-              <View style={styles.dot} />
-           </View>
-           <View style={styles.dotsRow}>
-              <View style={[styles.dot, { opacity: 0 }]} />
-              <View style={styles.dot} />
-              <View style={[styles.dot, { opacity: 0 }]} />
-           </View>
-           <View style={styles.dotsRow}>
-              <View style={styles.dot} />
-              <View style={[styles.dot, { opacity: 0 }]} />
-              <View style={styles.dot} />
-           </View>
+           <Ionicons name="shield-checkmark" size={54} color="#0A0E1A" />
         </View>
       </Animated.View>
 
@@ -134,37 +120,25 @@ const styles = StyleSheet.create({
     height: 100,
   },
   diceFace: {
-    width: 100,
-    height: 100,
+    width: 110,
+    height: 110,
     backgroundColor: '#FFFFFF',
     borderRadius: 24,
-    borderWidth: 4,
-    borderColor: '#10B981',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 18,
     elevation: 20,
-    shadowColor: '#10B981',
+    shadowColor: '#FFFFFF',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.5,
     shadowRadius: 15,
   },
-  dotsRow: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-  },
-  dot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: '#0A0E1A',
-  },
   diceText: {
-    fontSize: 32,
+    fontSize: 48,
     fontWeight: '900',
-    letterSpacing: 2,
+    letterSpacing: 4,
+    textShadowColor: 'rgba(255, 255, 255, 0.4)',
+    textShadowOffset: { width: 0, height: 4 },
+    textShadowRadius: 10,
   },
   byRow: {
     flexDirection: 'row',
