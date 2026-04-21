@@ -111,7 +111,9 @@ router.post('/', auth, upload.array('files', 10), async (req, res, next) => {
 
 // List my applications
 router.get('/my', auth, async (req, res) => {
-  const apps = await Application.find({ userEmail: req.user.email }).sort({ createdAt: -1 });
+  const apps = await Application.find({ userEmail: req.user.email })
+    .populate('documentIds')
+    .sort({ createdAt: -1 });
   return res.json(apps);
 });
 

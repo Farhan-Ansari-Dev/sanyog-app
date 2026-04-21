@@ -228,12 +228,12 @@ export const useAppStore = create<AppState>()(
         statusHistory: history,
         clientTasks,
         validUntil: validUntil.toISOString(),
-        documents: (a.documentIds || []).map((docId: string, idx: number) => ({
-          id: docId,
-          name: a.documents && a.documents[idx] ? 'Document' : `File-${idx}.pdf`,
-          type: 'pdf',
-          uploadedAt: a.createdAt,
-          size: '1 MB'
+        documents: (a.documentIds || []).map((doc: any) => ({
+          id: doc._id || doc.id,
+          name: doc.originalName || 'Document.pdf',
+          type: doc.mimeType?.split('/')[1] || 'pdf',
+          uploadedAt: doc.createdAt || a.createdAt,
+          size: doc.sizeBytes ? `${(doc.sizeBytes / 1024 / 1024).toFixed(2)} MB` : '1 MB'
         })),
         remarks: a.remarks || '',
         createdAt: a.createdAt,
