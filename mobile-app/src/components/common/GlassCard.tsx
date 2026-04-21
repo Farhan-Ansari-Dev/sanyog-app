@@ -18,22 +18,21 @@ export default function GlassCard({ children, onPress, style, variant = 'default
 
   const cardStyle: ViewStyle = {
     backgroundColor: t.card,
-    borderRadius: borderRadius.lg,
-    padding: spacing.base,
+    borderRadius: borderRadius.xl,  // Upgraded soft corners
+    padding: spacing.lg,            // Upgraded padding bounds
     borderWidth: 1,
     borderColor: t.borderSubtle,
-    ...(variant === 'elevated' && {
-      elevation: 4,
-      shadowColor: t.shadow,
-      shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.1,
-      shadowRadius: 6,
-      borderWidth: 0,
-    }),
+    elevation: variant === 'default' ? 2 : 5,
+    shadowColor: t.shadow,
+    shadowOffset: { width: 0, height: variant === 'default' ? 2 : 6 },
+    shadowOpacity: variant === 'default' ? 0.05 : 0.12,
+    shadowRadius: variant === 'default' ? 8 : 14,
     ...(variant === 'outlined' && {
       backgroundColor: 'transparent',
       borderColor: t.border,
       borderWidth: 1.5,
+      elevation: 0,
+      shadowOpacity: 0,
     }),
   };
 

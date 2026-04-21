@@ -139,7 +139,7 @@ export default function ProfileScreen({ navigation }: any) {
         </GlassCard>
 
         {/* App Stats */}
-        <View style={{ flexDirection: 'row', marginBottom: spacing.lg }}>
+        <View style={{ flexDirection: 'row', marginBottom: spacing['xl'] }}>
           {[
             { value: store.applications.length, label: 'Applications', icon: 'documents-outline' as const },
             { value: store.applications.filter((a) => a.status === 'approved').length, label: 'Certified', icon: 'ribbon-outline' as const },
@@ -150,17 +150,22 @@ export default function ProfileScreen({ navigation }: any) {
               style={{
                 flex: 1,
                 backgroundColor: t.card,
-                borderRadius: borderRadius.lg,
-                padding: spacing.md,
+                borderRadius: borderRadius['xl'],
+                paddingVertical: spacing.lg,
                 alignItems: 'center',
                 borderWidth: 1,
                 borderColor: t.borderSubtle,
-                marginLeft: i > 0 ? spacing.sm : 0
+                marginLeft: i > 0 ? spacing.base : 0,
+                elevation: 3,
+                shadowColor: t.shadow,
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.08,
+                shadowRadius: 10,
               }}
             >
-              <Ionicons name={stat.icon} size={20} color={t.primary} style={{ marginBottom: spacing.xs }} />
-              <Text style={{ fontSize: typography.lg, fontWeight: typography.black, color: t.text }}>{stat.value}</Text>
-              <Text style={{ fontSize: typography.xs, color: t.textMuted, marginTop: 2 }}>{stat.label}</Text>
+              <Ionicons name={stat.icon} size={28} color={t.primary} style={{ marginBottom: spacing.sm }} />
+              <Text style={{ fontSize: typography['2xl'], fontWeight: typography.black, color: t.text }}>{stat.value}</Text>
+              <Text style={{ fontSize: typography.xs, color: t.textMuted, marginTop: 4, letterSpacing: 0.5, fontWeight: '700', textTransform: 'uppercase' }}>{stat.label}</Text>
             </View>
           ))}
         </View>
