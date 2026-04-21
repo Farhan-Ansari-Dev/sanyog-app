@@ -236,7 +236,6 @@ export function MainTabNavigator() {
       <MainStack.Screen name="AppDetail" component={AppDetailScreen} options={{ title: 'Application Details' }} />
       <MainStack.Screen name="UploadDocs" component={UploadDocsScreen} options={{ title: 'Upload Documents' }} />
       <MainStack.Screen name="About" component={AboutScreen} options={{ title: 'About Sanyog' }} />
-      <MainStack.Screen name="ServicesList" component={ServicesScreen} options={{ title: 'Services' }} />
       <MainStack.Screen name="NotifList" component={NotificationsScreen} options={{ title: 'Notifications' }} />
       <MainStack.Screen name="RoadmapWizard" component={RoadmapWizardScreen} options={{ title: 'AI Roadmap' }} />
     </MainStack.Navigator>
