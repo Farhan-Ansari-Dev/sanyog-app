@@ -67,10 +67,16 @@ async function saveS3({ buffer, mimeType, originalName, keyPrefix }) {
     `[storage:s3] bucket=${bucket} region=${region} endpoint=${endpoint ? 'custom' : 'aws'} staticCreds=${hasStaticCreds}`
   );
 
+  const { NodeHttpHandler } = require('@smithy/node-http-handler');
+
   const clientConfig = {
     region,
     endpoint: endpoint || undefined,
     forcePathStyle: Boolean(endpoint),
+    requestHandler: new NodeHttpHandler({
+      connectionTimeout: 5000,
+      requestTimeout: 5000,
+    }),
   };
 
   // If explicit keys are provided, use them; otherwise rely on AWS SDK default chain

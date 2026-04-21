@@ -35,15 +35,19 @@ router.get('/:id/signed-url', adminAuth, requireRole(['admin', 'ops', 'viewer'])
 
   try {
     const { region, bucket, accessKeyId, secretAccessKey, endpoint } = getS3Env();
+    const { NodeHttpHandler } = require('@smithy/node-http-handler');
 
     const clientConfig = {
       region,
       endpoint: endpoint || undefined,
       forcePathStyle: Boolean(endpoint),
+      // 10 second timeout for S3 operations to avoid hanging
+      requestHandler: new NodeHttpHandler({
+        connectionTimeout: 5000,
+        requestTimeout: 5000,
+      }),
     };
 
-    // Use explicit credentials if provided; otherwise fall back to AWS default chain
-    // (env/shared config/EC2 instance profile/etc.).
     if (accessKeyId && secretAccessKey) {
       clientConfig.credentials = { accessKeyId, secretAccessKey };
     }
@@ -53,15 +57,20 @@ router.get('/:id/signed-url', adminAuth, requireRole(['admin', 'ops', 'viewer'])
     const command = new GetObjectCommand({
       Bucket: bucket,
       Key: doc.storageKey,
-      ResponseContentDisposition: `inline; filename="${encodeURIComponent(doc.originalName)}"`,
+      ResponseContentDisposition: `attachment; filename="${encodeURIComponent(doc.originalName)}"`,
     });
 
-    const expiresInSeconds = 300;
+    // Generate a signed URL valid for 30 minutes
+    const expiresInSeconds = 1800;
     const url = await getSignedUrl(s3, command, { expiresIn: expiresInSeconds });
 
     return res.json({ url, expiresInSeconds });
   } catch (e) {
-    return res.status(500).json({ error: e?.message || 'Failed to create signed URL' });
+    console.error('[AdminDocs] Signed URL Error:', e);
+    return res.status(500).json({ 
+      error: 'Failed to create download link',
+      detail: e?.message || 'Storage handshake timeout'
+    });
   }
 });
 

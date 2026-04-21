@@ -35,6 +35,9 @@ router.get('/', adminAuth, requireRole(['admin', 'ops', 'viewer']), async (req, 
     const arr = docsByApp.get(key) || [];
     arr.push({
       _id: d._id,
+      fileId: d._id, // Frontend alias
+      fileName: d.originalName, // Frontend alias
+      fileSize: d.sizeBytes, // Frontend alias
       originalName: d.originalName,
       mimeType: d.mimeType,
       sizeBytes: d.sizeBytes,
