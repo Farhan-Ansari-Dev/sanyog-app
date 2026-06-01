@@ -70,21 +70,21 @@ export default function HomeScreen({ navigation }: any) {
       icon: 'add-circle' as const,
       color: '#3B82F6',
       bg: '#3B82F6' + '12',
-      onPress: () => navigation.navigate('ServicesList'),
+      onPress: () => navigation.navigate('CertificationsTab'),
     },
     {
       label: 'Track',
       icon: 'analytics' as const,
       color: '#10B981',
       bg: '#10B981' + '12',
-      onPress: () => navigation.navigate('AppsList'),
+      onPress: () => navigation.navigate('ApplicationsTab'),
     },
     {
       label: 'Expert',
       icon: 'chatbubble-ellipses' as const,
       color: '#8B5CF6',
       bg: '#8B5CF6' + '12',
-      onPress: () => navigation.navigate('ContactExpert'),
+      onPress: () => navigation.navigate('ProfileTab', { screen: 'ProfileScreen' }),
     },
     {
       label: 'Call Us',
@@ -114,7 +114,7 @@ export default function HomeScreen({ navigation }: any) {
           }}
         >
           <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
-            <Pressable onPress={() => navigation.navigate('ProfileMain')} style={{ marginRight: spacing.sm }}>
+            <Pressable onPress={() => navigation.navigate('ProfileTab')} style={{ marginRight: spacing.sm }}>
               {store.user?.avatar ? (
                 <Image source={{ uri: store.user.avatar }} style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: t.borderSubtle }} />
               ) : (
@@ -134,7 +134,7 @@ export default function HomeScreen({ navigation }: any) {
           </View>
 
           <Pressable
-            onPress={() => navigation.navigate('NotifList')}
+            onPress={() => navigation.navigate('NotificationsScreen')}
             style={({ pressed }) => ({
               width: 48,
               height: 48,
@@ -388,7 +388,7 @@ export default function HomeScreen({ navigation }: any) {
           {statCards.map((stat, i) => (
             <Pressable
               key={i}
-              onPress={() => navigation.navigate('AppsList')}
+              onPress={() => navigation.navigate('ApplicationsTab')}
               style={({ pressed }) => ({
                 flex: 1,
                 alignItems: 'center',
@@ -498,7 +498,7 @@ export default function HomeScreen({ navigation }: any) {
           title="Featured Services"
           subtitle="Popular certifications"
           actionLabel="View All"
-          onAction={() => navigation.navigate('ServicesList')}
+          onAction={() => navigation.navigate('CertificationsTab')}
         />
         <ScrollView
           horizontal
@@ -510,7 +510,7 @@ export default function HomeScreen({ navigation }: any) {
           {featuredCerts.map((cert, i) => (
             <Pressable
               key={cert.id}
-              onPress={() => navigation.navigate('CertDetail', { certId: cert.id })}
+              onPress={() => navigation.navigate('CertDetailScreen', { certId: cert.id })}
               style={({ pressed }) => ({
                 width: width * 0.52,
                 backgroundColor: t.card,
@@ -589,7 +589,7 @@ export default function HomeScreen({ navigation }: any) {
             <SectionHeader
               title="Recent Applications"
               actionLabel="View All"
-              onAction={() => navigation.navigate('AppsList')}
+              onAction={() => navigation.navigate('ApplicationsTab')}
             />
             <View style={{ paddingHorizontal: spacing.lg }}>
               {recentApps.map((app) => (
@@ -645,7 +645,7 @@ export default function HomeScreen({ navigation }: any) {
           {store.categories.map((cat) => (
             <Pressable
               key={cat.id}
-              onPress={() => navigation.navigate('ServiceGroup', { categoryId: cat.id, categoryName: cat.name })}
+              onPress={() => navigation.navigate('CertificationsTab')}
               style={({ pressed }) => ({
                 flexDirection: 'row',
                 alignItems: 'center',

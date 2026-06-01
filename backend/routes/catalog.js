@@ -1,8 +1,9 @@
 const router = require('express').Router();
 const Service = require('../models/Service');
 const { SERVICE_CATALOG } = require('../services/serviceCatalog');
+const cacheMiddleware = require('../middleware/cache');
 
-router.get('/services', async (req, res) => {
+router.get('/services', cacheMiddleware('cache:catalog:services', 86400), async (req, res) => {
   try {
     let services = await Service.find({ isActive: true }).sort({ priority: -1, createdAt: 1 });
     
@@ -43,6 +44,26 @@ router.get('/services', async (req, res) => {
     console.error('Error fetching catalog services:', error);
     return res.status(500).json({ error: 'Internal Server Error' });
   }
+});
+
+// Mock Country Rules with global caching
+router.get('/country-rules', cacheMiddleware('cache:catalog:country-rules', 86400), (req, res) => {
+  const rules = {
+    'India': [
+      { rule: 'BIS CRS', description: 'Mandatory certification for 77 IT and electronic product categories.', severity: 'High' },
+      { rule: 'WPC ETA', description: 'Required for all wireless and RF products.', severity: 'High' },
+      { rule: 'EPR', description: 'E-Waste management requirement for producers and importers.', severity: 'Medium' }
+    ],
+    'European Union': [
+      { rule: 'CE Mark', description: 'Mandatory conformity mark for products sold in the EEA.', severity: 'High' },
+      { rule: 'RoHS', description: 'Restriction of Hazardous Substances in electrical equipment.', severity: 'High' }
+    ],
+    'United States': [
+      { rule: 'FCC', description: 'Mandatory for all devices operating at 9 kHz or higher.', severity: 'High' }
+    ]
+  };
+
+  return res.json(rules);
 });
 
 module.exports = router;

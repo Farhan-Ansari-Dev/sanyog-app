@@ -36,6 +36,15 @@ router.post('/send-otp', sendOtpLimiter, async (req, res) => {
 
   const email = parsed.data.email.toLowerCase();
 
+  // Google Play Test Account Bypass
+  if (email === 'test@sanyogconformity.com') {
+    return res.json({
+      ok: true,
+      message: `Verification code sent to ${email}`,
+      _devOtp: '1234'
+    });
+  }
+
   try {
     const otp = generateOtp();
     const otpHash = await bcrypt.hash(otp, 10);
@@ -84,6 +93,18 @@ router.post('/verify-otp', async (req, res) => {
   const { email, code } = parsed.data;
   const lowerEmail = email.toLowerCase();
 
+  // Google Play Test Account Bypass
+  if (lowerEmail === 'test@sanyogconformity.com' && code === '1234') {
+    let user = await User.findOne({ email: lowerEmail });
+    if (!user) {
+      const passwordHash = await bcrypt.hash('12345678', 10);
+      user = new User({ email: lowerEmail, name: 'Play Store Tester', isVerified: true, passwordHash });
+      await user.save();
+    }
+    const token = jwt.sign({ email: lowerEmail, userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    return res.json({ ok: true, token, user });
+  }
+
   try {
     const user = await User.findOne({ email: lowerEmail });
     if (!user || !user.otpHash || user.otpExpiresAt < Date.now()) {
@@ -116,6 +137,18 @@ router.post('/login-password', async (req, res) => {
 
   const { email, password } = parsed.data;
   const lowerEmail = email.toLowerCase();
+
+  // Google Play Test Account Bypass
+  if (lowerEmail === 'test@sanyogconformity.com' && password === '12345678') {
+    let user = await User.findOne({ email: lowerEmail });
+    if (!user) {
+      const passwordHash = await bcrypt.hash('12345678', 10);
+      user = new User({ email: lowerEmail, name: 'Play Store Tester', isVerified: true, passwordHash });
+      await user.save();
+    }
+    const token = jwt.sign({ email: lowerEmail, userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    return res.json({ ok: true, token, user });
+  }
 
   try {
     const user = await User.findOne({ email: lowerEmail });
@@ -214,24 +247,38 @@ router.post('/register', async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
 
+    const otp = generateOtp();
+    const otpHash = await bcrypt.hash(otp, 10);
+    const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
     const user = await User.findOneAndUpdate(
       { email: lowerEmail },
-      { $set: { name, company, mobile, country, passwordHash, isVerified: true } },
+      { 
+        $set: { 
+          name, 
+          company, 
+          mobile, 
+          country, 
+          passwordHash, 
+          isVerified: false,
+          otpHash,
+          otpExpiresAt
+        } 
+      },
       { upsert: true, new: true }
     );
 
-    // TRIGGER WELCOME NOTIFICATION
-    const Notification = require('../models/Notification');
-    await Notification.create({
-      userId: user._id,
-      title: "Welcome to Sanyog",
-      desc: `Your account for ${name} has been activated successfully.`,
-      type: 'success'
-    });
+    // SEND OTP EMAIL FOR VERIFICATION
+    await emailService.sendOtpEmail(lowerEmail, otp);
 
-    const token = jwt.sign({ email: lowerEmail, userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    return res.status(201).json({ ok: true, token, user });
+    return res.status(201).json({ 
+      ok: true, 
+      message: 'Registration successful. Please verify your email with the OTP sent.',
+      requiresVerification: true,
+      email: lowerEmail
+    });
   } catch (err) {
+    console.error('[Register] Error:', err);
     return res.status(500).json({ error: 'Signup failed' });
   }
 });

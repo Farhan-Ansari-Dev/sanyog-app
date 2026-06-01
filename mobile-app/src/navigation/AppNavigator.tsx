@@ -1,246 +1,241 @@
-/**
- * Sanyog Conformity – Simplified Navigation (debugging)
- * Uses only stack navigators to bypass potential bottom-tabs issues
- */
 import React from 'react';
-import { View, Text, Pressable, SafeAreaView, StatusBar, ScrollView } from 'react-native';
+import { TouchableOpacity, View, Text } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../hooks/useTheme';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import { Feather } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import { useAppStore } from '../store/useAppStore';
-import { typography, spacing, borderRadius } from '../theme';
+import { useTheme } from '../hooks/useTheme';
 
-// Import screens
-import SplashScreen from '../screens/auth/AnimatedSplashScreen';
-import OnboardingScreen from '../screens/auth/OnboardingScreen';
-import LoginScreen from '../screens/auth/LoginScreen';
-import RegisterScreen from '../screens/auth/RegisterScreen';
-import OTPScreen from '../screens/auth/OTPScreen';
-import HomeScreen from '../screens/home/HomeScreen';
-import ServicesScreen from '../screens/services/ServicesScreen';
-import ServiceGroupScreen from '../screens/services/ServiceGroupScreen';
-import CertDetailScreen from '../screens/services/CertDetailScreen';
-import ApplyScreen from '../screens/services/ApplyScreen';
-import ApplicationsScreen from '../screens/applications/ApplicationsScreen';
-import AppDetailScreen from '../screens/applications/AppDetailScreen';
-import UploadDocsScreen from '../screens/applications/UploadDocsScreen';
-import NotificationsScreen from '../screens/notifications/NotificationsScreen';
-import ProfileScreen from '../screens/profile/ProfileScreen';
-import AboutScreen from '../screens/profile/AboutScreen';
-import ContactExpertScreen from '../screens/profile/ContactExpertScreen';
+import AuthNavigator from './AuthNavigator';
+import HomeNavigator from './HomeNavigator';
+import CertificationsNavigator from './CertificationsNavigator';
+import ApplicationsNavigator from './ApplicationsNavigator';
+import InsightsNavigator from './InsightsNavigator';
+import ProfileNavigator from './ProfileNavigator';
+import DocumentsNavigator from './DocumentsNavigator';
+import ShipmentNavigator from './ShipmentNavigator';
+import AiNavigator from './AiNavigator';
+import TestingNavigator from './TestingNavigator';
+import PaymentsNavigator from './PaymentsNavigator';
+import CommunicationNavigator from './CommunicationNavigator';
+import CertificatesNavigator from './CertificatesNavigator';
+import AdminNavigator from './AdminNavigator';
 import RoadmapWizardScreen from '../screens/services/RoadmapWizardScreen';
-import PlaceholderScreen from '../screens/common/PlaceholderScreen';
 
-// Types
-import type {
-  AuthStackParamList,
-  TabParamList,
-} from '../types';
+const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
+const Drawer = createDrawerNavigator();
 
-const AuthStack = createNativeStackNavigator<AuthStackParamList>();
+const BRAND_COLOR = '#16a34a';
 
-// Simplified main stack that includes ALL screens
-type MainStackParamList = {
-  // Tabs (home screens for each tab)
-  HomeMain: undefined;
-  AppsList: undefined;
-  ProfileMain: undefined;
-  SupportMain: undefined;
-  // Sub-screens
-  ServicesList: undefined;
-  NotifList: undefined;
-  CertDetail: { certId: string };
-  ServiceGroup: { categoryId: string; categoryName: string };
-  ApplyStep1: { certId: string; certName: string };
-  ApplyStep2: { certId: string; certName: string; formData: any };
-  ApplyStep3: { certId: string; certName: string; formData: any };
-  AppDetail: { appId: string };
-  UploadDocs: { appId: string };
-  About: undefined;
-  ContactExpert: undefined;
-  Settings: undefined;
-  RoadmapWizard: undefined;
-  Placeholder: { title: string };
-};
-
-const MainStack = createNativeStackNavigator<MainStackParamList>();
-
-// ─── Custom Bottom Tab Bar ──────────────────────────────
-function CustomTabBar({ navigation, currentTab }: { navigation: any; currentTab: string }) {
+function MainTabs() {
+  const navigation = useNavigation<any>();
+  const user = useAppStore((s) => s.user);
   const t = useTheme();
-  const unreadCount = useAppStore((s) => s.unreadCount);
 
-  const tabs = [
-    { key: 'HomeMain', label: 'Home', icon: 'home-outline', iconFocused: 'home' },
-    { key: 'AppsList', label: 'Applications', icon: 'document-text-outline', iconFocused: 'document-text' },
-    { key: 'ProfileMain', label: 'Profile', icon: 'person-outline', iconFocused: 'person' },
-    { key: 'SupportMain', label: 'Support', icon: 'help-buoy-outline', iconFocused: 'help-buoy' },
-  ];
+  // Get initials from user name
+  const initials = user?.name
+    ? user.name.split(' ').map((n: string) => n[0]).slice(0, 2).join('').toUpperCase()
+    : 'U';
 
-  return (
-    <View
+  const ProfileAvatar = () => (
+    <TouchableOpacity
+      onPress={() => navigation.navigate('Dashboard', { screen: 'ProfileTab' })}
       style={{
-        flexDirection: 'row',
-        backgroundColor: t.tabBarBg,
-        borderTopWidth: 1,
-        borderTopColor: t.tabBarBorder,
-        height: 64,
-        paddingBottom: 8,
-        paddingTop: 8,
+        marginRight: 16,
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        backgroundColor: '#16a34a',
+        justifyContent: 'center',
+        alignItems: 'center',
       }}
     >
-      {tabs.map((tab) => {
-        const isActive = currentTab === tab.key;
-        return (
-          <Pressable
-            key={tab.key}
-            onPress={() => navigation.navigate(tab.key)}
-            style={{
-              flex: 1,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
+      <Text style={{ color: '#fff', fontSize: 13, fontWeight: '800', letterSpacing: 0.5 }}>
+        {initials}
+      </Text>
+    </TouchableOpacity>
+  );
+
+  return (
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ color, focused }) => {
+          let iconName: any;
+          if (route.name === 'HomeTab') iconName = 'home';
+          else if (route.name === 'CertificationsTab') iconName = 'award';
+          else if (route.name === 'ApplicationsTab') iconName = 'file-text';
+          else if (route.name === 'InsightsTab') iconName = 'bar-chart-2';
+          else if (route.name === 'ProfileTab') iconName = 'user';
+          return (
+            <Feather
+              name={iconName}
+              size={22}
+              color={color}
+            />
+          );
+        },
+        tabBarActiveTintColor: BRAND_COLOR,
+        tabBarInactiveTintColor: '#9ca3af',
+        tabBarStyle: {
+          backgroundColor: t.surface,
+          borderTopWidth: 1,
+          borderTopColor: t.borderSubtle,
+          height: 60,
+          paddingBottom: 8,
+          paddingTop: 6,
+          elevation: 8,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.06,
+          shadowRadius: 12,
+        },
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: '600',
+          marginTop: 2,
+        },
+        // Clean solid header — fixes content overlap on ALL screens
+        headerStyle: {
+          backgroundColor: t.surface,
+          elevation: 0,
+          shadowOpacity: 0,
+          borderBottomWidth: 1,
+          borderBottomColor: t.borderSubtle,
+        },
+        headerTintColor: t.text,
+        headerTitleStyle: {
+          fontWeight: '800',
+          fontSize: 17,
+          letterSpacing: -0.3,
+        },
+        headerTitleAlign: 'center',
+        headerLeft: () => (
+          <TouchableOpacity
+            onPress={() => navigation.openDrawer()}
+            style={{ marginLeft: 16, width: 40, height: 40, justifyContent: 'center', alignItems: 'center' }}
           >
-            <View style={{ position: 'relative' }}>
-              <Ionicons
-                name={(isActive ? tab.iconFocused : tab.icon) as any}
-                size={22}
-                color={isActive ? t.tabBarActive : t.tabBarInactive}
-              />
-              {(tab.badge ?? 0) > 0 && (
-                <View
-                  style={{
-                    position: 'absolute',
-                    top: -3,
-                    right: -8,
-                    backgroundColor: '#EF4444',
-                    borderRadius: 8,
-                    minWidth: 16,
-                    height: 16,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    paddingHorizontal: 4,
-                  }}
-                >
-                  <Text style={{ color: '#FFFFFF', fontSize: 9, fontWeight: '800' }}>
-                    {tab.badge! > 9 ? '9+' : tab.badge!}
-                  </Text>
-                </View>
-              )}
-            </View>
-            <Text
-              style={{
-                fontSize: typography.xs,
-                fontWeight: isActive ? typography.bold : typography.medium,
-                color: isActive ? t.tabBarActive : t.tabBarInactive,
-                marginTop: 2,
-              }}
-            >
-              {tab.label}
-            </Text>
-          </Pressable>
-        );
+            <Feather name="menu" size={22} color={t.text} />
+          </TouchableOpacity>
+        ),
+        headerRight: () => <ProfileAvatar />,
       })}
-    </View>
+    >
+      <Tab.Screen name="HomeTab" component={HomeNavigator} options={{ title: 'Home', headerShown: false }} />
+      <Tab.Screen name="CertificationsTab" component={CertificationsNavigator} options={{ title: 'Certs' }} />
+      <Tab.Screen name="ApplicationsTab" component={ApplicationsNavigator} options={{ title: 'Apps' }} />
+      <Tab.Screen name="InsightsTab" component={InsightsNavigator} options={{ title: 'Insights' }} />
+      <Tab.Screen name="ProfileTab" component={ProfileNavigator} options={{ title: 'Profile' }} />
+    </Tab.Navigator>
   );
 }
 
-// ─── Wrapper for tab-level screens ──────────────────────
-function TabScreen({ children, navigation, screenName }: { children: React.ReactNode; navigation: any; screenName: string }) {
-  return (
-    <View style={{ flex: 1 }}>
-      {children}
-      <CustomTabBar navigation={navigation} currentTab={screenName} />
-    </View>
-  );
-}
-
-// HOC to wrap a screen component with the tab bar
-function withTabBar(Component: React.ComponentType<any>, screenName: string) {
-  return function WrappedScreen(props: any) {
-    return (
-      <TabScreen navigation={props.navigation} screenName={screenName}>
-        <Component {...props} />
-      </TabScreen>
-    );
-  };
-}
-
-// ─── Screen Options ─────────────────────────────────────
-function useScreenOptions() {
+function MainDrawer() {
   const t = useTheme();
-  return {
-    headerStyle: { backgroundColor: t.surface },
-    headerTintColor: t.text,
-    headerTitleStyle: { fontWeight: typography.bold as any, fontSize: typography.lg },
-    headerShadowVisible: false,
-    contentStyle: { backgroundColor: t.bg },
-  };
-}
-
-// ─── Auth Navigator ─────────────────────────────────────
-export function AuthNavigator() {
-  const opts = useScreenOptions();
   return (
-    <AuthStack.Navigator screenOptions={{ ...opts, headerShown: false }}>
-      <AuthStack.Screen name="Splash" component={SplashScreen} />
-      <AuthStack.Screen name="Onboarding" component={OnboardingScreen} />
-      <AuthStack.Screen name="Login" component={LoginScreen} />
-      <AuthStack.Screen name="Register" component={RegisterScreen} />
-      <AuthStack.Screen name="OTP" component={OTPScreen} />
-    </AuthStack.Navigator>
+    <Drawer.Navigator
+      screenOptions={{
+        headerShown: false,
+        drawerActiveTintColor: BRAND_COLOR,
+        drawerInactiveTintColor: t.textSecondary,
+        drawerStyle: {
+          backgroundColor: t.surface,
+        },
+      }}
+    >
+      {/* Bottom Tabs wrapped in Drawer */}
+      <Drawer.Screen 
+        name="Dashboard" 
+        component={MainTabs} 
+        options={{ drawerIcon: ({color}) => <Feather name="layout" size={22} color={color} /> }} 
+      />
+      {/* Redundant items but explicitly requested in Hamburger Menu mapping to respective Tabs via Drawer component (We link the Tab stack here) */}
+      <Drawer.Screen 
+        name="Certifications" 
+        component={CertificationsNavigator} 
+        options={{ drawerIcon: ({color}) => <Feather name="award" size={22} color={color} /> }} 
+      />
+      <Drawer.Screen 
+        name="Applications" 
+        component={ApplicationsNavigator} 
+        options={{ drawerIcon: ({color}) => <Feather name="file-text" size={22} color={color} /> }} 
+      />
+      
+      {/* Other Hamburger Menu Modules */}
+      <Drawer.Screen 
+        name="Documents" 
+        component={DocumentsNavigator} 
+        options={{ drawerIcon: ({color}) => <Feather name="folder" size={22} color={color} /> }} 
+      />
+      <Drawer.Screen 
+        name="Shipment & Compliance" 
+        component={ShipmentNavigator} 
+        options={{ drawerIcon: ({color}) => <Feather name="truck" size={22} color={color} /> }} 
+      />
+      <Drawer.Screen 
+        name="AI Assistant" 
+        component={AiNavigator} 
+        options={{ drawerIcon: ({color}) => <Feather name="cpu" size={22} color={color} /> }} 
+      />
+      <Drawer.Screen 
+        name="Testing & Inspection" 
+        component={TestingNavigator} 
+        options={{ drawerIcon: ({color}) => <Feather name="activity" size={22} color={color} /> }} 
+      />
+      <Drawer.Screen 
+        name="Certificate Center" 
+        component={CertificatesNavigator} 
+        options={{ drawerIcon: ({color}) => <Feather name="shield" size={22} color={color} /> }} 
+      />
+      <Drawer.Screen 
+        name="Payments & Billing" 
+        component={PaymentsNavigator} 
+        options={{ drawerIcon: ({color}) => <Feather name="credit-card" size={22} color={color} /> }} 
+      />
+      <Drawer.Screen 
+        name="Communication Center" 
+        component={CommunicationNavigator} 
+        options={{ drawerIcon: ({color}) => <Feather name="message-circle" size={22} color={color} /> }} 
+      />
+      {/* Additional tabs that are in the drawer */}
+      <Drawer.Screen 
+        name="Insights" 
+        component={InsightsNavigator} 
+        options={{ drawerIcon: ({color}) => <Feather name="bar-chart-2" size={22} color={color} /> }} 
+      />
+      <Drawer.Screen 
+        name="Profile" 
+        component={ProfileNavigator} 
+        options={{ drawerIcon: ({color}) => <Feather name="user" size={22} color={color} /> }} 
+      />
+      <Drawer.Screen 
+        name="Admin Panel" 
+        component={AdminNavigator} 
+        options={{ drawerIcon: ({color}) => <Feather name="settings" size={22} color={color} /> }} 
+      />
+    </Drawer.Navigator>
   );
 }
 
-// ─── Main Navigator ─────────────────────────────────────
-export function MainTabNavigator() {
-  const opts = useScreenOptions();
-
+export default function AppNavigator() {
+  const isAuthenticated = useAppStore((s) => s.isAuthenticated);
+  
   return (
-    <MainStack.Navigator screenOptions={opts}>
-      {/* Tab-level screens (with tab bar) */}
-      <MainStack.Screen
-        name="HomeMain"
-        component={withTabBar(HomeScreen, 'HomeMain')}
-        options={{ headerShown: false }}
-      />
-      <MainStack.Screen
-        name="ServicesList"
-        component={withTabBar(ServicesScreen, 'ServicesList')}
-        options={{ headerShown: false }}
-      />
-      <MainStack.Screen
-        name="AppsList"
-        component={withTabBar(ApplicationsScreen, 'AppsList')}
-        options={{ headerShown: false }}
-      />
-      <MainStack.Screen
-        name="ProfileMain"
-        component={withTabBar(ProfileScreen, 'ProfileMain')}
-        options={{ headerShown: false }}
-      />
-      <MainStack.Screen
-        name="SupportMain"
-        component={withTabBar(ContactExpertScreen, 'SupportMain')}
-        options={{ headerShown: false }}
-      />
-
-      {/* Sub-screens (no tab bar) */}
-      <MainStack.Screen name="CertDetail" component={CertDetailScreen} options={{ title: 'Certification' }} />
-      <MainStack.Screen
-        name="ServiceGroup"
-        component={ServiceGroupScreen}
-        options={({ route }: any) => ({ title: route.params.categoryName })}
-      />
-      <MainStack.Screen name="ApplyStep1" component={ApplyScreen} options={{ title: 'Apply' }} />
-      <MainStack.Screen name="ApplyStep2" component={ApplyScreen as any} options={{ title: 'Apply' }} />
-      <MainStack.Screen name="ApplyStep3" component={ApplyScreen as any} options={{ title: 'Apply' }} />
-      <MainStack.Screen name="AppDetail" component={AppDetailScreen} options={{ title: 'Application Details' }} />
-      <MainStack.Screen name="UploadDocs" component={UploadDocsScreen} options={{ title: 'Upload Documents' }} />
-      <MainStack.Screen name="About" component={AboutScreen} options={{ title: 'About Sanyog' }} />
-      <MainStack.Screen name="NotifList" component={NotificationsScreen} options={{ title: 'Notifications' }} />
-      <MainStack.Screen name="RoadmapWizard" component={RoadmapWizardScreen} options={{ title: 'AI Roadmap' }} />
-      <MainStack.Screen name="Placeholder" component={PlaceholderScreen} options={{ headerShown: false }} />
-    </MainStack.Navigator>
+    <Stack.Navigator 
+      screenOptions={{ 
+        headerShown: false,
+      }}
+    >
+      {isAuthenticated ? (
+        <>
+          <Stack.Screen name="Main" component={MainDrawer} />
+          <Stack.Screen name="RoadmapWizard" component={RoadmapWizardScreen} options={{ presentation: 'fullScreenModal' }} />
+        </>
+      ) : (
+        <Stack.Screen name="Auth" component={AuthNavigator} />
+      )}
+    </Stack.Navigator>
   );
 }

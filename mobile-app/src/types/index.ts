@@ -4,11 +4,26 @@
 
 // ─── Navigation ───────────────────────────────────────────
 export type AuthStackParamList = {
-  Splash: undefined;
-  Onboarding: undefined;
-  Login: undefined;
+  SplashScreen: undefined;
+  OnboardingScreen: undefined;
+  LoginScreen: undefined;
   Register: undefined;
-  OTP: { email: string };
+  OtpScreen: { email: string };
+  UserTypeSelectionScreen: undefined;
+  OnboardingScreen1: undefined;
+  OnboardingScreen2: undefined;
+  OnboardingScreen3: undefined;
+  SignupScreen: undefined;
+  ContinueWithGoogleScreen: undefined;
+  EmailOtpLoginScreen: undefined;
+  OtpVerificationScreen: undefined;
+  ForgotPasswordScreen: undefined;
+  ResetPasswordScreen: undefined;
+  SessionExpiredScreen: undefined;
+  NoInternetScreen: undefined;
+  MaintenanceScreen: undefined;
+  ForceUpdateScreen: undefined;
+  AnimatedSplashScreen: undefined;
 };
 
 export type HomeStackParamList = {

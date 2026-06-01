@@ -6,6 +6,7 @@ const Application = require('../models/Application');
 const Document = require('../models/Document');
 const ApplicationEvent = require('../models/ApplicationEvent');
 const { auth } = require('../middleware/auth');
+const cacheMiddleware = require('../middleware/cache');
 const { saveUploadedFile, getStorageMode } = require('../services/storage');
 
 function fileFilter(req, file, cb) {
@@ -110,7 +111,7 @@ router.post('/', auth, upload.array('files', 10), async (req, res, next) => {
 });
 
 // List my applications
-router.get('/my', auth, async (req, res) => {
+router.get('/my', auth, cacheMiddleware('cache:apps', 300, (req) => `cache:apps:${req.user.email}`), async (req, res) => {
   const apps = await Application.find({ userEmail: req.user.email })
     .populate('documentIds')
     .sort({ createdAt: -1 });

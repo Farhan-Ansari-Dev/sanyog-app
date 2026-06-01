@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Dice by Sanyog",
-    "slug": "sanyog-conformity-solutions",
+    "slug": "dice-by-sanyog",
     "version": "1.0.0",
     "scheme": "sanyog",
     "orientation": "portrait",
@@ -17,11 +17,11 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.sanyog.conformity",
+      "bundleIdentifier": "com.dicebysanyog.app",
       "buildNumber": "1"
     },
     "android": {
-      "package": "com.sanyog.conformity",
+      "package": "com.dicebysanyog.app",
       "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
@@ -36,8 +36,9 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "48ee77d4-664b-4361-ba43-0c40a1a80135"
+        "projectId": "d16ad1ec-7e46-4fe3-8681-1c3f31998f62"
       }
-    }
+    },
+    "owner": "farhan_ansari"
   }
 }
