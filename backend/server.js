@@ -18,6 +18,8 @@ const adminDocumentsRoutes = require('./routes/adminDocuments');
 const adminServicesRoutes = require('./routes/adminServices');
 const adminUsersRoutes = require('./routes/adminUsers');
 const catalogRoutes = require('./routes/catalog');
+const shipmentsRoutes = require('./routes/shipments');
+const aiRoutes = require('./routes/ai');
 const { seedAdminFromEnv } = require('./services/adminSeed');
 
 const app = express();
@@ -107,6 +109,8 @@ app.use('/auth', authRoutes);
 app.use('/notifications', require('./routes/notifications'));
 app.use('/applications', applicationRoutes);
 app.use('/contact', contactRoutes);
+app.use('/shipments', shipmentsRoutes);
+app.use('/ai', aiRoutes);
 
 app.use('/admin/auth', adminAuthRoutes);
 app.use('/admin/applications', adminApplicationRoutes);

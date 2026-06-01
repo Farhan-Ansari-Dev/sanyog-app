@@ -24,7 +24,7 @@ import { spacing, typography, borderRadius } from '../../theme';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { AuthStackParamList } from '../../types';
 
-type Props = NativeStackScreenProps<AuthStackParamList, 'OTP'>;
+type Props = NativeStackScreenProps<AuthStackParamList, 'OtpScreen'>;
 
 const OTP_LENGTH = 6;
 

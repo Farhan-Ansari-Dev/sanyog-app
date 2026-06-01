@@ -2,12 +2,23 @@
  * Sanyog Conformity – Mobile App Entry Point
  * Premium enterprise-grade certification management app
  */
+import 'react-native-gesture-handler';
 import React, { useEffect } from 'react';
 import { View, Text, LogBox, PermissionsAndroid, Platform } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import { useAppStore } from './src/store/useAppStore';
-import { AuthNavigator, MainTabNavigator } from './src/navigation/AppNavigator';
+import AppNavigator from './src/navigation/AppNavigator';
+import PermissionModal from './src/components/common/PermissionModal';
+import * as Notifications from 'expo-notifications';
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
 
 // Suppress non-critical warnings
 LogBox?.ignoreLogs?.(['Require cycle']);
@@ -44,23 +55,61 @@ class ErrorBoundary extends React.Component<
 }
 
 function AppContent() {
-  const isAuthenticated = useAppStore((s) => s.isAuthenticated);
+  const hasGrantedPermissions = useAppStore((s) => s.hasGrantedPermissions);
+  const setPermissionsGranted = useAppStore((s) => s.setPermissionsGranted);
+  const [showPermModal, setShowPermModal] = React.useState(false);
 
   useEffect(() => {
-    if (Platform.OS === 'android') {
-      PermissionsAndroid.requestMultiple([
-        PermissionsAndroid.PERMISSIONS.CAMERA,
-        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-        PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
-      ]).catch(console.warn);
+    if (!hasGrantedPermissions) {
+      setTimeout(() => setShowPermModal(true), 1500);
     }
-  }, []);
+    setupNotifications();
+  }, [hasGrantedPermissions]);
+
+  const setupNotifications = async () => {
+    const { status } = await Notifications.requestPermissionsAsync();
+    if (status === 'granted') {
+      // Schedule a mock notification for 5 seconds from now
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: '🚨 Compliance Alert',
+          body: 'Your ISO 9001 certification expires in 30 days. Tap to renew.',
+          data: { certId: 'iso9001' },
+        },
+        trigger: { seconds: 5 },
+      });
+    }
+  };
+
+  const handleGrantPermissions = async () => {
+    setShowPermModal(false);
+    if (Platform.OS === 'android') {
+      try {
+        await PermissionsAndroid.requestMultiple([
+          PermissionsAndroid.PERMISSIONS.CAMERA,
+          PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+          PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
+        ]);
+        setPermissionsGranted();
+      } catch (err) {
+        console.warn(err);
+      }
+    } else {
+      // iOS permissions would be handled here if needed via react-native-permissions
+      setPermissionsGranted();
+    }
+  };
 
   return (
     <NavigationContainer>
-      {isAuthenticated ? <MainTabNavigator /> : <AuthNavigator />}
+      <AppNavigator />
+      <PermissionModal 
+        visible={showPermModal} 
+        onAllow={handleGrantPermissions} 
+        onSkip={() => setShowPermModal(false)} 
+      />
     </NavigationContainer>
   );
 }

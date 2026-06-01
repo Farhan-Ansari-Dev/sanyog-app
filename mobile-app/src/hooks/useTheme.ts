@@ -1,11 +1,19 @@
 /**
  * Custom hook for themed styles
+ * Reads from the Zustand store so the in-app dark-mode toggle is respected.
+ * Falls back to the OS color scheme only when the store value is unavailable.
  */
-import { useAppStore } from '../store/useAppStore';
+import { useColorScheme } from 'react-native';
 import { darkTheme, lightTheme } from '../theme';
+import { useAppStore } from '../store/useAppStore';
 import type { ThemeColors } from '../theme';
 
 export function useTheme(): ThemeColors {
-  const mode = useAppStore((s) => s.theme);
-  return mode === 'dark' ? darkTheme : lightTheme;
+  // Primary source: user's explicit preference stored in Zustand
+  const storeTheme = useAppStore((s) => s.theme);
+  // Fallback: OS-level color scheme (used before the store hydrates)
+  const systemScheme = useColorScheme();
+
+  const isDark = storeTheme ? storeTheme === 'dark' : systemScheme === 'dark';
+  return isDark ? darkTheme : lightTheme;
 }

@@ -22,6 +22,18 @@ const ApplicationSchema = new mongoose.Schema(
     documents:   [{ type: String }],
     documentIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Document' }],
 
+    // Mobile App enhanced tracking
+    statusHistory: [{
+      status: String,
+      note: String,
+      date: { type: Date, default: Date.now }
+    }],
+    clientTasks: [{
+      task: String,
+      pending: { type: Boolean, default: true }
+    }],
+    validUntil: { type: Date },
+
     // Soft-delete support
     deletedAt:  { type: Date, default: null, index: true },
     deletedBy:  { type: String },   // admin email

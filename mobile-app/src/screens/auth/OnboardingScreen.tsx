@@ -24,7 +24,7 @@ import { spacing, typography, borderRadius } from '../../theme';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { AuthStackParamList } from '../../types';
 
-type Props = NativeStackScreenProps<AuthStackParamList, 'Onboarding'>;
+type Props = NativeStackScreenProps<AuthStackParamList, 'OnboardingScreen'>;
 
 interface Slide {
   id: string;
@@ -94,13 +94,13 @@ export default function OnboardingScreen({ navigation }: Props) {
       setCurrentIndex(nextIndex);
     } else {
       setOnboardingSeen();
-      navigation.replace('Login');
+      navigation.replace('LoginScreen');
     }
   };
 
   const handleSkip = () => {
     setOnboardingSeen();
-    navigation.replace('Login');
+    navigation.replace('LoginScreen');
   };
 
   const isLastSlide = currentIndex === slides.length - 1;

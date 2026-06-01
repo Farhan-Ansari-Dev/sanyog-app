@@ -19,7 +19,7 @@ export const mockCategories: ServiceCategory[] = [
     icon: 'globe',
     description: 'Global compliance for export markets — Saudi, EU, Africa, US & more',
     serviceCount: 24,
-    gradient: palette.gradientGreen,
+    gradient: palette.gradientGreen as [string, string],
   },
   {
     id: 'domestic',
@@ -27,7 +27,7 @@ export const mockCategories: ServiceCategory[] = [
     icon: 'shield-checkmark',
     description: 'Indian regulatory compliance — BIS, ISO, WPC, FSSAI, CDSCO & more',
     serviceCount: 20,
-    gradient: palette.gradientPurple,
+    gradient: palette.gradientPurple as [string, string],
   },
   {
     id: 'testing',
@@ -35,7 +35,7 @@ export const mockCategories: ServiceCategory[] = [
     icon: 'flask',
     description: 'Accredited lab testing — Textiles, Electronics, Food, RoHS & more',
     serviceCount: 11,
-    gradient: palette.gradientEmerald,
+    gradient: palette.gradientEmerald as [string, string],
   },
   {
     id: 'inspection',
@@ -43,7 +43,7 @@ export const mockCategories: ServiceCategory[] = [
     icon: 'search',
     description: 'Pre-shipment, container, vehicle & food inspections',
     serviceCount: 5,
-    gradient: palette.gradientGold,
+    gradient: palette.gradientGold as [string, string],
   },
 ];
 

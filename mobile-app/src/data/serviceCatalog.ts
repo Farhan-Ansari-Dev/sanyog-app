@@ -78,6 +78,36 @@ export const SERVICE_CATALOG = [
       { name: "Container Loading Inspection", slug: "container-inspection" },
       { name: "Health Certificate (Export)", slug: "health-cert" }
     ]
+  },
+  {
+    name: "Environmental & Sustainability",
+    services: [
+      { name: "EPR (Extended Producer Responsibility)", slug: "epr-sustainability" },
+      { name: "Carbon Footprint Assessment", slug: "carbon-footprint" },
+      { name: "Environmental Impact Assessment (EIA)", slug: "eia-full" },
+      { name: "Green Product Certification", slug: "green-product" },
+      { name: "RoHS Compliance (Restriction of Hazardous Substances)", slug: "rohs-compliance" },
+      { name: "WEEE Compliance", slug: "weee" },
+      { name: "ISO 14001 (Environmental Management)", slug: "iso-14001" },
+      { name: "Plastic Waste Management", slug: "plastic-waste" },
+      { name: "E-Waste Management Registration", slug: "ewaste" },
+      { name: "Sustainability Reporting & ESG Audit", slug: "esg-audit" }
+    ]
+  },
+  {
+    name: "Training",
+    services: [
+      { name: "BIS Certification Training", slug: "bis-training" },
+      { name: "ISO Awareness & Implementation Training", slug: "iso-training" },
+      { name: "EPR Compliance Training", slug: "epr-training" },
+      { name: "Export Documentation Training", slug: "export-doc-training" },
+      { name: "Regulatory Affairs Training", slug: "regulatory-training" },
+      { name: "Internal Auditor Training (ISO)", slug: "internal-auditor" },
+      { name: "Product Safety & Testing Training", slug: "product-safety-training" },
+      { name: "FSSAI Compliance Training", slug: "fssai-training" },
+      { name: "CE Marking Technical Training", slug: "ce-training" },
+      { name: "Customs & Trade Compliance Training", slug: "customs-training" }
+    ]
   }
 ];
 

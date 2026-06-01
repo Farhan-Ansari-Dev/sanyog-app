@@ -10,11 +10,13 @@ export default function LoginScreen({ navigation }: any) {
 
   const handleLogin = () => {
     // Mock login
-    setAuth('mock_token', { 
-      id: '1', 
-      name: 'Demo User', 
-      email: email || 'demo@sanyog.com', 
-      role: 'client' 
+    setAuth('dummy-token', { 
+      id: 'user-1', 
+      name: 'Admin', 
+      email: 'admin@sanyog.com', 
+      phone: '+1 234 567 8900', 
+      company: 'Sanyog Conformity',
+      avatar: '',
     });
   };
 

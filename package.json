@@ -1,0 +1,9 @@
+{
+  "name": "sanyog-conformity-root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "admin": "cd admin-panel && npm run dev -- --port 5174 2>/dev/null || (cd ../Dice_ST/admin-dashboard && npm run dev -- --port 5174)",
+    "dev": "cd ../Dice_ST/admin-dashboard && npm run dev -- --port 5174"
+  }
+}

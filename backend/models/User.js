@@ -7,6 +7,7 @@ const UserSchema = new mongoose.Schema(
     name:         { type: String, trim: true },
     passwordHash: { type: String },
     company:      { type: String, trim: true },
+    industry:     { type: String, trim: true },
     country:      { type: String, trim: true },
     isVerified:   { type: Boolean, default: false },
 
@@ -26,6 +27,10 @@ const UserSchema = new mongoose.Schema(
         sms: { type: Boolean, default: false },
         push: { type: Boolean, default: true },
         applicationUpdates: { type: Boolean, default: true },
+        certExpiring: { type: Boolean, default: true },
+        shipmentDelays: { type: Boolean, default: true },
+        shipmentArrivals: { type: Boolean, default: false },
+        newRegulations: { type: Boolean, default: true },
         promotions: { type: Boolean, default: false },
         security: { type: Boolean, default: true },
       }
